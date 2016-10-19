@@ -1,0 +1,18 @@
+# This is an illustration of what my programs assume your file tree looks like
+# you can have any number of input subdirectories but this example only displays one
+
+$SIMPATH/
+├── fargo.exe
+├── input_phase0
+│   ├── planets.cfg
+│   └── numerical_config.par
+├── jobs
+│   ├── phase0.oar
+│   ├── phase1.oar
+│ (...)
+│   └── phaseN.oar  
+└── output
+    ├── gasdens0.dat  
+    ├── gasdens1.dat  
+  (...)
+    └── gasdens999.dat  
