@@ -21,7 +21,7 @@ Nonetheless, a security has been added to prevent over-enthousiastic users from 
 ### slaughter v1.0
 /!\ does not -yet- ask for confirmation
 ```
-slaughter  # kills every jobs that matches the $USER name
+slaughter  # kills every jobs that match the $USER name
 ```
 
 ## Instalation
