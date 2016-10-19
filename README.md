@@ -18,6 +18,12 @@ It also automatically edit all files newly copied to replace every occurence of 
 Nonetheless, a security has been added to prevent over-enthousiastic users from deleted their results in $base in case something went wrong during the copy or the editing : the original executable files are deprieved of their "x" permission so it has to be turned back on manually using chmod before liftoff.
 
 
+### slaughter v1.0
+/!\ does not -yet- ask for confirmation
+```
+slaughter  # kills every jobs that matches the $USER name
+```
+
 ## Instalation
 
 recommanded method : 
