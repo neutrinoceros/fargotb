@@ -24,7 +24,15 @@ Nonetheless, a security has been added to prevent over-enthousiastic users from 
 slaughter  # kills every jobs that match the $USER name
 ```
 
+## Python (plotting tools) content
+
+### parse2dTo1d
+This program turns 2d output files genrated by fargo into 1d integrated (and azimuthally averaged) profiles that are better suited for plotting, analysis and scp'ing.
+
+
 ## Instalation
+
+> Instalation file currently is not working, this issue will be adressed before first release
 
 recommanded method : 
 copy the source in the directory of your choice
