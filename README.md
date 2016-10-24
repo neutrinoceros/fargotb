@@ -7,7 +7,8 @@
 ## Content
 
 ### longRunGenerator v0.0
-longRunGenerator create more job files and launch them on the go in an append-chain. It gathers information provided in an input file formatted as input_example.dat
+longRunGenerator creates more job files and launch them on the go in an append-chain. It gathers information provided in an input file formatted as longRun_input_example.par
+
 
 ### dupplicate v1.0
 ```
