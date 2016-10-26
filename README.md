@@ -10,9 +10,9 @@
 longRunGenerator creates more job files and launch them on the go in an append-chain. It gathers information provided in an input file formatted as longRun_input_example.par
 
 
-### dupplicate v1.0
+### duplicate v1.0
 ```
-dupplicate base target
+duplicate base target
 ```
 copies the file tree of _$base_ into a new directory _$target_. It excludes content from _$base_/output/ and OAR output files.
 It also automatically edit all files newly copied to replace every occurence of _$base_ by _$target_ so the new simulation could in principle be ran immediatly.
