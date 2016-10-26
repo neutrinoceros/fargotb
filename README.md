@@ -14,9 +14,9 @@ longRunGenerator creates more job files and launch them on the go in an append-c
 ```
 dupplicate base target
 ```
-copies the file tree of $base into a new directory $target. It excludes content from $base/output/ and OAR output files.
-It also automatically edit all files newly copied to replace every occurence of $base by $target so the new simulation could in principle be ran immediatly.
-Nonetheless, a security has been added to prevent over-enthousiastic users from deleted their results in $base in case something went wrong during the copy or the editing : the original executable files are deprieved of their "x" permission so it has to be turned back on manually using chmod before liftoff.
+copies the file tree of _$base_ into a new directory _$target_. It excludes content from _$base_/output/ and OAR output files.
+It also automatically edit all files newly copied to replace every occurence of _$base_ by _$target_ so the new simulation could in principle be ran immediatly.
+Nonetheless, a security has been added to prevent over-enthousiastic users from deleting their results in _$base_ in case something went wrong during the copy or the editing : the original executable files are deprieved of their "x" permission so it has to be turned back on manually using chmod before liftoff.
 
 
 ### slaughter v1.0
