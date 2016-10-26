@@ -28,9 +28,6 @@ function tailcut {
 base=$(tailcut $1 "/")
 target=$(tailcut $2 "/")
 
-echo $base
-echo $target
-
 
 # SYNCHRONIZATION
 #----------------------------------------------------------------------
