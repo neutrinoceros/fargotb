@@ -8,5 +8,5 @@ seedjob                     phase0.oar
 configdir                   input_phase0
 configfile                  numerical_config.par
 
-oph                         2                                       #output per hour
+opd                         2                                       #output per day
 
