@@ -13,7 +13,7 @@
 
 # PARSING
 #----------------------------------------------------------------------
-jobs=$(oarstat | grep $USER) # default value of $jobs
+jobs=$(oarstat | grep jacob) # | grep $USER) # default value of $jobs
 
 while [[ $# -gt 0 ]]
 do
@@ -24,13 +24,12 @@ case $key in
         jobs=$(oarstat | grep $USER | grep $target)
         shift
         ;;
-    *)
-        ;;
+    *);;
 esac
 shift
 done
 
-tokill=$(echo $jobs |cut -d ' ' -f 1)
+tokill=$(echo "$jobs" | cut -d ' ' -f 1)
 
 
 # PROCEDURE
@@ -39,7 +38,10 @@ tokill=$(echo $jobs |cut -d ' ' -f 1)
 echo "You are about to kill the following jobs :"
 echo -e "\n$jobs\n" 
 read -p "proceed (y/[n])?    " choice
+
 case "$choice" in
-    y|Y|yes|YES ) oardel $tokill;;
+    y|Y|yes|YES ) for jobnumber in ${tokill[*]}
+        do oardel $jobnumber; done
+        ;;
     *) echo "I'm sorry Dave. I'm afraid I can't do that";;
 esac
