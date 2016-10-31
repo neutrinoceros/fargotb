@@ -30,7 +30,7 @@ kills every jobs that match the $USER name, after confirmation
 ```
 slaughter -p label
 ```
-kills every jobs that match the $USER name and the given label. **-p** has aliases (**-P**|**--picky).
+kills every jobs that match the $USER name and the given label. **-p** has aliases (**-P**|**--picky**).
 
 ## Python (plotting tools) content
 
