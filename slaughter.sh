@@ -13,7 +13,7 @@
 
 # PARSING
 #----------------------------------------------------------------------
-jobs=$(oarstat | grep jacob) # | grep $USER) # default value of $jobs
+jobs=$(oarstat | grep $USER) # default value of $jobs
 
 while [[ $# -gt 0 ]]
 do
