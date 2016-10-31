@@ -19,11 +19,18 @@ It also automatically edit all files newly copied to replace every occurence of 
 Nonetheless, a security has been added to prevent over-enthousiastic users from deleting their results in _$base_ in case something went wrong during the copy or the editing : the original executable files are deprieved of their "x" permission so it has to be turned back on manually using chmod before liftoff.
 
 
-### slaughter v1.1
+### slaughter v1.2
+
+examples :
+```
+slaughter
+```
+kills every jobs that match the $USER name, after confirmation
 
 ```
-slaughter  # kills every jobs that match the $USER name, after confirmation
+slaughter -p label
 ```
+kills every jobs that match the $USER name and the given label. **-p** has aliases (**-P**|**--picky).
 
 ## Python (plotting tools) content
 
