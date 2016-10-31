@@ -6,11 +6,11 @@
 
 ## Content
 
-### longRunGenerator v0.0
+### longRunGenerator v1.0
 longRunGenerator creates more job files and launch them on the go in an append-chain. It gathers information provided in an input file formatted as longRun_input_example.par
 
 
-### duplicate v1.0
+### duplicate v1.1
 ```
 duplicate base target
 ```
@@ -19,7 +19,7 @@ It also automatically edit all files newly copied to replace every occurence of 
 Nonetheless, a security has been added to prevent over-enthousiastic users from deleting their results in _$base_ in case something went wrong during the copy or the editing : the original executable files are deprieved of their "x" permission so it has to be turned back on manually using chmod before liftoff.
 
 
-### slaughter v1.0
+### slaughter v1.1
 
 ```
 slaughter  # kills every jobs that match the $USER name, after confirmation
