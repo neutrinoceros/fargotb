@@ -49,11 +49,6 @@ case "$choice" in
     y|Y|yes|YES ) for jobnumber in ${tokill[*]}
         do oardel $jobnumber; done
         ;;
-<<<<<<< HEAD
     *) echo "I'm sorry Dave. I'm afraid I can't do that"
         ;;
 esac
-=======
-    *) echo "I'm sorry Dave. I'm afraid I can't do that";;
-esac
->>>>>>> 7c0a77eed4bfe715b664e76465b98667d84dadfb
