@@ -1,4 +1,5 @@
-script      = $(realpath ./slaughter.sh)
+SRC         = $(realpath ./)
+script      = $(SRC)/slaughter.sh
 INSTALL_DIR = $(realpath /home/$(USER)/bin/)
 TARGET      = $(INSTALL_DIR)/slaughter
 FLAGS	    = -s
@@ -9,4 +10,5 @@ $(TARGET) : $(script)
 	ln $(FLAGS) $^ $@ 
 
 clean :
-	echo $(TARGET)
+	rm *~
+	rm $(TARGET)
