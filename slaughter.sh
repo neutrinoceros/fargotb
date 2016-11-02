@@ -31,8 +31,8 @@ esac
 shift
 done
 
-SEARCH="(oarstat | eval $GREPING | tr -s ' ' | cut -d ' ' -f 1,4,5)"
-jobs=$(printf "%7s  %10s  %14s\n" $(eval $SEARCH))
+jobs=$(oarstat | eval $GREPING | tr -s ' ' \
+    | awk '{gsub(" *.*=","",$5); printf "%7s  %10s  %30s\n",$1,$4,$5}')
 tokill=$(echo "$jobs" | cut -d ' ' -f 1)
 
 
@@ -40,7 +40,7 @@ tokill=$(echo "$jobs" | cut -d ' ' -f 1)
 #----------------------------------------------------------------------
 
 echo "You are about to kill the following jobs :"
-echo "num        runtime   id"
+echo "    num     runtime                              id"
 echo "-----------------------------------------------------------"
 echo -e "$jobs\n" 
 read -p "proceed (y/[n])?    " choice
@@ -48,7 +48,7 @@ read -p "proceed (y/[n])?    " choice
 case "$choice" in
     y|Y|yes|YES ) for jobnumber in ${tokill[*]}
         do oardel $jobnumber; done
-        ;;
+       ;;
     *) echo "I'm sorry Dave. I'm afraid I can't do that"
         ;;
 esac
