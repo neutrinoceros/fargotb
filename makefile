@@ -1,14 +1,12 @@
-SRC         = $(realpath ./)
-script      = $(SRC)/slaughter.sh
+SRC_DIR     = $(realpath ./)
 INSTALL_DIR = $(realpath /home/$(USER)/bin/)
-TARGET      = $(INSTALL_DIR)/slaughter
-FLAGS	    = -s
+SCRIPTS     = $(wildcard $(SRC_DIR)/*sh)
+TARGETS     = $(INSTALL_DIR)/$(notdir $(basename $(SCRIPTS)))
 
-all : $(TARGET)
+all : $(TARGETS)
 
-$(TARGET) : $(script)
-	ln $(FLAGS) $^ $@ 
+% : %.sh
+	ln -s $^ $@ 
 
-clean :
-	rm *~
-	rm $(TARGET)
+uninstall :
+	rm $(TARGETS)
