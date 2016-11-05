@@ -5,7 +5,7 @@ TARGETS     = $(addprefix $(INSTALL_DIR)/, $(basename $(notdir $(SCRIPTS))))
 
 all : $(TARGETS)
 
-% : %.sh
+$(INSTALL_DIR)/% : $(SRC_DIR)/%.sh
 	ln -s $^ $@ 
 
 uninstall :
