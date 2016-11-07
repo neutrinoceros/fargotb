@@ -28,6 +28,20 @@ function tailcut {
 base=$(tailcut $1 "/")
 target=$(tailcut $2 "/")
 
+while [[ $# -gt 0 ]]
+do
+key="$1"
+case $key in
+    -r|-R|--restart)
+        restartfrom="$2"
+        shift
+        ;;
+    *)
+        ;;
+esac
+shift
+done
+
 
 # SYNCHRONIZATION
 #----------------------------------------------------------------------
@@ -39,16 +53,21 @@ FLAGS=(
     --exclude="\#*\#"      # emacs autosave files
     )
 
-rsync -av "${FLAGS[@]}" $base/ $target
 
 
+rsync -av "${FLAGS[@]}" $base/ $target    
+if [ ! -z ${restartfrom} ]
+then
+    echo $restartfrom
+    rsync --dry-run -av  $base/output/*$restartfrom.dat $target/output
+fi
 
 # AUTO-EDITION of files mentioning their own location
 #----------------------------------------------------------------------
 # /!\ This part may still be subject to bug corrections
 
-sed -i "s!$base!$target!g" $target/jobs/*oar
-sed -i "s!$base!$target!g" $target/input*/*par
+#sed -i "s!$base!$target!g" $target/jobs/*oar
+#sed -i "s!$base!$target!g" $target/input*/*par
 
 
 # SECURITY
@@ -56,4 +75,4 @@ sed -i "s!$base!$target!g" $target/input*/*par
 # we force the user to change persmissions before they can 
 # run the simulation in case there is still something wrong
 
-chmod -x $target/*exe 
+#chmod -x $target/*exe 
