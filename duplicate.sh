@@ -7,26 +7,13 @@
 # This program copies a base simulation with all its file-tree 
 # except the output files
 
-# DEFINITIONS
-#----------------------------------------------------------------------
-
-function tailcut {
-    #this function removes the last character of $1 if it matches $2
-    if [ ${1:(-1)} == $2 ]
-    then
-        res=${1:0:$((${#1}-1))}
-    else
-        res=$1
-    fi
-    echo "$res"    
-}
-
 
 # PARSING
 #----------------------------------------------------------------------
 
-base=$(tailcut $1 "/")
-target=$(tailcut $2 "/")
+base=$(readlink -e $1)    # gets the absolute path 
+                          # even from relative input
+target=$(basename $2)     # removes a "/" ending char if provided
 
 
 # SYNCHRONIZATION
