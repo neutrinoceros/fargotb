@@ -11,9 +11,11 @@
 # PARSING
 #----------------------------------------------------------------------
 
-base=$(readlink -e $1)    # gets the absolute path 
-                          # even from relative input
-target=$(basename $2)     # removes a "/" ending char if provided
+# gets the absolute path even from relative input
+base="/"$(readlink -e $1 | cut --complement -d '/' -f 1,2)
+
+# removes a "/" ending char if provided
+target=$(pwd)/$(basename $2)
 
 
 # SYNCHRONIZATION
@@ -27,7 +29,6 @@ FLAGS=(
     )
 
 rsync -av "${FLAGS[@]}" $base/ $target
-
 
 
 # AUTO-EDITION of files mentioning their own location
