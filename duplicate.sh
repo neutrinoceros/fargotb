@@ -10,6 +10,7 @@
 
 # PARSING
 #----------------------------------------------------------------------
+
 restartfrom=0
 
 while getopts r:R: option
@@ -42,12 +43,13 @@ FLAGS=(
 rsync -av "${FLAGS[@]}" $base/ $target 
 
 # optional, addtional synchro including specified restart files
+optf="find $base/output  | egrep '[^0-9]$restartfrom.dat'"
+autf="find $base/output/ | egrep '/((planet|orbit)[0-9]*|used_rad).dat'"
+
 if [[  $restartfrom > 0 ]]
 then
-    optfindcmd="find $base/output  | egrep '[^0-9]$restartfrom.dat'"
-    autfindcmd="find $base/output/ | egrep '/((planet|orbit)[0-9]*|used_rad).dat'"
-    AUTOINCLUDE=$(eval $autfindcmd)
-    RESTARTFILES=$(eval $optfindcmd)
+    AUTOINCLUDE=$(eval $autf)
+    RESTARTFILES=$(eval $optf)
     rsync -av --include=$RESTARTFILES \
         --include=$AUTOINCLUDE \
         $base/output/*$restartfrom.dat $target/output/
