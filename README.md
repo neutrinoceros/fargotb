@@ -10,7 +10,7 @@
 longRunGenerator creates more job files and launch them on the go in an append-chain. It gathers information provided in an input file formatted as longRun_input_example.par
 
 
-### duplicate v1.1
+### duplicate v1.2
 ```
 duplicate base target
 ```
@@ -18,6 +18,7 @@ copies the file tree of _$base_ into a new directory _$target_. It excludes cont
 It also automatically edit all files newly copied to replace every occurence of _$base_ by _$target_ so the new simulation could in principle be ran immediatly.
 Nonetheless, a security has been added to prevent over-enthousiastic users from deleting their results in _$base_ in case something went wrong during the copy or the editing : the original executable files are deprieved of their "x" permission so it has to be turned back on manually using chmod before liftoff.
 
+duplicate handles an optional -r flag to allow the copy of files required for a restart on the go.
 
 ### slaughter v1.2
 
