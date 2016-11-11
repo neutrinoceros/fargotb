@@ -7,40 +7,25 @@
 # This program copies a base simulation with all its file-tree 
 # except the output files
 
-# DEFINITIONS
-#----------------------------------------------------------------------
-
-function tailcut {
-    #this function removes the last character of $1 if it matches $2
-    if [ ${1:(-1)} == $2 ]
-    then
-        res=${1:0:$((${#1}-1))}
-    else
-        res=$1
-    fi
-    echo "$res"    
-}
-
 
 # PARSING
 #----------------------------------------------------------------------
+restartfrom=0
 
-base=$(tailcut $1 "/")
-target=$(tailcut $2 "/")
-
-while [[ $# -gt 0 ]]
+while getopts r:R: option
 do
-key="$1"
-case $key in
-    -r|-R|--restart)
-        restartfrom="$2"
-        shift
-        ;;
-    *)
-        ;;
-esac
-shift
+    case $option in
+        r|R ) restartfrom=$2 ;
+            shift $((OPTIND-1))
+            ;;
+        *) exit 1;;
+    esac
 done
+            
+# gets the absolute path even from relative input
+base="/"$(readlink -e $1 | cut --complement -d '/' -f 1,2)
+# removes a "/" ending char if provided
+target=$(pwd)/$(basename $2)
 
 
 # SYNCHRONIZATION
@@ -54,13 +39,17 @@ FLAGS=(
     )
 
 
-
-rsync -av "${FLAGS[@]}" $base/ $target    
-if [ ! -z ${restartfrom} ]
+echo base is $base
+echo target is $target
+#rsync -av "${FLAGS[@]}" $base/ $target    
+if [[  $restartfrom > 0 ]]
 then
-    echo $restartfrom
-    rsync --dry-run -av  $base/output/*$restartfrom.dat $target/output
+    echo RESTART FROM : $restartfrom
+    #rsync --dry-run -av $base/output/*$restartfrom.dat $target/output
+    #rsync --dry-run -av $base/output/*$restartfrom.dat test
+    rsync --dry-run -av $base/output/*$restartfrom.dat test
 fi
+
 
 # AUTO-EDITION of files mentioning their own location
 #----------------------------------------------------------------------
