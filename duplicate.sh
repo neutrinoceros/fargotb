@@ -6,7 +6,7 @@
 # --------------------------
 # This program copies a base simulation with all its file-tree 
 # except the output files
-
+# Optionally, it can copy specified restart files with -r (-R) flag
 
 # PARSING
 #----------------------------------------------------------------------
@@ -38,16 +38,16 @@ FLAGS=(
     --exclude="\#*\#"      # emacs autosave files
     )
 
+# main synchronisation
+rsync -av "${FLAGS[@]}" $base/ $target 
 
-echo base is $base
-echo target is $target
-#rsync -av "${FLAGS[@]}" $base/ $target    
+# optional, addtional synchro including specified restart files
 if [[  $restartfrom > 0 ]]
 then
-    echo RESTART FROM : $restartfrom
-    #rsync --dry-run -av $base/output/*$restartfrom.dat $target/output
-    #rsync --dry-run -av $base/output/*$restartfrom.dat test
-    rsync --dry-run -av $base/output/*$restartfrom.dat test
+    findcmd="find $base/output | egrep '[^0-9]$restartfrom.dat'"
+    RESTARTFILES=$(eval $findcmd)
+    rsync -av --include=$RESTARTFILES \
+        $base/output/*$restartfrom.dat $target/output/
 fi
 
 
@@ -55,8 +55,8 @@ fi
 #----------------------------------------------------------------------
 # /!\ This part may still be subject to bug corrections
 
-#sed -i "s!$base!$target!g" $target/jobs/*oar
-#sed -i "s!$base!$target!g" $target/input*/*par
+sed -i "s!$base!$target!g" $target/jobs/*oar
+sed -i "s!$base!$target!g" $target/input*/*par
 
 
 # SECURITY
@@ -64,4 +64,4 @@ fi
 # we force the user to change persmissions before they can 
 # run the simulation in case there is still something wrong
 
-#chmod -x $target/*exe 
+chmod -x $target/*exe 
