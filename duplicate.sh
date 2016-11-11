@@ -44,9 +44,12 @@ rsync -av "${FLAGS[@]}" $base/ $target
 # optional, addtional synchro including specified restart files
 if [[  $restartfrom > 0 ]]
 then
-    findcmd="find $base/output | egrep '[^0-9]$restartfrom.dat'"
-    RESTARTFILES=$(eval $findcmd)
+    optfindcmd="find $base/output  | egrep '[^0-9]$restartfrom.dat'"
+    autfindcmd="find $base/output/ | egrep '/((planet|orbit)[0-9]*|used_rad).dat'"
+    AUTOINCLUDE=$(eval $autfindcmd)
+    RESTARTFILES=$(eval $optfindcmd)
     rsync -av --include=$RESTARTFILES \
+        --include=$AUTOINCLUDE \
         $base/output/*$restartfrom.dat $target/output/
 fi
 
