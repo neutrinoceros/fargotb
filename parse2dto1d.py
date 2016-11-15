@@ -4,23 +4,29 @@
 # Author : Clément Robert
 # written june 2016
 # --------------------------
-# This executable converts a 2d binary file from Fargo into a plain ascii "1d" file 
-# containing 2 columns : [radii, 1d integrated quantity]
+# This executable converts a 2d binary file from Fargo into a 
+# plain ascii "1d" file containing 2 columns : 
+# [radii, 1d integrated quantity]
 #
-# It is designed to be as easy as possible to embed into shell loops for mass conversions. 
-# It takes 3 arguments : 0) path to configuration file (usually called "template.par")
-#                        1) physical quantity (see qty dict for details)
-#                        2) output number 
-# You can optionnaly skip the radii column by providing a fourth argument "light"
+# It is designed to be as easy as possible to embed into shell loops 
+# 
+# Arguments 
+#    0) path to configuration file (usually called "template.par")
+#    1) physical quantity (see qty dict for details)
+#    2) output number 
+#
+# Options (as additional arguements)
+#    'light') skip the radii column
 #
 # /!\ WARNING : The output file is written in the current directory
 
-import numpy as np      #sci computations and easy to manipulate array classes
+import numpy as np      #sci computations and array classes
 import re               #regular expressions
 import sys              #allow call to classic shell commands
 import fileinput        #used to add headers to outputfiles
 
-# parsing functions definitions
+
+# DEFINITIONS
 #----------------------------------------------------------------------
 
 def getScriptArgs() :
@@ -29,7 +35,6 @@ def getScriptArgs() :
     args = [a for a in  sys.argv]
     args.reverse(); args.pop(); args.reverse();
     return args
-
 
 def parseString(configfile, key) :
     """returns the string associated with $key"""
@@ -44,7 +49,6 @@ def parseString(configfile, key) :
     m     = regex.search(content)
     param = m.group().split()[1]
     return param
-
 
 def parseValue(config, key) :
     """returns the value associated with the word $key 
@@ -66,7 +70,6 @@ def parseValue(config, key) :
         value = int(param)
     return value
 
-
 qtydict = {"d"  : "dens",
            "t"  : "temperature",
            "p"  : "Pressure",
@@ -79,18 +82,21 @@ qtydict = {"d"  : "dens",
            }
 
 
-# parse the script's arguments
+# PARSING
 #----------------------------------------------------------------------
+
 args = getScriptArgs()
 if len(args)<3 :
-    print "error : please provide  input repertory, a quantity and an output number as script arguments (order matters)"
-    print " 'quantity' accepts the following keys :"
-    print qtydict
+    print """mandatory arguments : 
+    0) path to configuration file 
+    1) {0}
+    2) output number
+    """.format('|'.join([str(k) for k in qtydict.keys]))
     sys.exit()
 
 config,key,nout = args
 
-qty     = qtydict[key]
+qty       = qtydict[key]
 
 outputdir = parseString(config, 'OutputDir')
 exfile    = outputdir+"gas"+qty+str(nout)+".dat"
@@ -105,12 +111,13 @@ DT      = parseValue(config,'DT')
 print "2D -> 1D parsing in ",exfile," found :"
 print "nrad=%d, nsec=%d, rmin=%e, rmax=%e" % (nrad, nsec, rmin, rmax)
 
-
 dr       = (rmax-rmin)/nrad
 dtheta   = 2.*np.pi/nsec  
 
+
 # reshape the data
 #----------------------------------------------------------------------
+
 tab      = np.fromfile(exfile).reshape(nrad,nsec)
 radii    = np.linspace(rmin,rmax,nrad)
 #nb : there should be a coefficient applied here
@@ -121,8 +128,10 @@ if "light" in args :
 else :
     tabout = np.column_stack((radii,integral))
 
-# save new 1d array
+
+# SAVING
 #----------------------------------------------------------------------
+
 outfilename = "%s%s_1d.dat" % (qty, nout)
 print "saving to %s" % outfilename
 np.savetxt(outfilename,tabout)
