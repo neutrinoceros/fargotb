@@ -6,9 +6,17 @@
 # --------------------------
 # This program copies a base simulation with all its file-tree 
 # except the output files
-# Optionally, it can copy specified restart files with -r (-R) flag
+#
+# Arguments 
+#    0) $base   : simulation to be copied
+#    1) $target : path for the copy
+#
+# Options
+#    r|R) restart mode, preserves the files requiered for a restart.
+#    m|M) move (mv) mode : base is moved to target while auto-refering
+#                          files are still being updated
 
-# LOCAL DEFITIONS
+# DEFINITIONS
 #----------------------------------------------------------------------
 
 restartfrom=0

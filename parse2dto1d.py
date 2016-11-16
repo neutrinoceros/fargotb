@@ -15,7 +15,7 @@
 #    1) physical quantity (see qty dict for details)
 #    2) output number 
 #
-# Options (as additional arguements)
+# Options (as additional arguments)
 #    'light') skip the radii column
 #
 # /!\ WARNING : The output file is written in the current directory

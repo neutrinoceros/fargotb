@@ -6,6 +6,14 @@
 # --------------------------
 # This program generates an append-chain of jobs based on the first one, 
 # matching the number of outputs in numerical_config.par
+#
+# Arguments 
+#    0) path of the configuration file
+#
+# Options
+#    l) launch generated subjobs in an append chain
+#    L) launch-only mode. 
+#       Assumes the program was already ran in write-only mode
 
 # DEFINITIONS
 #----------------------------------------------------------------------
