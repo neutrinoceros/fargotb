@@ -10,8 +10,6 @@
 # DEFINITIONS
 #----------------------------------------------------------------------
 
-inputfile=$1
-
 function parser { 
 cat $1 | grep -i $2 | tr -s ' ' | cut -d ' ' -f 2
 }
@@ -19,6 +17,25 @@ cat $1 | grep -i $2 | tr -s ' ' | cut -d ' ' -f 2
 
 # PARSING
 #----------------------------------------------------------------------
+
+WRITE=true
+LAUNCH=false
+while getopts lL option
+do
+    case $option in
+        l) LAUNCH=true;
+            echo "yo! "
+            shift $((OPTIND-1))
+            ;;
+        L) WRITE=false;LAUNCH=true;
+            echo "alabordage"
+            shift $((OPTIND-1))
+            ;;
+        *) exit 1;;
+    esac
+done
+
+inputfile=$1
 
 # read the input file displaying all necessary information
 simdir=$(parser $inputfile simdir)
@@ -48,7 +65,6 @@ OPD=$(($OPD-1))
 
 NJ=$(($ntot/($OPD*$ninterm))) # number of jobs recquiered by the user
 
-
 # MAIN LOOP
 #----------------------------------------------------------------------
 
@@ -60,24 +76,29 @@ while [ $i -le $NJ ]
 do
     newfile=$seed\_$i.oar
     restart=$(($OPD*$i))
-    cp $seedjob $newfile
-    sed -i "s/\$EXECUTABLE/\$EXECUTABLE -s $restart/g" $newfile
-    # DANGER AHEAD
-    #//////////////////////////////////////////////////
-    if [ $i -eq 1 ] 
+
+    if [[ $WRITE == true ]]
     then
-        oarsub -S $newfile
+        cp $seedjob $newfile
+        sed -i "s/\$EXECUTABLE/\$EXECUTABLE -s $restart/g" $newfile
+    fi
+    
+    if [[ $LAUNCH == true ]]
+    then
+        if [ $i -eq 1 ] 
+        then
+            oarsub -S $newfile
+        fi
+        
+        if [ $i -gt 1 ]
+        then
+        # get the number of the previousjob
+            jobnumber=$(oarstat|grep $USER|tail -1|cut -d ' ' -f 1)
+        # submit the newjob, as an appendage of the previous one
+            oarsub -S -a $jobnumber $newfile
+        fi 
     fi
 
-    if [ $i -gt 1 ]
-    then
-        # get the number of the previousjob
-        jobnumber=$(oarstat | grep $USER | tail -1 | cut -d ' ' -f 1)
-        # submit the newjob, as an appendage of the previous one
-        oarsub -S -a $jobnumber $newfile
-    fi
-    # END OF DANGER ZONE
-    #\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
     i=$(($i+1))
 done
 cd -
