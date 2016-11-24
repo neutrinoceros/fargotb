@@ -32,11 +32,9 @@ while getopts lL option
 do
     case $option in
         l) LAUNCH=true;
-            echo "yo! "
             shift $((OPTIND-1))
             ;;
         L) WRITE=false;LAUNCH=true;
-            echo "alabordage"
             shift $((OPTIND-1))
             ;;
         *) exit 1;;
