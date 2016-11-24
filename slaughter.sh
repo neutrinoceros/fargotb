@@ -33,7 +33,9 @@ done
 
 jobs=$(oarstat | eval $GREPING | tr -s ' ' \
     | awk '{gsub(" *.*=","",$5); printf "%7s  %10s  %30s\n",$1,$4,$5}')
-tokill=$(echo "$jobs" | cut -d ' ' -f 1)
+
+
+tokill=$(eval """echo "$jobs" |  cut -d ' ' -f 1""")
 
 
 # PROCEDURE
@@ -47,8 +49,8 @@ read -p "proceed (y/[n])?    " choice
 
 case "$choice" in
     y|Y|yes|YES ) for jobnumber in ${tokill[*]}
-        do oardel $jobnumber; done
-       ;;
+        do oardel $jobnumber; done 
+	;;
     *) echo "I'm sorry Dave. I'm afraid I can't do that"
         ;;
 esac
