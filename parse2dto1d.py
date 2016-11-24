@@ -29,6 +29,24 @@ import fileinput        #used to add headers to outputfiles
 # DEFINITIONS
 #----------------------------------------------------------------------
 
+qtydict = {"d"  : "dens",
+           "t"  : "temperature",
+           "p"  : "Pressure",
+           "vr" : "vrad",
+           "vt" : "vtheta",
+           "df" : "epsilon",
+           "l"  : "label",
+           "do" : "dustdens",
+           "go" : "gasonlydens",
+           #-----------------------------------
+           # upper-case keys do not correspond
+           # to existing fields but rather
+           # rely on recipes to be computed
+           #-----------------------------------
+           "PHI": "flow"
+           }
+
+
 def getScriptArgs() :
     """returns a list containing all the arguments 
     given to the script in order"""
@@ -70,16 +88,40 @@ def parseValue(config, key) :
         value = int(param)
     return value
 
-qtydict = {"d"  : "dens",
-           "t"  : "temperature",
-           "p"  : "Pressure",
-           "vr" : "vrad",
-           "vt" : "vtheta",
-           "df" : "epsilon",
-           "l"  : "label",
-           "do" : "dustdens",
-           "go" : "gasonlydens"
-           }
+
+def getexfile(outdir,qty,nout) :
+    exfile = outdir+"gas"+qty+str(nout)+".dat"
+    return exfile
+
+def get2Dfield(key,nrad,nsec,outdir,nout) : 
+    qty     = qtydict[key]    
+    exfile  = getexfile(outdir,qty,nout)
+    field2D = np.fromfile(exfile).reshape(nrad,nsec)
+    return field2D, exfile
+
+def getflow(nrad,nsec,rad,outdir,nout) :
+    """
+    careful : this routine does not account for the staggered scheme
+    """
+    sigma,filesig = get2Dfield('d' ,nrad,nsec,outdir,nout)
+    vrad,filevrad = get2Dfield('vr',nrad,nsec,outdir,nout)
+    flow2D = 2*np.pi*vrad*sigma
+    for i in range(flow2D.shape[0]) :
+        flow2D[i] *= rad[i]
+    files  = [filesig, filevrad]
+    return flow2D, files
+
+recipes = {"flow" : getflow}
+
+def get1Dfield(key,nrad,nsec,rad,outdir,nout) :
+    if key.islower() :
+        field2D, exfile  = get2Dfield(key,nrad,nsec,outdir,nout)
+    else :
+        recipe = recipes[qtydict[key]]
+        field2D, exfile  = recipe(nrad,nsec,rad,outdir,nout)
+    
+    integral = field2D.sum(axis=1)/nsec
+    return integral, exfile
 
 
 # PARSING
@@ -94,51 +136,40 @@ if len(args)<3 :
     """.format('|'.join([str(k) for k in qtydict.keys]))
     sys.exit()
 
-config,key,nout = args
+config,key,NOUT = args
+print "parsing 1D %s field..." % (key)
 
-qty       = qtydict[key]
+OUTDIR  = parseString(config, 'OutputDir')
 
-outputdir = parseString(config, 'OutputDir')
-exfile    = outputdir+"gas"+qty+str(nout)+".dat"
-
-nrad    = parseValue(config,'nrad')
-nsec    = parseValue(config,'nsec')
-rmin    = parseValue(config,'rmin')
-rmax    = parseValue(config,'rmax')
+NRAD    = parseValue(config,'nrad')
+NSEC    = parseValue(config,'nsec')
+RMIN    = parseValue(config,'rmin')
+RMAX    = parseValue(config,'rmax')
 ninterm = parseValue(config,"ninterm")
 DT      = parseValue(config,'DT')
 
-print "2D -> 1D parsing in ",exfile," found :"
-print "nrad=%d, nsec=%d, rmin=%e, rmax=%e" % (nrad, nsec, rmin, rmax)
+radii   = np.linspace(RMIN,RMAX,NRAD)
+dr      = (RMAX-RMIN)/NRAD
+dtheta  = 2.*np.pi/NSEC
 
-dr       = (rmax-rmin)/nrad
-dtheta   = 2.*np.pi/nsec  
+field1D,EXFILE = get1Dfield(key,NRAD,NSEC,radii,OUTDIR,NOUT)
 
-
-# reshape the data
-#----------------------------------------------------------------------
-
-tab      = np.fromfile(exfile).reshape(nrad,nsec)
-radii    = np.linspace(rmin,rmax,nrad)
-#nb : there should be a coefficient applied here
-integral = tab.sum(axis=1)/nsec
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if "light" in args :
-    tabout = integral
+    tabout = field1D
 else :
-    tabout = np.column_stack((radii,integral))
+    tabout = np.column_stack((radii,field1D))
 
 
 # SAVING
 #----------------------------------------------------------------------
 
-outfilename = "%s%s_1d.dat" % (qty, nout)
+outfilename = "%s%s_1d.dat" % (qtydict[key], NOUT)
 print "saving to %s" % outfilename
 np.savetxt(outfilename,tabout)
 
-currenttime  = DT * int(nout) * ninterm
+currenttime  = DT * int(NOUT) * ninterm
 currentorbit = currenttime/(2.*np.pi)
-header  = "#original 2d file name        %s\n" % exfile
+header  = "#original 2d file name        %s\n" % EXFILE
 header += "#time                         %e\n" % currenttime
 header += "#orbit                        %s\n" % currentorbit
 
