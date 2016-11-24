@@ -32,10 +32,15 @@ do
 done
             
 # gets the absolute path even from relative input
-base="/"$(readlink -e $1 | cut --complement -d '/' -f 1,2)
+base=$(readlink -e $1)
+# | cut --complement -d '/' -f 1,2)
 # removes a "/" ending char if provided
-tardir="/"$(readlink -e $(dirname $2) | cut --complement -d '/' -f 1,2)
+tardir=$(readlink -e $(dirname $2))
+# | cut --complement -d '/' -f 1,2)
 target=$tardir/$(basename $2)
+
+echo base is $base
+echo target is $target
 
 
 # SYNCHRONIZATION
