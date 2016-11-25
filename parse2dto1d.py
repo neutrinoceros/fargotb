@@ -29,34 +29,30 @@ import fileinput        #used to add headers to outputfiles
 # DEFINITIONS
 #----------------------------------------------------------------------
 
-qtydict = {"d"  : "dens",
-           "t"  : "temperature",
-           "p"  : "Pressure",
-           "vr" : "vrad",
-           "vt" : "vtheta",
-           "df" : "epsilon",
-           "l"  : "label",
-           "do" : "dustdens",
-           "go" : "gasonlydens",
-           #-----------------------------------
-           # upper-case keys do not correspond
-           # to existing fields but rather
-           # rely on recipes to be computed
-           #-----------------------------------
-           "PHI": "flow"
-           }
+# lower-case keys correspond to existing .dat files. 
+# This dictionnary provides the corresponding rootnames of those files
+TAGS = {"d"  : "dens",
+        "t"  : "temperature",
+        "p"  : "Pressure",
+        "vr" : "vrad",
+        "vt" : "vtheta",
+        "df" : "epsilon",
+        "l"  : "label",
+        "do" : "dustdens",
+        "go" : "gasonlydens"
+       }
 
-
+# parsing fucntions
+#-----------------------------------
 def getScriptArgs() :
-    """returns a list containing all the arguments 
-    given to the script in order"""
+    """get a list of the arguments given to the script in order"""
     args = [a for a in  sys.argv]
     args.reverse(); args.pop(); args.reverse();
     return args
 
 def parseString(configfile, key) :
-    """returns the string associated with $key"""
-    with open(config,'r') as fi :
+    """fetch a string associated with $key"""
+    with open(configfile,'r') as fi :
         rawcontent = fi.readlines()
         content = r''
         for c in rawcontent :
@@ -68,11 +64,12 @@ def parseString(configfile, key) :
     param = m.group().split()[1]
     return param
 
-def parseValue(config, key) :
-    """returns the value associated with the word $key 
-    in a specified $config file.
-    The function is not case sensible regarding $key."""
-    with open(config,'r') as fi :
+def parseValue(configfile, key) :
+    """
+    fetch a numerical value associated with $key 
+    /!\ This is not case sensible regarding $key.
+    """
+    with open(configfile,'r') as fi :
         rawcontent = fi.readlines()
         content = r''
         for c in rawcontent :
@@ -88,20 +85,31 @@ def parseValue(config, key) :
         value = int(param)
     return value
 
-
 def getexfile(outdir,qty,nout) :
+    """put together the exact path to the base data file"""
     exfile = outdir+"gas"+qty+str(nout)+".dat"
     return exfile
 
-def get2Dfield(key,nrad,nsec,outdir,nout) : 
-    qty     = qtydict[key]    
+def get2Dfield(key,nrad,nsec,outdir,nout) :
+    """read a 2D output data file"""
+    qty     = TAGS[key]    
     exfile  = getexfile(outdir,qty,nout)
     field2D = np.fromfile(exfile).reshape(nrad,nsec)
     return field2D, exfile
 
+#-----------------------------------
+# upper-case keys do not correspond 
+# to existing .dat files but rather
+# are computed using $RECIPES 
+# defined in the following
+
+# /!\ dev note : 
+# all recipes must share their arguments
+
 def getflow(nrad,nsec,rad,outdir,nout) :
     """
-    careful : this routine does not account for the staggered scheme
+    compute the radial mass flow of the medium
+    /!\ this routine does not account for the staggered scheme
     """
     sigma,filesig = get2Dfield('d' ,nrad,nsec,outdir,nout)
     vrad,filevrad = get2Dfield('vr',nrad,nsec,outdir,nout)
@@ -111,15 +119,20 @@ def getflow(nrad,nsec,rad,outdir,nout) :
     files  = [filesig, filevrad]
     return flow2D, files
 
-recipes = {"flow" : getflow}
+RECIPES = {"PHI" : getflow}
 
+# main routine
+#-----------------------------------
 def get1Dfield(key,nrad,nsec,rad,outdir,nout) :
-    if key.islower() :
+    """self-explanatory enough ;-)"""
+    if   key.islower() :
         field2D, exfile  = get2Dfield(key,nrad,nsec,outdir,nout)
-    else :
-        recipe = recipes[qtydict[key]]
+    elif key.isupper() :
+        recipe = RECIPES[key]
         field2D, exfile  = recipe(nrad,nsec,rad,outdir,nout)
-    
+    else :
+        err = "key has to provided in pure-lower *or* pure-upper case"
+        raise Keyerror(err)
     integral = field2D.sum(axis=1)/nsec
     return integral, exfile
 
@@ -128,25 +141,24 @@ def get1Dfield(key,nrad,nsec,rad,outdir,nout) :
 #----------------------------------------------------------------------
 
 args = getScriptArgs()
-if len(args)<3 :
-    print """mandatory arguments : 
+if len(args)<3 or "-h" in args :
+    print """USAGE :
     0) path to configuration file 
     1) {0}
     2) output number
-    """.format('|'.join([str(k) for k in qtydict.keys]))
+    """.format('|'.join([str(k) for k in TAGS.keys]))
     sys.exit()
 
 config,key,NOUT = args
 print "parsing 1D %s field..." % (key)
 
 OUTDIR  = parseString(config, 'OutputDir')
-
-NRAD    = parseValue(config,'nrad')
-NSEC    = parseValue(config,'nsec')
-RMIN    = parseValue(config,'rmin')
-RMAX    = parseValue(config,'rmax')
-ninterm = parseValue(config,"ninterm")
-DT      = parseValue(config,'DT')
+NRAD    = parseValue (config, 'nrad'   )
+NSEC    = parseValue (config, 'nsec'   )
+RMIN    = parseValue (config, 'rmin'   )
+RMAX    = parseValue (config, 'rmax'   )
+ninterm = parseValue (config, 'ninterm')
+DT      = parseValue (config, 'DT'     )
 
 radii   = np.linspace(RMIN,RMAX,NRAD)
 dr      = (RMAX-RMIN)/NRAD
@@ -163,7 +175,7 @@ else :
 # SAVING
 #----------------------------------------------------------------------
 
-outfilename = "%s%s_1d.dat" % (qtydict[key], NOUT)
+outfilename = "%s%s_1d.dat" % (TAGS[key], NOUT)
 print "saving to %s" % outfilename
 np.savetxt(outfilename,tabout)
 
