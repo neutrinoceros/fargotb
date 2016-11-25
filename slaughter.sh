@@ -15,6 +15,7 @@
 #----------------------------------------------------------------------
 
 GREPING="grep $USER"
+GREPING="grep elena"
 
 while [[ $# -gt 0 ]]
 do
@@ -32,25 +33,23 @@ shift
 done
 
 jobs=$(oarstat | eval $GREPING | tr -s ' ' \
-    | awk '{gsub(" *.*=","",$5); printf "%7s  %10s  %30s\n",$1,$4,$5}')
-
-
-tokill=$(eval """echo "$jobs" |  cut -d ' ' -f 1""")
+    | awk '{gsub(" *.*=","",$5) ; printf "%-10s  %-12s  %-30s\n",$1,$4,$5}')
+tokill=$(echo "$jobs" | tr -s ' ' | cut -d ' ' -f 1)
 
 
 # PROCEDURE
 #----------------------------------------------------------------------
 
 echo "You are about to kill the following jobs :"
-echo "    num     runtime                              id"
+echo "num         runtime       id"
 echo "-----------------------------------------------------------"
 echo -e "$jobs\n" 
 read -p "proceed (y/[n])?    " choice
 
 case "$choice" in
     y|Y|yes|YES ) for jobnumber in ${tokill[*]}
-        do oardel $jobnumber; done 
-	;;
+        do oardel $jobnumber; done
+        ;;
     *) echo "I'm sorry Dave. I'm afraid I can't do that"
         ;;
 esac
