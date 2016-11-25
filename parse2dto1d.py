@@ -31,6 +31,10 @@ import fileinput        #used to add headers to outputfiles
 
 # lower-case keys correspond to existing .dat files. 
 # This dictionnary provides the corresponding rootnames of those files
+#
+# upper-case keys do not correspond to existing .dat files but rather
+# are computed using $RECIPES defined in the following
+
 TAGS = {"d"  : "dens",
         "t"  : "temperature",
         "p"  : "Pressure",
@@ -39,7 +43,9 @@ TAGS = {"d"  : "dens",
         "df" : "epsilon",
         "l"  : "label",
         "do" : "dustdens",
-        "go" : "gasonlydens"
+        "go" : "gasonlydens",
+        #--------------------
+        "PHI": "flow"
        }
 
 # parsing fucntions
@@ -97,12 +103,6 @@ def get2Dfield(key,nrad,nsec,outdir,nout) :
     field2D = np.fromfile(exfile).reshape(nrad,nsec)
     return field2D, exfile
 
-#-----------------------------------
-# upper-case keys do not correspond 
-# to existing .dat files but rather
-# are computed using $RECIPES 
-# defined in the following
-
 # /!\ dev note : 
 # all recipes must share their arguments
 
@@ -119,7 +119,7 @@ def getflow(nrad,nsec,rad,outdir,nout) :
     files  = [filesig, filevrad]
     return flow2D, files
 
-RECIPES = {"PHI" : getflow}
+RECIPES = {"flow" : getflow}
 
 # main routine
 #-----------------------------------
@@ -128,7 +128,7 @@ def get1Dfield(key,nrad,nsec,rad,outdir,nout) :
     if   key.islower() :
         field2D, exfile  = get2Dfield(key,nrad,nsec,outdir,nout)
     elif key.isupper() :
-        recipe = RECIPES[key]
+        recipe = RECIPES[TAGS[key]]
         field2D, exfile  = recipe(nrad,nsec,rad,outdir,nout)
     else :
         err = "key has to provided in pure-lower *or* pure-upper case"
