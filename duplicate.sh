@@ -31,16 +31,26 @@ do
     esac
 done
             
-# gets the absolute path even from relative input
-base=$(readlink -e $1)
-# | cut --complement -d '/' -f 1,2)
-# removes a "/" ending char if provided
-tardir=$(readlink -e $(dirname $2))
-# | cut --complement -d '/' -f 1,2)
-target=$tardir/$(basename $2)
 
-echo base is $base
-echo target is $target
+# gets the absolute path even from relative input
+roots=$(readlink -e $1 | cut -d '/' -f 2)
+if [[ $roots == "gpfs" ]]
+then
+    base=/$(readlink -e $1 | cut --complement -d '/' -f 1,2)
+else
+    base=$(readlink -e $1)
+fi
+
+# removes a "/" ending char if provided
+roots=$(readlink -e $(dirname $2) | cut -d '/' -f 2)
+if [[ $roots == "gpfs" ]]
+then
+    tardir=/$(readlink -e $(dirname $2) | cut --complement -d '/' -f 1,2)
+else
+    tardir=$(readlink -e $(dirname $2))
+fi
+
+target=$tardir/$(basename $2)
 
 
 # SYNCHRONIZATION
