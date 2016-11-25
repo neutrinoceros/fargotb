@@ -49,6 +49,8 @@ git clone https://github.com/neutrinoceros/fargotb.git
 ```
 then
 ```
+mkdir ~/bin
+export PATH=$PATH:$(readlink -e ~/bin/)
 cd fargotb
 make
 ```
