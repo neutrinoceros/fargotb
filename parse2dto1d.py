@@ -160,9 +160,9 @@ RMAX    = parseValue (config, 'rmax'   )
 ninterm = parseValue (config, 'ninterm')
 DT      = parseValue (config, 'DT'     )
 
-radii   = np.linspace(RMIN,RMAX,NRAD)
 dr      = (RMAX-RMIN)/NRAD
 dtheta  = 2.*np.pi/NSEC
+radii   = np.linspace(RMIN,RMAX-dr,NRAD) #that is equivalent to Rinf
 
 field1D,EXFILE = get1Dfield(key,NRAD,NSEC,radii,OUTDIR,NOUT)
 
