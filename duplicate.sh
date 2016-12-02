@@ -21,7 +21,27 @@
 
 restartfrom=0
 MVMODE=false
+USAGE="echo -e 'usage\n-----\n\t\$0:base\n \t\$1:target'"
 
+
+# CHECK ARGUMENTS CONSISTENCY
+#----------------------------------------------------------------------
+
+if (( $# != 2 ))
+then
+    echo
+    if (( $# > 0 )); then
+        case $1 in
+            "-h"|"--help" ) eval $USAGE; exit
+                ;;
+            * )
+                ;;
+        esac
+    fi
+    echo "error : invalid number of argments"; eval $USAGE
+    echo
+    exit
+fi
 
 # PARSING
 #----------------------------------------------------------------------
@@ -38,7 +58,7 @@ do
         *) exit 1;;
     esac
 done
-            
+        
 
 # gets the absolute path even from relative input
 roots=$(readlink -e $1 | cut -d '/' -f 2)
