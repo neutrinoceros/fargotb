@@ -21,32 +21,13 @@
 
 restartfrom=0
 MVMODE=false
-USAGE="echo -e 'usage\n-----\n\t\$0:base\n \t\$1:target'"
+USAGE="usage\n-----\n\t\$0:base\n \t\$1:target"
 
-
-# CHECK ARGUMENTS CONSISTENCY
-#----------------------------------------------------------------------
-
-if (( $# != 2 ))
-then
-    echo
-    if (( $# > 0 )); then
-        case $1 in
-            "-h"|"--help" ) eval $USAGE; exit
-                ;;
-            * )
-                ;;
-        esac
-    fi
-    echo "error : invalid number of argments"; eval $USAGE
-    echo
-    exit
-fi
 
 # PARSING
 #----------------------------------------------------------------------
 
-while getopts r:R:mM option
+while getopts r:R:mMhH option
 do
     case $option in
         r|R ) restartfrom=$2 ;
@@ -55,30 +36,37 @@ do
         m|M ) MVMODE=true
             shift $((OPTIND-1))
             ;;
-        *) exit 1;;
+        h|H ) echo -e $USAGE ; exit 0;
+            ;;
+        *) echo "error : invalid argument"; echo -e $USAGE; exit 1
+            ;;
     esac
 done
-        
 
-# gets the absolute path even from relative input
-roots=$(readlink -e $1 | cut -d '/' -f 2)
-if [[ $roots == "gpfs" ]]
-then
-    base=/$(readlink -e $1 | cut --complement -d '/' -f 1,2)
-else
-    base=$(readlink -e $1)
+if [[ $# != 2 ]] ; then
+    echo "error : invalid number of arguments" ; exit 1
 fi
 
-# removes a "/" ending char if provided
-roots=$(readlink -e $(dirname $2) | cut -d '/' -f 2)
-if [[ $roots == "gpfs" ]]
-then
-    tardir=/$(readlink -e $(dirname $2) | cut --complement -d '/' -f 1,2)
+target=$(readlink -e $2)
+if [ $? == 0 ] ; then
+    echo "error : \$target must not be an existing directory" ; exit 1
 else
-    tardir=$(readlink -e $(dirname $2))
+    target=$(readlink -f $2)
 fi
 
-target=$tardir/$(basename $2)
+base=$(readlink -e $1)
+if [ $? == 1 ] ; then
+    echo "error : \$base must be an  existing directory" ; exit 1
+else
+    if [[ $base == *"gpfs"* ]] ; then
+        base=/$(  echo $base   | cut --complement -d / -f 1,2) 
+        target=/$(echo $target | cut --complement -d / -f 1,2) 
+    fi
+    if [[ $base != *"$USER"* ]] ; then
+        echo "error : you can only use this script on directories you own"
+        exit 1
+    fi
+fi
 
 
 # SYNCHRONIZATION
@@ -105,10 +93,10 @@ case "$choice" in
 esac
 
 else
-# main synchronisation
+    # main synchronisation
     rsync -av "${FLAGS[@]}" $base/ $target 
 
-# optional, addtional synchro including specified restart files
+    # optional, addtional synchro including specified restart files
     optf="find $base/output  | egrep '[^0-9]$restartfrom.dat'"
     autf="find $base/output/ | egrep '/((planet|orbit)[0-9]*|used_rad).dat'"
 
@@ -122,16 +110,16 @@ else
     fi
 fi
 
-
-if [[ $? == 0 ]]
-then 
+if [[ $? != 0 ]] ; then
+    echo "error : something went wrong while syncing." ;exit 1
+fi
 
 # AUTO-EDITION of files mentioning their own location
 #----------------------------------------------------------------------
 # /!\ This part may still be subject to bug corrections
 
-    sed -i "s!$base!$target!g" $target/jobs/*oar
-    sed -i "s!$base!$target!g" $target/input*/*par
+sed -i "s?$base?$target?g" $target/jobs/*oar   2&>1 /dev/null
+sed -i "s?$base?$target?g" $target/input*/*par 2&>1 /dev/null
 
 
 # SECURITY
@@ -139,6 +127,4 @@ then
 # we force the user to change persmissions before they can 
 # run the simulation in case there is still something wrong
 
-    chmod -x $target/*exe 
-
-fi
+chmod -x $target/*exe 2&>1 /dev/null
