@@ -154,7 +154,7 @@ def getrad(rmin,rmax,nrad,dr,key) :
             radii_new[i] /= 3.*(radii[i+1]**2 - radii[i]**2)
         radii_new[-1]  = 2.*((radii[-1]+dr)**3 - radii[-1]**3)
         radii_new[-1] /= 3.*((radii[-1]+dr)**2 - radii[-1]**2)
-    radii = radii_new
+        radii = radii_new
     return radii
 
 
