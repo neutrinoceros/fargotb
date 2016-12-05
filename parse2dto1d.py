@@ -48,6 +48,12 @@ TAGS = {"d"  : "dens",
         "PHI": "flow"
        }
 
+Centered  = ["dens", "temperature", "Pressure",
+             "espilon", "label", "dustdens", "gasonlydens",
+             "vtheta"]
+
+Staggered = ["vrad"]
+
 # parsing fucntions
 #-----------------------------------
 def getScriptArgs() :
@@ -70,7 +76,7 @@ def parseString(configfile, key) :
     param = m.group().split()[1]
     return param
 
-def parseValue(configfile, key) :
+def parseValue(configfile, key, kind=int) :
     """
     fetch a numerical value associated with $key 
     /!\ This is not case sensible regarding $key.
@@ -85,7 +91,7 @@ def parseValue(configfile, key) :
     regex = re.compile(exp,re.IGNORECASE)
     m     = regex.search(content)
     param = m.group().split()[1]
-    if '.' in param or 'e' in param :
+    if '.' in param or 'e' in param or kind == float :
         value = float(param)
     else :
         value = int(param)
@@ -136,6 +142,21 @@ def get1Dfield(key,nrad,nsec,rad,outdir,nout) :
     integral = field2D.sum(axis=1)/nsec
     return integral, exfile
 
+def getrad(rmin,rmax,nrad,dr,key) :
+    #the default radius is Rinf
+    radii   = np.linspace(rmin,rmax-dr,nrad)
+    if TAGS[key] in Centered :
+        #we convert to Rmed if needed
+        L = len(radii)
+        radii_new = np.zeros(L)
+        for i in range(L-1) :
+            radii_new[i]  = 2.*(radii[i+1]**3 - radii[i]**3)
+            radii_new[i] /= 3.*(radii[i+1]**2 - radii[i]**2)
+        radii_new[-1]  = 2.*((radii[-1]+dr)**3 - radii[-1]**3)
+        radii_new[-1] /= 3.*((radii[-1]+dr)**2 - radii[-1]**2)
+    radii = radii_new
+    return radii
+
 
 # PARSING
 #----------------------------------------------------------------------
@@ -150,19 +171,20 @@ if len(args)<3 or "-h" in args :
     sys.exit()
 
 config,key,NOUT = args
-print "parsing 1D %s field..." % (key)
+# print "parsing 1D %s field..." % (key)
 
-OUTDIR  = parseString(config, 'OutputDir')
-NRAD    = parseValue (config, 'nrad'   )
-NSEC    = parseValue (config, 'nsec'   )
-RMIN    = parseValue (config, 'rmin'   )
-RMAX    = parseValue (config, 'rmax'   )
-ninterm = parseValue (config, 'ninterm')
-DT      = parseValue (config, 'DT'     )
+OUTDIR  = parseString(config, 'OutputDir'       )
+NRAD    = parseValue (config, 'nrad'            )
+NSEC    = parseValue (config, 'nsec'            )
+RMIN    = parseValue (config, 'rmin',      float)
+RMAX    = parseValue (config, 'rmax',      float)
+ninterm = parseValue (config, 'ninterm'         )
+DT      = parseValue (config, 'DT',        float)
 
-dr      = (RMAX-RMIN)/NRAD
+DR      = (RMAX-RMIN)/NRAD
 dtheta  = 2.*np.pi/NSEC
-radii   = np.linspace(RMIN,RMAX-dr,NRAD) #that is equivalent to Rinf
+
+radii =  getrad(RMIN,RMAX,NRAD,DR,key)
 
 field1D,EXFILE = get1Dfield(key,NRAD,NSEC,radii,OUTDIR,NOUT)
 
