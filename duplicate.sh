@@ -118,8 +118,8 @@ fi
 #----------------------------------------------------------------------
 # /!\ This part may still be subject to bug corrections
 
-sed -i "s?$base?$target?g" $target/jobs/*oar   2&>1 /dev/null
-sed -i "s?$base?$target?g" $target/input*/*par 2&>1 /dev/null
+sed -i "s?$base?$target?g" $target/jobs/*oar   >> /dev/null 2>&1
+sed -i "s?$base?$target?g" $target/input*/*par >> /dev/null 2>&1
 
 
 # SECURITY
@@ -127,4 +127,4 @@ sed -i "s?$base?$target?g" $target/input*/*par 2&>1 /dev/null
 # we force the user to change persmissions before they can 
 # run the simulation in case there is still something wrong
 
-chmod -x $target/*exe 2&>1 /dev/null
+chmod -x $target/*exe >> /dev/null 2>&1
