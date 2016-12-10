@@ -11,9 +11,9 @@
 # It is designed to be as easy as possible to embed into shell loops 
 # 
 # Arguments 
-#    0) path to configuration file (usually called "template.par")
-#    1) physical quantity (see qty dict for details)
-#    2) output number 
+#    0                  ) path to configuration file (usually *.par)
+#    1 to second-to-last) physical quantities, see TAGS for details 
+#    last               ) output number 
 #
 # Options (as additional arguments)
 #    'light') skip the radii column
@@ -157,6 +157,27 @@ def getrad(rmin,rmax,nrad,dr,key) :
         radii = radii_new
     return radii
 
+# file management
+#-----------------------------------
+def saveoutput(tab,k,nout,dt,nint,exfile) :
+    """saving routine"""
+    outfilename = "%s%s_1d.dat" % (TAGS[k], nout)
+    print "saving to %s" % outfilename
+    np.savetxt(outfilename,tab)
+
+    currenttime  = DT * int(nout) * nint
+    currentorbit = currenttime/(2.*np.pi)
+    header  = "#original 2d file name        %s\n" % exfile
+    header += "#time                         %e\n" % currenttime
+    header += "#orbit                        %s\n" % currentorbit
+
+    with open(outfilename,'r') as fi :
+        content = fi.read()
+
+    with open(outfilename,'w') as fi :
+        fi.write(header)
+        fi.write(content)
+
 
 # PARSING
 #----------------------------------------------------------------------
@@ -169,8 +190,15 @@ if len(args)<3 or "-h" in args :
     2) output number
     """.format('|'.join([str(k) for k in TAGS.keys]))
     sys.exit()
+elif len(args)==3 :
+    config,KEYS,NOUT = args
+    KEYS = [KEYS]
+else :
+    NOUT   = args.pop()
+    args.reverse()
+    config = args.pop()
+    KEYS   = args
 
-config,key,NOUT = args
 # print "parsing 1D %s field..." % (key)
 
 OUTDIR  = parseString(config, 'OutputDir'       )
@@ -184,32 +212,17 @@ DT      = parseValue (config, 'DT',        float)
 DR      = (RMAX-RMIN)/NRAD
 dtheta  = 2.*np.pi/NSEC
 
-radii =  getrad(RMIN,RMAX,NRAD,DR,key)
 
-field1D,EXFILE = get1Dfield(key,NRAD,NSEC,radii,OUTDIR,NOUT)
-
-if "light" in args :
-    tabout = field1D
-else :
-    tabout = np.column_stack((radii,field1D))
-
-
-# SAVING
+# MAIN LOOP
 #----------------------------------------------------------------------
+for key in KEYS :
+    radii =  getrad(RMIN,RMAX,NRAD,DR,key)
 
-outfilename = "%s%s_1d.dat" % (TAGS[key], NOUT)
-print "saving to %s" % outfilename
-np.savetxt(outfilename,tabout)
+    field1D,EXFILE = get1Dfield(key,NRAD,NSEC,radii,OUTDIR,NOUT)
 
-currenttime  = DT * int(NOUT) * ninterm
-currentorbit = currenttime/(2.*np.pi)
-header  = "#original 2d file name        %s\n" % EXFILE
-header += "#time                         %e\n" % currenttime
-header += "#orbit                        %s\n" % currentorbit
+    if "light" in args :
+        tabout = field1D
+    else :
+        tabout = np.column_stack((radii,field1D))
 
-with open(outfilename,'r') as fi :
-    content = fi.read()
-
-with open(outfilename,'w') as fi :
-    fi.write(header)
-    fi.write(content)
+    saveoutput(tabout,key,NOUT,DT,ninterm,EXFILE)
