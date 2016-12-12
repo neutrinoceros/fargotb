@@ -26,8 +26,7 @@ import sys              #allow call to classic shell commands
 import fileinput        #used to add headers to outputfiles
 
 
-# DEFINITIONS
-#----------------------------------------------------------------------
+# Defintions **********************************************************
 
 # lower-case keys correspond to existing .dat files. 
 # This dictionnary provides the corresponding rootnames of those files
@@ -54,8 +53,7 @@ Centered  = ["dens", "temperature", "Pressure",
 
 Staggered = ["vrad"]
 
-# parsing fucntions
-#-----------------------------------
+# parsing functions ----------------
 def getScriptArgs() :
     """get a list of the arguments given to the script in order"""
     args = [a for a in  sys.argv]
@@ -113,10 +111,7 @@ def get2Dfield(key,nrad,nsec,outdir,nout) :
 # all recipes must share their arguments
 
 def getflow(nrad,nsec,rad,outdir,nout) :
-    """
-    compute the radial mass flow of the medium
-    /!\ this routine does not account for the staggered scheme
-    """
+    """compute the radial mass flow of the medium"""
     sigma,filesig = get2Dfield('d' ,nrad,nsec,outdir,nout)
     vrad,filevrad = get2Dfield('vr',nrad,nsec,outdir,nout)
     flow2D = 2*np.pi*vrad*sigma
@@ -127,8 +122,7 @@ def getflow(nrad,nsec,rad,outdir,nout) :
 
 RECIPES = {"flow" : getflow}
 
-# main routine
-#-----------------------------------
+# main routine ---------------------
 def get1Dfield(key,nrad,nsec,rad,outdir,nout) :
     """self-explanatory enough ;-)"""
     if   key.islower() :
@@ -157,8 +151,7 @@ def getrad(rmin,rmax,nrad,dr,key) :
         radii = radii_new
     return radii
 
-# file management
-#-----------------------------------
+# file management ------------------
 def saveoutput(tab,k,nout,dt,nint,exfile) :
     """saving routine"""
     outfilename = "%s%s_1d.dat" % (TAGS[k], nout)
@@ -179,8 +172,7 @@ def saveoutput(tab,k,nout,dt,nint,exfile) :
         fi.write(content)
 
 
-# PARSING
-#----------------------------------------------------------------------
+# PARSING *************************************************************
 
 args = getScriptArgs()
 if len(args)<3 or "-h" in args :
@@ -213,8 +205,8 @@ DR      = (RMAX-RMIN)/NRAD
 dtheta  = 2.*np.pi/NSEC
 
 
-# MAIN LOOP
-#----------------------------------------------------------------------
+# MAIN LOOP ***********************************************************
+
 for key in KEYS :
     radii =  getrad(RMIN,RMAX,NRAD,DR,key)
 

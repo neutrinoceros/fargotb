@@ -74,6 +74,7 @@ fi
 
 FLAGS=(
     --exclude="*output/*"  # output files
+    --exclude="*out*"      # output files
     --exclude="*.dat"      # data files
     --exclude="*~"         # temp files
     --exclude="\#*\#"      # emacs autosave files
