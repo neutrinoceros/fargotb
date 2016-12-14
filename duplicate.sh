@@ -132,3 +132,9 @@ sed -i "s?$base?$target?g" $target/in*/*par    >> /dev/null 2>&1
 # run the simulation in case there is still something wrong
 
 chmod -x $target/*exe >> /dev/null 2>&1
+echo
+echo " Warning ------------------------------------------------------"
+echo "   *.exe files are being removed of their -x persmission."
+echo "   please check that everything went well before using chmod +x"
+echo " ------------------------------------------------------ Warning" 
+echo
