@@ -112,7 +112,7 @@ else
         RESTARTFILES=$(eval $optf)
         rsync -av --include=$RESTARTFILES \
             --include=$AUTOINCLUDE \
-            $base/output/*$restartfrom.dat $target/output/
+            $base/output/*$restartfrom.dat $target/output/ 2>/dev/null
     fi
 fi
 
