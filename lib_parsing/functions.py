@@ -55,7 +55,11 @@ def get2Dfield(key,nrad,nsec,outdir,nout) :
     """read a 2D output data file"""
     qty     = TAGS[key]    
     exfile  = getexfile(outdir,qty,nout)
-    field2D = np.fromfile(exfile).reshape(nrad,nsec)
+    try :
+        field2D = np.fromfile(exfile).reshape(nrad,nsec)
+    except IOError :
+        print "IOError : file doesn't exist, aborting script"
+        sys.exit(1)
     return field2D, exfile
 
 def getrad(rmin,rmax,nrad,dr,key) :
