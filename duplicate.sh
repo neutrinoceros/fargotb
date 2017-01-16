@@ -103,8 +103,8 @@ else
     rsync -av "${AUTOEXCLUDE[@]}" $base/ $target 
 
     # optional, addtional synchro including specified restart files
-    optf="find $base/output  | egrep '[^0-9]$restartfrom.dat'"
-    autf="find $base/output/ | egrep '/((planet|orbit)[0-9]*|used_rad|dims).dat'"
+    optf="find $base/out*  | egrep '[^0-9]$restartfrom.dat'"
+    autf="find $base/out*/ | egrep '/((planet|orbit)[0-9]*|used_rad|dims).dat'"
 
     if [[ $restartfrom > 0 ]]
     then
