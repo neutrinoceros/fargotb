@@ -21,4 +21,4 @@ Centered  = ["dens", "temperature", "Pressure",
              "espilon", "label", "dustdens", "gasonlydens",
              "vtheta"]
 
-Staggered = ["vrad"]
+Staggered = ["vrad", "flow"]

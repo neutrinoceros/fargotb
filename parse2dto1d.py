@@ -26,13 +26,13 @@ from lib_parsing import * # built-in module that comes with the toolbox
 # Defintions **********************************************************
 
 # main routine ---------------------
-def get1Dfield(key,nrad,nsec,rad,outdir,nout) :
+def get1Dfield(nrad,nsec,rmin,rmax,dr,outdir,nout,Rinf,Rmed,key) :
     """self-explanatory enough ;-)"""
     if   key.islower() :
-        field2D, exfile  = get2Dfield(key,nrad,nsec,outdir,nout)
+        field2D, exfile = get2Dfield(key,nrad,nsec,outdir,nout)
     elif key.isupper() :
         recipe = RECIPES[TAGS[key]]
-        field2D, exfile  = recipe(nrad,nsec,rad,outdir,nout)
+        field2D, exfile = recipe(nrad,nsec,rmin,rmax,dr,outdir,nout,Rinf,Rmed)
     else :
         err = "key has to provided in pure-lower *or* pure-upper case"
         raise Keyerror(err)
@@ -79,8 +79,6 @@ else :
     config = args.pop()
     KEYS   = args
 
-# print "parsing 1D %s field..." % (key)
-
 OUTDIR  = parseString(config, 'OutputDir'       )
 NRAD    = parseValue (config, 'nrad'            )
 NSEC    = parseValue (config, 'nsec'            )
@@ -96,13 +94,16 @@ dtheta  = 2.*np.pi/NSEC
 # MAIN LOOP ***********************************************************
 
 for key in KEYS :
-    radii =  getrad(RMIN,RMAX,NRAD,DR,key)
+    used_radii =  getrad(RMIN,RMAX,NRAD,DR,key)
+    #either Rinf or Rmed is returned, according to $ke
+    RMED = getrad(RMIN,RMAX,NRAD,DR,'d')
+    RINF = getrad(RMIN,RMAX,NRAD,DR,'vr')
 
-    field1D,EXFILE = get1Dfield(key,NRAD,NSEC,radii,OUTDIR,NOUT)
+    field1D,EXFILE = get1Dfield(NRAD,NSEC,RMIN,RMAX,DR,OUTDIR,NOUT,RINF,RMED,key)
 
     if "light" in args :
         tabout = field1D
     else :
-        tabout = np.column_stack((radii,field1D))
+        tabout = np.column_stack((used_radii,field1D))
 
     saveoutput(tabout,key,NOUT,DT,ninterm,EXFILE)

@@ -112,7 +112,7 @@ else
         RESTARTFILES=$(eval $optf)
         rsync -av --include=$RESTARTFILES \
             --include=$AUTOINCLUDE \
-            $base/output/*$restartfrom.dat $target/output/ 2>/dev/null
+            $base/out*/*$restartfrom.dat $target/out/ 2>/dev/null
     fi
 fi
 
@@ -123,7 +123,6 @@ fi
 # AUTO-EDITING of files mentioning their own location *****************
 
 sed -i "s?$base?$target?g" $target/jobs/*oar   >> /dev/null 2>&1
-sed -i "s?$base?$target?g" $target/input*/*par >> /dev/null 2>&1
 sed -i "s?$base?$target?g" $target/in*/*par    >> /dev/null 2>&1
 
 
