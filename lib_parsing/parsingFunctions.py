@@ -50,29 +50,3 @@ def getexfile(outdir,qty,nout) :
     """put together the exact path to the base data file"""
     exfile = outdir+"gas"+qty+str(nout)+".dat"
     return exfile
-
-def get2Dfield(key,nrad,nsec,outdir,nout) :
-    """read a 2D output data file"""
-    qty     = TAGS[key]    
-    exfile  = getexfile(outdir,qty,nout)
-    try :
-        field2D = np.fromfile(exfile).reshape(nrad,nsec)
-    except IOError :
-        print "IOError : file doesn't exist, aborting script"
-        sys.exit(1)
-    return field2D, exfile
-
-def getrad(rmin,rmax,nrad,dr,key) :
-    #the default radius is Rinf
-    radii   = np.linspace(rmin,rmax-dr,nrad)
-    if TAGS[key] in Centered :
-        #we convert to Rmed if needed
-        L = len(radii)
-        radii_new = np.zeros(L)
-        for i in range(L-1) :
-            radii_new[i]  = 2.*(radii[i+1]**3 - radii[i]**3)
-            radii_new[i] /= 3.*(radii[i+1]**2 - radii[i]**2)
-        radii_new[-1]  = 2.*((radii[-1]+dr)**3 - radii[-1]**3)
-        radii_new[-1] /= 3.*((radii[-1]+dr)**2 - radii[-1]**2)
-        radii = radii_new
-    return radii

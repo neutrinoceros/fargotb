@@ -20,45 +20,9 @@
 #
 # /!\ WARNING : The output file is written in the current directory
 
-import fileinput          # used to add headers to outputfiles
 from lib_parsing import * # built-in module that comes with the toolbox
 
 # Defintions **********************************************************
-
-# main routine ---------------------
-def get1Dfield(nrad,nsec,rmin,rmax,dr,outdir,nout,Rinf,Rmed,key) :
-    """self-explanatory enough ;-)"""
-    if   key.islower() :
-        field2D, exfile = get2Dfield(key,nrad,nsec,outdir,nout)
-    elif key.isupper() :
-        recipe = RECIPES[TAGS[key]]
-        field2D, exfile = recipe(nrad,nsec,rmin,rmax,dr,outdir,nout,Rinf,Rmed)
-    else :
-        err = "key has to provided in pure-lower *or* pure-upper case"
-        raise Keyerror(err)
-    integral = field2D.sum(axis=1)/nsec
-    return integral, exfile
-
-# file management ------------------
-def saveoutput(tab,k,nout,dt,nint,exfile) :
-    """saving routine"""
-    outfilename = "%s%s_1d.dat" % (TAGS[k], nout)
-    print "saving to %s" % outfilename
-    np.savetxt(outfilename,tab)
-
-    currenttime  = DT * int(nout) * nint
-    currentorbit = currenttime/(2.*np.pi)
-    header  = "#original 2d file name        %s\n" % exfile
-    header += "#time                         %e\n" % currenttime
-    header += "#orbit                        %s\n" % currentorbit
-
-    with open(outfilename,'r') as fi :
-        content = fi.read()
-
-    with open(outfilename,'w') as fi :
-        fi.write(header)
-        fi.write(content)
-
 
 # PARSING *************************************************************
 
