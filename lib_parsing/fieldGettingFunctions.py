@@ -33,6 +33,6 @@ def get2Dfield(key,nrad,nsec,outdir,nout) :
     try :
         field2D = np.fromfile(exfile).reshape(nrad,nsec)
     except IOError :
-        print "IOError : file doesn't exist, aborting script"
+        print "IOError : {0} doesn't exist, aborting script".format(exfile)
         sys.exit(1)
     return field2D, exfile
