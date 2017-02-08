@@ -44,6 +44,7 @@ else :
     KEYS   = args
 
 OUTDIR  = parseString(config, 'OutputDir'       )
+SPACING = parseString(config, 'RadialSpacing'   )
 NRAD    = parseValue (config, 'nrad'            )
 NSEC    = parseValue (config, 'nsec'            )
 RMIN    = parseValue (config, 'rmin',      float)
@@ -58,10 +59,10 @@ dtheta  = 2.*np.pi/NSEC
 # MAIN LOOP ***********************************************************
 
 for key in KEYS :
-    used_radii =  getrad(RMIN,RMAX,NRAD,DR,key)
+    used_radii =  getrad(RMIN,RMAX,NRAD,DR,key,SPACING)
     #either Rinf or Rmed is returned, according to $ke
-    RMED = getrad(RMIN,RMAX,NRAD,DR,'d')
-    RINF = getrad(RMIN,RMAX,NRAD,DR,'vr')
+    RMED = getrad(RMIN,RMAX,NRAD,DR,'d',SPACING)
+    RINF = getrad(RMIN,RMAX,NRAD,DR,'vr',SPACING)
 
     field1D,EXFILE = get1Dfield(NRAD,NSEC,RMIN,RMAX,DR,OUTDIR,NOUT,RINF,RMED,key)
 

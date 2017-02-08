@@ -1,12 +1,15 @@
 from parsingFunctions import *
 
-def getRinf(rmin,rmax,nrad,dr) :
-    rinf = np.linspace(rmin,rmax-dr,nrad)
+def getRinf(rmin,rmax,nrad,dr,spacing) :
+    if spacing == "Logarithmic" :
+        rinf = np.array([rmin * np.exp(i * np.log(rmax/rmin)/nrad) for i in range(nrad)])
+    else : #default is "Arithmetic"
+        rinf = np.linspace(rmin,rmax-dr,nrad)
     return rinf
 
 
-def getRmed(rmin,rmax,nrad,dr) :
-    rinf = getRinf(rmin,rmax,nrad,dr)
+def getRmed(rmin,rmax,nrad,dr,spacing) :
+    rinf = getRinf(rmin,rmax,nrad,dr,spacing)
     L = len(rinf)
     rmed = np.zeros(L)
     for i in range(L-1) :
@@ -17,12 +20,12 @@ def getRmed(rmin,rmax,nrad,dr) :
     return rmed
 
 
-def getrad(rmin,rmax,nrad,dr,key) :
+def getrad(rmin,rmax,nrad,dr,key,spacing) :
     #the default radius is Rinf, because it is easier to compute
     if TAGS[key] in Centered :
-        rad = getRmed(rmin,rmax,nrad,dr)
+        rad = getRmed(rmin,rmax,nrad,dr,spacing)
     else :
-        rad = getRinf(rmin,rmax,nrad,dr)
+        rad = getRinf(rmin,rmax,nrad,dr,spacing)
     return rad
 
 
