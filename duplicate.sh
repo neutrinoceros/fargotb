@@ -135,11 +135,19 @@ echo
 read -p "*) enter new OAR tag        " NEW_OARTAG
 sed -i "s?$OLD_OARTAG?#OAR -n $NEW_OARTAG?g" $target/jobs/*oar >> /dev/null 2>&1
 
+
+docfile=$target/Infos.md
 echo
 read -p "*) enter docstring          " DocString
-echo "simtag           $NEW_OARTAG" >  $target/Infos.md
-echo "copied from      $base"       >> $target/Infos.md
-echo "docstring        $DocString"  >> $target/Infos.md
+
+
+echo ''                             >  $docfile
+echo "# file : $docfile"            >> $docfile
+echo "----------------------------------------------------------------" >> $docfile
+echo "simtag           $NEW_OARTAG" >> $docfile
+echo "copied from      $base"       >> $docfile
+echo "docstring        $DocString"  >> $docfile
+echo ''                             >> $docfile
 
 
 # SECURITY ************************************************************
