@@ -1,0 +1,25 @@
+#macros
+#----------------------------------------------------------------------------
+
+getmassFARGO() {
+    #arg : terminal.dat where total mass is printed
+    cat $1 | grep -i "gas total mass" | cut -d " " -f 5 > mass.dat
+}
+alias fargetmass=getmassFARGO
+
+
+tell_whats_new () {
+    base=$(eval "grep 'copied from' Infos.md | tr -s ' ' | cut -d ' ' -f 3")
+    echo base is $base      
+    diff $base/in/phase0.par $(pwd)/in/phase0.par
+}
+alias whatsnew=tell_whats_new
+
+
+#aliases
+#----------------------------------------------------------------------------
+
+alias farcurve="fargnuplot -x -curve"
+
+alias farmake="cd srcdust; make build=PARALLEL; cd ../"
+ 
