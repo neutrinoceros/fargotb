@@ -38,6 +38,13 @@ AUTOEXCLUDE=(
     --exclude="*.md*"      # documentation files
      )
 
+RESTART_AUTOINCLUDE=(
+    --include="planet*.dat"
+    --include="orbit*.dat"
+    --include="used_rad.dat"
+    --include="dims.dat"    
+    )
+
 
 # PARSING *************************************************************
 # options ---------------------------------------------------------
@@ -88,38 +95,34 @@ fi
 
 # SYNCHRONIZATION *****************************************************
 
-if [[ $MVMODE == true ]]
-then
-    echo "THIS IS MVMODE"
-    read -p "proceed (y/[n])?    " choice
+if [[ $MVMODE == true ]] ; then
+    read -p  \
+        "*) This is mv-mode of duplicate. Proceed (y/[n])?    " choice
 
-case "$choice" in
-    y|Y|yes|YES ) mv $base $target
-        ;;
-    *) echo "I'm sorry Dave. I'm afraid I can't do that"
-        ;;
-esac
+    case "$choice" in
+        y|Y|yes|YES ) mv $base $target
+            ;;
+        *) echo "I'm sorry Dave. I'm afraid I can't do that"
+            ;;
+    esac
 
 else
     # main synchronisation
     rsync -av "${AUTOEXCLUDE[@]}" $base/ $target 
 
-    # optional, addtional synchro including specified restart files
-    optf="find $base/out*  | egrep '[^0-9]$restartfrom.dat'"
-    autf="find $base/out*/ | egrep '/((planet|orbit)[0-9]*|used_rad|dims).dat'"
-
-    if [[ $restartfrom > 0 ]]
-    then
-        AUTOINCLUDE=$(eval $autf)
-        RESTARTFILES=$(eval $optf)
-        rsync -av --include=$RESTARTFILES \
-            --include=$AUTOINCLUDE \
-            $base/out*/*$restartfrom.dat $target/out/ 2>/dev/null
+    if [[ $restartfrom > 0 ]] ; then
+        # optional, addtional synchro including specified restart files
+        RESTART_FILES=(--include="*$restartfrom.dat")
+        rsync -av \
+            "${RESTART_AUTOINCLUDE[@]}" \
+            "${RESTART_FILES[@]}" \
+            --exclude="*" \
+            $base/out*/ $target/out/ 2>/dev/null
     fi
 fi
 
 if [[ $? != 0 ]] ; then
-    echo "error : something went wrong while syncing." ;exit 1
+    echo "error : something went wrong while syncing." ; exit 1
 fi
 
 # AUTO-EDITING of files mentioning their own location *****************
@@ -143,11 +146,12 @@ read -p "*) enter docstring          " DocString
 
 echo ''                             >  $docfile
 echo "# file : $docfile"            >> $docfile
-echo "----------------------------------------------------------------" >> $docfile
+echo "----------------------------------------------------------------" \
+                                    >> $docfile
 echo "simtag           $NEW_OARTAG" >> $docfile
 echo "copied from      $base"       >> $docfile
 echo "docstring        $DocString"  >> $docfile
-echo ''                             >> $docfile
+echo -e "\n"                        >> $docfile
 
 
 # SECURITY ************************************************************
