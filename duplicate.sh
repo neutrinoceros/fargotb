@@ -133,26 +133,27 @@ sed -i "s?$base?$target?g" $target/in*/*par    >> /dev/null 2>&1
 
 # INTERACTIVE DOCUMENTATION *******************************************
 
-OLD_OARTAG=$(eval "grep --no-filename '#OAR -n' $base/jobs/*.oar | head --lines 1")
-echo 
-read -p "*) enter new OAR tag        " NEW_OARTAG
-sed -i "s?$OLD_OARTAG?#OAR -n $NEW_OARTAG?g" $target/jobs/*oar >> /dev/null 2>&1
+if [[ $MVMODE != true ]] ; then
+    OLD_OARTAG=$(eval "grep --no-filename '#OAR -n' $base/jobs/*.oar | head --lines 1")
+    echo 
+    read -p "*) enter new OAR tag        " NEW_OARTAG
+    sed -i "s?$OLD_OARTAG?#OAR -n $NEW_OARTAG?g" $target/jobs/*oar >> /dev/null 2>&1
 
 
-docfile=$target/Infos.md
-echo
-read -p "*) enter docstring          " DocString
+    docfile=$target/Infos.md
+    echo
+    read -p "*) enter docstring          " DocString
 
 
-echo ''                             >  $docfile
-echo "# file : $docfile"            >> $docfile
-echo "----------------------------------------------------------------" \
-                                    >> $docfile
-echo "simtag           $NEW_OARTAG" >> $docfile
-echo "copied from      $base"       >> $docfile
-echo "docstring        $DocString"  >> $docfile
-echo -e "\n"                        >> $docfile
-
+    echo ''                             >  $docfile
+    echo "# file : $docfile"            >> $docfile
+    echo "----------------------------------------------------------------" \
+        >> $docfile
+    echo "simtag           $NEW_OARTAG" >> $docfile
+    echo "copied from      $base"       >> $docfile
+    echo "docstring        $DocString"  >> $docfile
+    echo -e "\n"                        >> $docfile
+fi
 
 # SECURITY ************************************************************
 # we force the user to change persmissions before they can 
