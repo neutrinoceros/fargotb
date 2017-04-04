@@ -48,10 +48,10 @@ RESTART_AUTOINCLUDE=(
 
 # PARSING *************************************************************
 # options ---------------------------------------------------------
-while getopts r:R:mMhH option
+while getopts r:R:s:S:mMhH option
 do
     case $option in
-        r|R ) restartfrom=$2 ;
+        r|R|s|S ) restartfrom=$2 ;
             shift $((OPTIND-1))
             ;;
         m|M ) MVMODE=true
