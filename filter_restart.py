@@ -29,17 +29,13 @@ plan_fmt = ['%d'] + ['%.18g']*10
 orb_fmt  = ['%.14e']*6
 for i in range(n_planets) :
    try :
-        orbit_data = np.loadtxt("out/orbit{0}.dat".format(i))
-        print "data for planet %d loaded !" % (i)
-
         plan_file = "out/planet{0}.dat".format(i)
         lines = filter(lambda x:int(x.split('\t')[0])<=n_restart,open(plan_file,'r'))
         open(plan_file,'w').write("".join(lines))
 
-        Jcut = 0
-        while orbit_data[Jcut,0] < t_restart :
-            Jcut += 1
-        np.savetxt("out/orbit{0}.dat".format(i),orbit_data[0:Jcut+1,], fmt=orb_fmt,delimiter="\t")
+        orb_file  = "out/orbit{0}.dat".format(i)
+        lines = filter(lambda x:float(x.split('\t')[0])<=t_restart,open(orb_file,'r'))
+        open(orb_file,'w').write("".join(lines))
         
    except IOError :
        print i, "failed"
