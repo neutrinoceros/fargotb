@@ -25,22 +25,21 @@ except IndexError :
 DT        = parseValue (config, 'DT',        float)
 ninterm   = parseValue (config, 'ninterm'         )
 t_restart = DT * n_restart * ninterm
-plan_fmt = ['%d'] + ['%.18e']*10
+plan_fmt = ['%d'] + ['%.18g']*10
 orb_fmt  = ['%.14e']*6
 for i in range(n_planets) :
    try :
-        plan_data  = np.loadtxt("out/planet{0}.dat".format(i))
         orbit_data = np.loadtxt("out/orbit{0}.dat".format(i))
         print "data for planet %d loaded !" % (i)
-        Icut = 0
-        while plan_data[Icut,0] < n_restart :
-            Icut += 1
-        np.savetxt("out/planet{0}.dat".format(i),plan_data[0:Icut+1,], fmt=plan_fmt)
+
+        plan_file = "out/planet{0}.dat".format(i)
+        lines = filter(lambda x:int(x.split('\t')[0])<=n_restart,open(plan_file,'r'))
+        open(plan_file,'w').write("".join(lines))
 
         Jcut = 0
         while orbit_data[Jcut,0] < t_restart :
             Jcut += 1
-        np.savetxt("out/orbit{0}.dat".format(i),orbit_data[0:Jcut+1,], fmt=orb_fmt)
+        np.savetxt("out/orbit{0}.dat".format(i),orbit_data[0:Jcut+1,], fmt=orb_fmt,delimiter="\t")
         
    except IOError :
        print i, "failed"
