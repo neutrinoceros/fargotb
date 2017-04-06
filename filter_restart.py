@@ -23,7 +23,8 @@ except IndexError :
     print "Warning : if you don't use excactly 3 arguments, only one planet is considered."
 
 DT        = parseValue (config, 'DT',        float)
-t_restart = DT * n_restart 
+ninterm   = parseValue (config, 'ninterm'         )
+t_restart = DT * n_restart * ninterm
 plan_fmt = ['%d'] + ['%.18e']*10
 orb_fmt  = ['%.14e']*6
 for i in range(n_planets) :
