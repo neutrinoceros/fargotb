@@ -1,5 +1,16 @@
 #!/usr/bin/python
 #-*-coding:utf-8-*-
+# --------------------------
+# Author : Clément Robert
+# written april 2017
+# --------------------------
+# This program filters out all lines in orbitNNN.dat and planetNNN.dat files you may get after a
+# long run, from where you want to restart, avoiding piling up useless data
+#
+# Arguments 
+#    0   ) path to configuration file (usually *.par)
+#    1   ) last output number you want to keep
+#    [2] ) number of planets used. Default is one.
 
 from lib_parsing import *
 
