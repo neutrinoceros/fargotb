@@ -3,17 +3,19 @@
 
 from lib_parsing import *
 
-
 args = getScriptArgs()
 try :
-    n_restart,n_planets = int(args[0]),int(args[1])
+    config,n_restart,n_planets = args[0],int(args[1]),int(args[2])
 except IndexError :
-    n_restart = int(args[0])
-    print "Warning : if you don't use excactly 2 arguments, only the first one is used."
+    config,n_restart = args[0],int(args[1])
+    n_planets = 1
+    print "Warning : if you don't use excactly 3 arguments, only one planet is considered."
 
-
+DT        = parseValue (config, 'DT',        float)
+t_restart = DT * n_restart 
 plan_fmt = ['%d'] + ['%.18e']*10
-for i in range(10) :
+orb_fmt  = ['%.14e']*6
+for i in range(n_planets) :
    try :
         plan_data  = np.loadtxt("out/planet{0}.dat".format(i))
         orbit_data = np.loadtxt("out/orbit{0}.dat".format(i))
@@ -23,6 +25,11 @@ for i in range(10) :
             Icut += 1
         np.savetxt("out/planet{0}.dat".format(i),plan_data[0:Icut+1,], fmt=plan_fmt)
 
+        Jcut = 0
+        while orbit_data[Jcut,0] < t_restart :
+            Jcut += 1
+        np.savetxt("out/orbit{0}.dat".format(i),orbit_data[0:Jcut+1,], fmt=orb_fmt)
+        
    except IOError :
        print i, "failed"
        pass
