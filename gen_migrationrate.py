@@ -11,7 +11,6 @@ from lib_parsing import *
 args = getScriptArgs()
 
 #unpack args
-print args[0]
 
 config = args[0]
 #parse values of h0,alpha
@@ -35,6 +34,10 @@ vrth  = vr_theo(sma,ASPECTRATIO,ALPHA_VISC)
 
 #dotsma = ... #choose you algorithm
 smadot = np.zeros(len(sma))
+for i in range(1,len(sma)) :
+    smadot[i] = (sma[i] - sma[i-1]) / (time[i]-time[i-1])
+#smadot /= 2.
+    
 #pack everything nicely together
 array = np.column_stack([time,sma,smadot,vrth])
 np.savetxt("typeII.dat",array,fmt="%.14e %.14e %.14e %.14e")
