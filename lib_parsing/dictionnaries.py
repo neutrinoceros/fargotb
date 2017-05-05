@@ -13,7 +13,8 @@ TAGS = {"d"  : "dens",
         "l"  : "label",
         "do" : "dustdens",
         "go" : "gasonlydens",
-        #--------------------
+        #--------------------exp
+        "rf" : "InstantRadialFlow",
         "PHI": "flow"
        }
 

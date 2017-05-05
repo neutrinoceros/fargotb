@@ -30,8 +30,7 @@ def getflow(nrad,nsec,rmin,rmax,dr,outdir,nout,Rinf,Rmed) :
     for i in range(nrad) :
         flow2D[i] *= Rinf[i]
     return flow2D, used_files
-
-
+    
 # -----------------------------------------------------------
 
 RECIPES = {"sigmaInf" : getSigmaInf,
