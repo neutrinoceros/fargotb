@@ -14,7 +14,7 @@ TAGS = {"d"  : "dens",
         "do" : "dustdens",
         "go" : "gasonlydens",
         #--------------------exp
-        "rf" : "InstantRadialFlow",
+        "rf" : "radialFlow",
         "PHI": "flow"
        }
 
