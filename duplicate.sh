@@ -41,6 +41,7 @@ AUTOEXCLUDE=(
 RESTART_AUTOINCLUDE=(
     --include="planet*.dat"
     --include="orbit*.dat"
+    --include="acc*.dat"
     --include="used_rad.dat"
     --include="dims.dat"    
     )
