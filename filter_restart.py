@@ -4,7 +4,7 @@
 # Author : Clément Robert
 # written april 2017
 # --------------------------
-# This program filters out all lines in orbitNNN.dat and planetNNN.dat files you may get after a
+# This program filters out all lines in {orbit,planet,acc}NNN.dat files you may get after a
 # long run, from where you want to restart, avoiding piling up useless data
 #
 # Arguments 
@@ -36,6 +36,10 @@ for i in range(n_planets) :
         orb_file  = "out/orbit{0}.dat".format(i)
         lines = filter(lambda x:float(x.split('\t')[0])<=t_restart,open(orb_file,'r'))
         open(orb_file,'w').write("".join(lines))
+
+        acc_file  = "out/acc{0}.dat".format(i)
+        lines = filter(lambda x:float(x.split('\t')[0])<=t_restart,open(acc_file,'r'))
+        open(acc_file,'w').write("".join(lines))
         
    except IOError :
        print i, "failed"
