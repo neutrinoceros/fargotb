@@ -25,8 +25,8 @@ except IndexError :
 DT        = parseValue (config, 'DT',        float)
 ninterm   = parseValue (config, 'ninterm'         )
 t_restart = DT * n_restart * ninterm
-plan_fmt = ['%d'] + ['%.18g']*10
-orb_fmt  = ['%.14e']*6
+#plan_fmt = ['%d'] + ['%.18g']*10
+#orb_fmt  = ['%.14e']*6
 for i in range(n_planets) :
    try :
         plan_file = "out/planet{0}.dat".format(i)
@@ -37,6 +37,8 @@ for i in range(n_planets) :
         lines = filter(lambda x:float(x.split('\t')[0])<=t_restart,open(orb_file,'r'))
         open(orb_file,'w').write("".join(lines))
 
+        #dev note : this may cause problems if ran in old simulation directories 
+        #lacking the acc.dat files. This will be fixed with a try/expect sub-structure
         acc_file  = "out/acc{0}.dat".format(i)
         lines = filter(lambda x:float(x.split('\t')[0])<=t_restart,open(acc_file,'r'))
         open(acc_file,'w').write("".join(lines))
