@@ -12,8 +12,6 @@ import argparse
 #issues :
 #     * background should be azimuthally cropped for the colormap to have correct scaling
 #     * xticks are uniformative in case of azimcropping
-#     * imshow may or may not be interpolating stuff, and we don't want this to hide
-#       our resolution
 
 # Defintions **********************************************************
 def Hill_radius(r_p,q_p) :
