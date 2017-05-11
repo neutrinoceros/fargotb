@@ -121,6 +121,8 @@ ax.set_xticklabels([r"$-\pi$",r"$-\pi/2$",r"$0$",r"$\pi/2$",r"$\pi$"])
 ytickslab = [r"${0}$".format(round(bg_used_radii_crop[int(n)],2)) for n in ax.get_yticks()[:-1]]
 ax.set_yticklabels(ytickslab)
 
+ax.set_xlabel(r"$\theta$", size=20)
+ax.set_ylabel(r"$r$",      size=20)
 
 #test zone
 #ax2.imshow(bg_field,cmap='viridis',aspect="auto")
