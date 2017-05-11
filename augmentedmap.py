@@ -77,6 +77,8 @@ parser.add_argument('-s', '--hillsphere',  action= 'store_true',
                     help="traces 0.3*R_H and R_H levels")
 parser.add_argument('-sl','--streamlines', action= 'store_true',
                     help="add streamlines (NOT IMPLEMENTED YET)")
+parser.add_argument('-q','--quiver', action= 'store_true',
+                    help="add quiver of velocity field (NOT IMPLEMENTED YET)")
 # keywords arguments -------------------------------------------------
 parser.add_argument('-bg','--background',dest='bg_key',
                     help="define background field using keys (label, density, FLI ...)",
@@ -197,6 +199,12 @@ if args.hillsphere :
 # todo
 if args.streamlines :
     print "Sorry, STREAMLINES are not implemented yet, come back later !"
+
+
+# draw velocity field ------------------------------------------------
+# todo
+if args.quiver :
+    print "Sorry, QUIVER is not implemented yet, come back later !"
 
 
 # PRINTING OUTPUT *****************************************************
