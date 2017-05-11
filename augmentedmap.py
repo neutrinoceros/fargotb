@@ -11,7 +11,6 @@ import argparse
 
 #issues :
 #     * background should be azimuthally cropped for the colormap to have correct scaling
-#     * Hill spheres are not exactly centered
 #     * xticks are uniformative in case of azimcropping
 #     * imshow may or may not be interpolating stuff, and we don't want this to hide
 #       our resolution
@@ -172,24 +171,23 @@ ax.set_ylabel(r"$r$",      size=20)
 #set limits
 ax.set_xlim(Imin,Imax)
 ax.set_ylim(0,Jmax-(Jmin+1))
-# draw hill sphere(s) #todo : make this optional
 
+
+# draw hill sphere(s) #todo : make this optional
 R_H = Hill_radius(r_p,q_p)
 thetas=np.linspace(0,2*np.pi,100)
-
 R_H_code = R_H/(r_p*dtheta)
-#dev note : those are not proprely centered FIXME
+
 ax.plot( *circle(NSEC/2,j_p-1,R_H_code,thetas),     c='r', ls='--')
 ax.plot( *circle(NSEC/2,j_p-1,0.3*R_H_code,thetas), c='r', ls='-')
-
-cb = fig.colorbar(im)
-cb.set_label("background value")#tmp
-
 
 # draw stream lines (optional) ****************************************
 
 
 # print out or save figure (optional flag) ****************************
+cb = fig.colorbar(im)
+cb.set_label("background value")#tmp
+
 #ax.plot(np.arange(NSEC),j_p*np.ones(NSEC),c='w',ls='--')#debug
 #plt.show()
 fig.savefig("coucou.png")
