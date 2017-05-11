@@ -27,17 +27,17 @@ def Hill_radius(r_p,q_p) :
 def findRadialLimits(r_p,q_p,rads,croper=5.) :
     R_H = Hill_radius(r_p,q_p)
     nr = len(rads)
-    jmin,jmax = 0,nr-1
+    jmin,jmax = 0,nr
     while rads[jmin] < r_p-croper*R_H :
         jmin +=1
-    while rads[jmax-2] > r_p+croper*R_H :
+    while rads[jmax-2] > r_p+croper*R_H :#todo : check -2 ???
         jmax -=1
     return jmin,jmax
 
 def findAzimLimits(r_p,q_p,thetas,croper=5.) :
     R_H = Hill_radius(r_p,q_p)
     ns = len(thetas)
-    imin,imax = 0,ns-1
+    imin,imax = 0,ns
     while r_p*thetas[imin] < -croper*R_H :
         imin +=1
     while r_p*thetas[imax-1] > croper*R_H :
@@ -55,7 +55,7 @@ def rotate(field,thetas,theta_p) :
         i_p += 1
 
     cesure  = ns/2 - i_p
-    rfield1 = np.concatenate((field[:,-cesure:ns-1],field[:,0:i_p]),axis=1)
+    rfield1 = np.concatenate((field[:,-cesure:ns-1],field[:,0:i_p+1]),axis=1)
     rfield2 = field[:,i_p:-cesure]
     rfield  = np.concatenate((rfield1,rfield2),axis=1)
     return rfield
@@ -142,15 +142,15 @@ ax = fig.add_subplot(111,aspect='auto')
 bg_field,     bgfile = get2Dfield(args.bg_key,NRAD,NSEC,OUTDIR,args.NOUT)
 vrad_field,   vrfile = get2Dfield('vr',NRAD,NSEC,OUTDIR,args.NOUT)
 vtheta_field, vtfile = get2Dfield('vt',NRAD,NSEC,OUTDIR,args.NOUT)
-bg_used_radii    = getrad(RMIN,RMAX,NRAD,DR,args.bg_key,SPACING)
-
-Jmin,Jmax          = findRadialLimits(r_p,q_p,bg_used_radii,args.crop_limit)
+bg_used_radii        = getrad(RMIN,RMAX,NRAD,DR,args.bg_key,SPACING)
 
 # rotation
 bg_field           = rotate(bg_field,     base_theta,theta_p)
 vrad_field         = rotate(vrad_field,   base_theta,theta_p)
 vtheta_field       = rotate(vtheta_field, base_theta,theta_p)
+
 # cropping
+Jmin,Jmax = findRadialLimits(r_p,q_p,bg_used_radii,args.crop_limit)
 bg_field_crop      = bg_field     [Jmin:Jmax,:]
 vrad_field_crop    = vrad_field   [Jmin:Jmax,:]
 vtheta_field_crop  = vtheta_field [Jmin:Jmax,:]
