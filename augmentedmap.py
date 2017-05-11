@@ -14,10 +14,11 @@ import argparse
 #     * xticks are uniformative in case of azimcropping
 #     * bug : ./augmentedmap.py ../data/in/phase0.par 20 -c 10 -tc yields wrong yticks
 
+
 # Defintions **********************************************************
+
 def Hill_radius(r_p,q_p) :
     return r_p*(q_p/3)**(1./3)
-
 
 def findRadialLimits(r_p,q_p,rads,croper=5.) :
     R_H = Hill_radius(r_p,q_p)
@@ -53,10 +54,11 @@ def rotate(field,thetas,theta_p) :
     ffield1 = np.concatenate((field[:,-cesure:ns-1],field[:,0:i_p]),axis=1)
     ffield2 = field[:,i_p:-cesure]
     ffield  = np.concatenate((ffield1,ffield2),axis=1)
-    return ffield,cesure
+    return ffield
 
 def circle(x0,y0,r,theta) :
     return x0+r*np.cos(theta), y0+r*np.sin(theta)
+
 
 # PARSING *************************************************************
 
@@ -68,7 +70,9 @@ parser.add_argument('-bg','--background',dest='bg_key', choices=['l','d'], defau
                     help="define background field using keys (label, density, FLI...)")
 parser.add_argument('-c' ,'--crop',      dest='crop_limit', type=float, default = 1000,
                     help="narrow down the region of interest in mutliples of R_Hill around the planet")
-parser.add_argument('-tc','--thetacrop', action= 'store_true')
+parser.add_argument('-tc','--thetacrop',         action= 'store_true')
+parser.add_argument('-s', '--hillsphere', dest='hill', action= 'store_true',
+                    help="traces 0.3*R_H and R_H levels")
 
 args = parser.parse_args()
 if args.thetacrop :
@@ -126,10 +130,10 @@ bg_used_radii    = getrad(RMIN,RMAX,NRAD,DR,args.bg_key,SPACING)
 # define background field, vt, vr
 # useful options should be density, label, FLI
 
-Jmin,Jmax = findRadialLimits(r_p,q_p,bg_used_radii,args.crop_limit)
-bg_field,cesure = rotate(bg_field,base_theta,theta_p)
+Jmin,Jmax          = findRadialLimits(r_p,q_p,bg_used_radii,args.crop_limit)
+bg_field           = rotate(bg_field,base_theta,theta_p)
+bg_field_crop      = bg_field[Jmin:Jmax,:]
 bg_used_radii_crop = bg_used_radii[Jmin:Jmax]
-bg_field_crop = bg_field[Jmin:Jmax,:]
 
 #These two lines need to be run after rotation...
 i_p = 0
@@ -168,12 +172,13 @@ ax.set_ylim(0,Jmax-(Jmin+1))
 
 
 # draw hill sphere(s) #todo : make this optional
-R_H = Hill_radius(r_p,q_p)
-thetas=np.linspace(0,2*np.pi,100)
-R_H_code = R_H/(r_p*dtheta)
+if args.hill :
+    R_H = Hill_radius(r_p,q_p)
+    thetas=np.linspace(0,2*np.pi,100)
+    R_H_code = R_H/(r_p*dtheta)
+    ax.plot( *circle(NSEC/2,j_p-1,R_H_code,thetas),     c='r', ls='--')
+    ax.plot( *circle(NSEC/2,j_p-1,0.3*R_H_code,thetas), c='r', ls='-')
 
-ax.plot( *circle(NSEC/2,j_p-1,R_H_code,thetas),     c='r', ls='--')
-ax.plot( *circle(NSEC/2,j_p-1,0.3*R_H_code,thetas), c='r', ls='-')
 
 # draw stream lines (optional) ****************************************
 
