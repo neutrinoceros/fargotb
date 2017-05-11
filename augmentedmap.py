@@ -12,6 +12,7 @@ import argparse
 #issues :
 #     * background should be azimuthally cropped for the colormap to have correct scaling
 #     * xticks are uniformative in case of azimcropping
+#     * bug : ./augmentedmap.py ../data/in/phase0.par 20 -c 10 -tc yields wrong yticks
 
 # Defintions **********************************************************
 def Hill_radius(r_p,q_p) :
@@ -70,23 +71,22 @@ parser.add_argument('-c' ,'--crop',      dest='crop_limit', type=float, default 
 parser.add_argument('-tc','--thetacrop', action= 'store_true')
 
 args = parser.parse_args()
-config     = args.config
-NOUT       = args.NOUT
-bg_key     = args.bg_key
-crop_limit = args.crop_limit
-azim_crop  = args.thetacrop
+if args.thetacrop :
+    azim_crop_limit = args.crop_limit
+else :
+    azim_crop_limit = 1000
 
 #--------------------------------------------------
 
 
-OUTDIR  = parseString(config, 'OutputDir'       )
-SPACING = parseString(config, 'RadialSpacing'   )
-NRAD    = parseValue (config, 'nrad'            )
-NSEC    = parseValue (config, 'nsec'            )
-RMIN    = parseValue (config, 'rmin',      float)
-RMAX    = parseValue (config, 'rmax',      float)
-ninterm = parseValue (config, 'ninterm'         )
-DT      = parseValue (config, 'DT',        float)
+OUTDIR  = parseString(args.config, 'OutputDir'       )
+SPACING = parseString(args.config, 'RadialSpacing'   )
+NRAD    = parseValue (args.config, 'nrad'            )
+NSEC    = parseValue (args.config, 'nsec'            )
+RMIN    = parseValue (args.config, 'rmin',      float)
+RMAX    = parseValue (args.config, 'rmax',      float)
+ninterm = parseValue (args.config, 'ninterm'         )
+DT      = parseValue (args.config, 'DT',        float)
 
 DR      = (RMAX-RMIN)/NRAD
 dtheta  = 2.*np.pi/NSEC
@@ -116,8 +116,8 @@ theta_p = 0.0#by definition
 fig = plt.figure()
 ax = fig.add_subplot(111,aspect='auto')
 
-bg_field, bgfile = get2Dfield(bg_key,NRAD,NSEC,OUTDIR,NOUT)
-bg_used_radii    = getrad(RMIN,RMAX,NRAD,DR,bg_key,SPACING)
+bg_field, bgfile = get2Dfield(args.bg_key,NRAD,NSEC,OUTDIR,args.NOUT)
+bg_used_radii    = getrad(RMIN,RMAX,NRAD,DR,args.bg_key,SPACING)
 
 
 # crop plotting region, cut out fields (optional) *********************
@@ -126,7 +126,7 @@ bg_used_radii    = getrad(RMIN,RMAX,NRAD,DR,bg_key,SPACING)
 # define background field, vt, vr
 # useful options should be density, label, FLI
 
-Jmin,Jmax = findRadialLimits(r_p,q_p,bg_used_radii,crop_limit)
+Jmin,Jmax = findRadialLimits(r_p,q_p,bg_used_radii,args.crop_limit)
 bg_field,cesure = rotate(bg_field,base_theta,theta_p)
 bg_used_radii_crop = bg_used_radii[Jmin:Jmax]
 bg_field_crop = bg_field[Jmin:Jmax,:]
@@ -142,11 +142,7 @@ while bg_used_radii_crop[j_p] < r_p :
 bg_used_theta = rotated_theta
 
 #finding limits of the plot
-if azim_crop :
-    azim_crop = crop_limit
-else :
-    azim_crop = 1000
-Imin,Imax = findAzimLimits(r_p,q_p,bg_used_theta,azim_crop)
+Imin,Imax = findAzimLimits(r_p,q_p,bg_used_theta,azim_crop_limit)
 
 
 im = ax.imshow(bg_field_crop,cmap='viridis',aspect="auto",
