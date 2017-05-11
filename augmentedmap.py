@@ -111,12 +111,16 @@ bg_field_crop = bg_field[Jmin:Jmax,:]
 
 ax.imshow(bg_field_crop,cmap='viridis',aspect="auto")
 ax.set_ylim(0,Jmax-(Jmin+1))
+
+
 # set ticks
-
-
-
 ax.set_xticks([0,NSEC/4,NSEC/2,3*NSEC/4,NSEC])
 ax.set_xticklabels([r"$-\pi$",r"$-\pi/2$",r"$0$",r"$\pi/2$",r"$\pi$"])
+
+
+ytickslab = [r"${0}$".format(round(bg_used_radii_crop[int(n)],2)) for n in ax.get_yticks()[:-1]]
+ax.set_yticklabels(ytickslab)
+
 
 #test zone
 #ax2.imshow(bg_field,cmap='viridis',aspect="auto")
