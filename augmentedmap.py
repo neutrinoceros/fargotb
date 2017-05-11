@@ -55,10 +55,10 @@ def rotate(field,thetas,theta_p) :
         i_p += 1
 
     cesure  = ns/2 - i_p
-    ffield1 = np.concatenate((field[:,-cesure:ns-1],field[:,0:i_p]),axis=1)
-    ffield2 = field[:,i_p:-cesure]
-    ffield  = np.concatenate((ffield1,ffield2),axis=1)
-    return ffield
+    rfield1 = np.concatenate((field[:,-cesure:ns-1],field[:,0:i_p]),axis=1)
+    rfield2 = field[:,i_p:-cesure]
+    rfield  = np.concatenate((rfield1,rfield2),axis=1)
+    return rfield
 
 def circle(x0,y0,r,theta) :
     return x0+r*np.cos(theta), y0+r*np.sin(theta)
@@ -134,18 +134,27 @@ theta_p = 0.0#by definition
 fig = plt.figure()
 ax = fig.add_subplot(111,aspect='auto')
 
-bg_field, bgfile = get2Dfield(args.bg_key,NRAD,NSEC,OUTDIR,args.NOUT)
-bg_used_radii    = getrad(RMIN,RMAX,NRAD,DR,args.bg_key,SPACING)
-
 
 # plot background *****************************************************
 # define background field, vt, vr
 # useful options should be density, label, FLI
 
+bg_field,     bgfile = get2Dfield(args.bg_key,NRAD,NSEC,OUTDIR,args.NOUT)
+vrad_field,   vrfile = get2Dfield('vr',NRAD,NSEC,OUTDIR,args.NOUT)
+vtheta_field, vtfile = get2Dfield('vt',NRAD,NSEC,OUTDIR,args.NOUT)
+bg_used_radii    = getrad(RMIN,RMAX,NRAD,DR,args.bg_key,SPACING)
+
 Jmin,Jmax          = findRadialLimits(r_p,q_p,bg_used_radii,args.crop_limit)
-bg_field           = rotate(bg_field,base_theta,theta_p)
-bg_field_crop      = bg_field[Jmin:Jmax,:]
-bg_used_radii_crop = bg_used_radii[Jmin:Jmax]
+
+# rotation
+bg_field           = rotate(bg_field,     base_theta,theta_p)
+vrad_field         = rotate(vrad_field,   base_theta,theta_p)
+vtheta_field       = rotate(vtheta_field, base_theta,theta_p)
+# cropping
+bg_field_crop      = bg_field     [Jmin:Jmax,:]
+vrad_field_crop    = vrad_field   [Jmin:Jmax,:]
+vtheta_field_crop  = vtheta_field [Jmin:Jmax,:]
+bg_used_radii_crop = bg_used_radii[Jmin:Jmax  ]
 
 # These two lines need to be run after rotation...
 i_p = 0
