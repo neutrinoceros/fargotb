@@ -7,6 +7,7 @@
 
 from lib_parsing import * # built-in module that comes with the toolbox
 import matplotlib.pyplot as plt
+import argparse
 
 #issues :
 #     * background should be azimuthally cropped for the colormap to have correct scaling
@@ -62,15 +63,21 @@ def circle(x0,y0,r,theta) :
 # PARSING *************************************************************
 
 #--------------------------------------------------
-args = getScriptArgs()
+parser = argparse.ArgumentParser()
+parser.add_argument("config")
+parser.add_argument("NOUT", type=int)
+parser.add_argument('-bg','--background',dest='bg_key', choices=['l','d'], default = 'd')
+parser.add_argument('-c' ,'--crop',      dest='crop_limit', type=float, default = 1000)
+parser.add_argument('-tc','--thetacrop', action= 'store_true')
 
-config,NOUT = args
 
-#config = ("/home/crobert/Bureau/sandboxPLOT2D/data/in/phase0.par") #tmp
-bg_key = "d"#tmp
-# NOUT = 20#tmp
-crop_limit = 5.#tmp
-azim_crop  = False
+args = parser.parse_args()
+config     = args.config
+NOUT       = args.NOUT
+bg_key     = args.bg_key
+crop_limit = args.crop_limit
+azim_crop  = args.thetacrop
+
 #--------------------------------------------------
 
 
