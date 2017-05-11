@@ -83,7 +83,6 @@ azim_crop  = args.thetacrop
 
 
 OUTDIR  = parseString(config, 'OutputDir'       )
-PlanetF = parseString(config, 'PlanetConfig'    )#to use
 SPACING = parseString(config, 'RadialSpacing'   )
 NRAD    = parseValue (config, 'nrad'            )
 NSEC    = parseValue (config, 'nsec'            )
@@ -101,10 +100,13 @@ rotated_theta = np.linspace(-np.pi,np.pi,NSEC)
 
 
 # get planetary info **************************************************
-r_p     = 1.#tmp
-theta_p = 0#tmp
-q_p     = 0.001#tmp
+lastline = np.loadtxt(OUTDIR+"planet0.dat")[-1]
+q_p = lastline[5]
+x_p = lastline[1]
+y_p = lastline[2]
 
+r_p     = np.sqrt(x_p**2+y_p**2)
+theta_p = 0.0#by definition
 
 # MAIN LOOP ***********************************************************
 
@@ -177,7 +179,7 @@ thetas=np.linspace(0,2*np.pi,100)
 
 R_H_code = R_H/(r_p*dtheta)
 #dev note : those are not proprely centered FIXME
-ax.plot( *circle(NSEC/2,j_p,R_H_code,thetas),         c='r', ls='-')
+ax.plot( *circle(NSEC/2,j_p,R_H_code,thetas),         c='r', ls='--')
 ax.plot( *circle(NSEC/2,j_p,0.3*R_H_code,thetas),     c='r', ls='-')
 
 cb = fig.colorbar(im)
