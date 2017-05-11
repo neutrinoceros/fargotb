@@ -8,6 +8,11 @@
 from lib_parsing import * # built-in module that comes with the toolbox
 import matplotlib.pyplot as plt
 
+#issues :
+#     * background should be azimuthally cropped for the colormap to have correct scaling
+#     * Hill spheres are not exactly centered
+#     * xticks are uniformative in case of azimcropping
+
 # Defintions **********************************************************
 def Hill_radius(r_p,q_p) :
     return r_p*(q_p/3)**(1./3)
@@ -157,6 +162,7 @@ R_H = Hill_radius(r_p,q_p)
 thetas=np.linspace(0,2*np.pi,100)
 
 R_H_code = R_H/(r_p*dtheta)
+#dev note : those are not proprely centered FIXME
 ax.plot( *circle(NSEC/2,j_p,R_H_code,thetas),         c='w', ls='--')
 ax.plot( *circle(NSEC/2,j_p,0.3*R_H_code,thetas),     c='r', ls='-')
 
