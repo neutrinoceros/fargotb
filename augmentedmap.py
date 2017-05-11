@@ -27,7 +27,7 @@ def findRadialLimits(r_p,q_p,rads,croper=5.) :
     jmin,jmax = 0,nr-1
     while rads[jmin] < r_p-croper*R_H :
         jmin +=1
-    while rads[jmax] > r_p+croper*R_H :
+    while rads[jmax-2] > r_p+croper*R_H :
         jmax -=1
     return jmin,jmax
 
@@ -179,10 +179,8 @@ thetas=np.linspace(0,2*np.pi,100)
 
 R_H_code = R_H/(r_p*dtheta)
 #dev note : those are not proprely centered FIXME
-ax.plot( *circle(NSEC/2,j_p,R_H_code,thetas),         c='w', ls='-')
-
-ax.plot( *circle(NSEC/2,j_p,R_H_code,thetas),         c='r', ls='--')
-ax.plot( *circle(NSEC/2,j_p,0.3*R_H_code,thetas),     c='r', ls='--')
+ax.plot( *circle(NSEC/2,j_p-1,R_H_code,thetas),     c='r', ls='--')
+ax.plot( *circle(NSEC/2,j_p-1,0.3*R_H_code,thetas), c='r', ls='-')
 
 cb = fig.colorbar(im)
 cb.set_label("background value")#tmp
