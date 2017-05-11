@@ -38,13 +38,9 @@ base_theta = np.linspace(0.,2*np.pi,NSEC)
 r_p     = 1.#tmp
 theta_p = 0#tmp
 q_p     = 0.001#tmp
-R_H     = r_p*(q_p/3)**(1./3) # Hill Radius
+
 
 # MAIN LOOP ***********************************************************
-
-# crop plotting region, cut out fields (optional)  
-# by default, the planet should be centered (this may be hard, especially near angular boundaries)
-crop_limit = 5. #(as a multiple of R_H)
 
 # optionnally, we could have the option of using cartesian coordinates
 
@@ -53,21 +49,14 @@ crop_limit = 5. #(as a multiple of R_H)
 # same scale in both directions 
 # this will be easy to spot when we plot hill "sphere"
 fig = plt.figure()
-ax = fig.add_subplot(111,aspect='auto')
-
+ax = fig.add_subplot(211,aspect='auto')
+ax2 = fig.add_subplot(212,aspect='auto')
 #plot background
 # define background field, vt, vr
 # useful options should be density, label, FLI
 bg_key = "d"#tmp
 bg_field, bgfile = get2Dfield(bg_key,NRAD,NSEC,OUTDIR,NOUT)
 bg_used_radii    = getrad(RMIN,RMAX,NRAD,DR,bg_key,SPACING)
-def flip(field) :
-    "flip the array upside down to accomodate imshow()"
-    nr,ns = field.shape
-    ffield = np.zeros((nr,ns))
-    for i in range(nr) :
-        ffield[i] = field[nr-(i+1)]
-    return ffield
 
 def rotate(field,thetas,theta_p) :
     ns = len(thetas)
@@ -81,12 +70,32 @@ def rotate(field,thetas,theta_p) :
     ffield  = np.concatenate((ffield1,ffield2),axis=1)
     return ffield,cesure
 
-bg_field = flip(bg_field)
 bg_field,cesure = rotate(bg_field,base_theta,theta_p)
 ax.imshow(bg_field,cmap='viridis',aspect="auto")
+ax.set_ylim(0,NRAD)
+
+# crop plotting region, cut out fields (optional)  
+# by default, the planet should be centered (this may be hard, especially near angular boundaries)
+# dev note : croping should be done BEFORE plotting anything
+
+crop_limit = 5.#tmp
+
+def findRadialLimits(r_p,q_p,rads,croper=5.) :
+    R_H = r_p*(q_p/3)**(1./3) # Hill Radius
+    nr = len(rads)
+    jmin,jmax = 0,nr-1
+    while rads[jmin] < r_p-croper*R_H :
+        jmin +=1
+    while rads[jmax] > r_p+croper*R_H :
+        jmax -=1
+    return jmin,jmax
+
+jmin,jmax = findRadialLimits(r_p,q_p,bg_used_radii,crop_limit)
+
+ax2.imshow(bg_field,cmap='viridis',aspect="auto")
+ax2.set_ylim(jmin,jmax)
 
 # draw hill sphere(s)
-
 
 # draw stream lines (optional)
 
