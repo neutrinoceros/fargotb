@@ -39,7 +39,8 @@ base_theta    = np.linspace(0.,2*np.pi,NSEC)
 rotated_theta = np.linspace(-np.pi,np.pi,NSEC)
 
 
-# get planetary info
+
+# get planetary info **************************************************
 r_p     = 1.#tmp
 theta_p = 0#tmp
 q_p     = 0.001#tmp
@@ -61,7 +62,8 @@ ax = fig.add_subplot(111,aspect='auto')
 bg_field, bgfile = get2Dfield(bg_key,NRAD,NSEC,OUTDIR,NOUT)
 bg_used_radii    = getrad(RMIN,RMAX,NRAD,DR,bg_key,SPACING)
 
-# crop plotting region, cut out fields (optional)
+
+# crop plotting region, cut out fields (optional) *********************
 def Hill_radius(r_p,q_p) :
     return r_p*(q_p/3)**(1./3)
 
@@ -91,7 +93,7 @@ def crop_field(field,jmin,jmax) :
     return cfield
 
 
-#plot background
+# plot background *****************************************************
 # define background field, vt, vr
 # useful options should be density, label, FLI
 
@@ -159,9 +161,11 @@ ax.plot( *circle(NSEC/2,j_p,0.3*R_H_code,thetas),     c='r', ls='-')
 
 cb = fig.colorbar(im)
 cb.set_label("background value")#tmp
-# draw stream lines (optional)
 
 
-# print out or save figure (optional flag)
+# draw stream lines (optional) ****************************************
+
+
+# print out or save figure (optional flag) ****************************
 #plt.show()
 fig.savefig("coucou.png")
