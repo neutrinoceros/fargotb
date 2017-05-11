@@ -13,6 +13,7 @@ import argparse
 #     * background should be azimuthally cropped for the colormap to have correct scaling
 #     * xticks are uniformative in case of azimcropping
 #     * bug : ./augmentedmap.py ../data/in/phase0.par 20 -c 10 -tc yields wrong yticks
+#     * bug : streamlines only work when no cropping is used
 
 #enhancements 
 #     * we could add the option of using cartesian coordinates
