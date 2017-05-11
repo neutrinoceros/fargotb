@@ -37,7 +37,7 @@ def findAzimLimits(r_p,q_p,thetas,croper=5.) :
     imin,imax = 0,ns-1
     while r_p*thetas[imin] < -croper*R_H :
         imin +=1
-    while r_p*thetas[imax] > croper*R_H :
+    while r_p*thetas[imax-1] > croper*R_H :
         imax -=1
     return imin,imax
 
@@ -152,8 +152,8 @@ else :
 Imin,Imax = findAzimLimits(r_p,q_p,bg_used_theta,azim_crop)
 
 
-im = ax.imshow(bg_field_crop,cmap='viridis',aspect="auto")
-
+im = ax.imshow(bg_field_crop,cmap='viridis',aspect="auto",
+               interpolation='bicubic')
 
 # set ticks
 ax.set_xticks([0,NSEC/4,NSEC/2,3*NSEC/4,NSEC])
@@ -179,8 +179,10 @@ thetas=np.linspace(0,2*np.pi,100)
 
 R_H_code = R_H/(r_p*dtheta)
 #dev note : those are not proprely centered FIXME
+ax.plot( *circle(NSEC/2,j_p,R_H_code,thetas),         c='w', ls='-')
+
 ax.plot( *circle(NSEC/2,j_p,R_H_code,thetas),         c='r', ls='--')
-ax.plot( *circle(NSEC/2,j_p,0.3*R_H_code,thetas),     c='r', ls='-')
+ax.plot( *circle(NSEC/2,j_p,0.3*R_H_code,thetas),     c='r', ls='--')
 
 cb = fig.colorbar(im)
 cb.set_label("background value")#tmp
