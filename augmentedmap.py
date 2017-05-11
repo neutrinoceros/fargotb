@@ -36,7 +36,7 @@ base_theta = np.linspace(0.,2*np.pi,NSEC)
 
 # get planetary info
 r_p     = 1.#tmp
-theta_p = np.pi#tmp
+theta_p = 0#tmp
 q_p     = 0.001#tmp
 R_H     = r_p*(q_p/3)**(1./3) # Hill Radius
 
@@ -69,7 +69,20 @@ def flip(field) :
         ffield[i] = field[nr-(i+1)]
     return ffield
 
+def rotate(field,thetas,theta_p) :
+    ns = len(thetas)
+    j_p = 0
+    while thetas[j_p] < theta_p :
+        j_p += 1
+
+    cesure  = ns/2 - j_p
+    ffield1 = np.concatenate((field[:,-cesure:ns-1],field[:,0:j_p]),axis=1)
+    ffield2 = field[:,j_p:-cesure]
+    ffield  = np.concatenate((ffield1,ffield2),axis=1)
+    return ffield,cesure
+
 bg_field = flip(bg_field)
+bg_field,cesure = rotate(bg_field,base_theta,theta_p)
 ax.imshow(bg_field,cmap='viridis',aspect="auto")
 
 # draw hill sphere(s)
