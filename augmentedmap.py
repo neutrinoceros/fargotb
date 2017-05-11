@@ -62,27 +62,36 @@ def circle(x0,y0,r,theta) :
 
 # PARSING *************************************************************
 
-#--------------------------------------------------
 parser = argparse.ArgumentParser()
+# mandatories --------------------------------------------------------
 parser.add_argument("config")
 parser.add_argument("NOUT", type=int)
-parser.add_argument('-bg','--background',dest='bg_key', choices=['l','d'], default = 'd',
-                    help="define background field using keys (label, density, FLI...)")
-parser.add_argument('-c' ,'--crop',      dest='crop_limit', type=float, default = 1000,
-                    help="narrow down the region of interest in mutliples of R_Hill around the planet")
-parser.add_argument('-tc','--thetacrop',         action= 'store_true')
-parser.add_argument('-s', '--hillsphere', dest='hill', action= 'store_true',
+# switches -----------------------------------------------------------
+parser.add_argument('-tc','--thetacrop',   action= 'store_true',
+                    help="crop the figure in the azimuthal direction")
+parser.add_argument('-s', '--hillsphere',  action= 'store_true',
                     help="traces 0.3*R_H and R_H levels")
+parser.add_argument('-sl','--streamlines', action= 'store_true',
+                    help="add streamlines (NOT IMPLEMENTED YET)")
+# keywords arguments -------------------------------------------------
+parser.add_argument('-bg','--background',dest='bg_key',
+                    help="define background field using keys (label, density, FLI ...)",
+                    choices=['l','d'], default = 'd')
+parser.add_argument('-c' ,'--crop',      dest='crop_limit', type=float,
+                    help="zoom around the planet",
+                    default = 1000)
+parser.add_argument('-o' ,'--output',
+                    help="define picture output file name",
+                    default = "")
 
+# conversion ---------------------------------------------------------
 args = parser.parse_args()
 if args.thetacrop :
     azim_crop_limit = args.crop_limit
 else :
     azim_crop_limit = 1000
 
-#--------------------------------------------------
-
-
+# fetching of numerical configuration --------------------------------
 OUTDIR  = parseString(args.config, 'OutputDir'       )
 SPACING = parseString(args.config, 'RadialSpacing'   )
 NRAD    = parseValue (args.config, 'nrad'            )
@@ -92,6 +101,7 @@ RMAX    = parseValue (args.config, 'rmax',      float)
 ninterm = parseValue (args.config, 'ninterm'         )
 DT      = parseValue (args.config, 'DT',        float)
 
+# minimal postprocessing ------------ --------------------------------
 DR      = (RMAX-RMIN)/NRAD
 dtheta  = 2.*np.pi/NSEC
 
@@ -171,8 +181,8 @@ ax.set_xlim(Imin,Imax)
 ax.set_ylim(0,Jmax-(Jmin+1))
 
 
-# draw hill sphere(s) #todo : make this optional
-if args.hill :
+# draw hill sphere(s)
+if args.hillsphere :
     R_H = Hill_radius(r_p,q_p)
     thetas=np.linspace(0,2*np.pi,100)
     R_H_code = R_H/(r_p*dtheta)
@@ -180,13 +190,18 @@ if args.hill :
     ax.plot( *circle(NSEC/2,j_p-1,0.3*R_H_code,thetas), c='r', ls='-')
 
 
-# draw stream lines (optional) ****************************************
-
+# draw stream lines ***************************************************
+# todo
+if args.streamlines :
+    print "Sorry, STREAMLINES are not implemented yet, come back later !"
 
 # print out or save figure (optional flag) ****************************
 cb = fig.colorbar(im)
 cb.set_label(AxLabels[args.bg_key])
 
 #ax.plot(np.arange(NSEC),j_p*np.ones(NSEC),c='w',ls='--')#debug
-#plt.show()
-fig.savefig("coucou.png")
+
+if args.output != ""  :
+    fig.savefig(args.output)
+else :
+    plt.show()
