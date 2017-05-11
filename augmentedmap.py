@@ -24,6 +24,9 @@ import argparse
 def Hill_radius(r_p,q_p) :
     return r_p*(q_p/3)**(1./3)
 
+def OmegaFrame(r_p,q_p) :
+    return np.sqrt((1.+q_p)/r_p**3)#todo : check
+
 def findRadialLimits(r_p,q_p,rads,croper=5.) :
     R_H = Hill_radius(r_p,q_p)
     nr = len(rads)
@@ -207,8 +210,11 @@ if args.hillsphere :
 # draw stream lines --------------------------------------------------
 # todo
 if args.streamlines :
-    print "Sorry, STREAMLINES are not implemented yet, come back later !"
-
+    vtheta_field_crop -= OmegaFrame(r_p,q_p)#todo : do this only in FIXED frame
+    ax.streamplot(np.arange(NSEC), np.arange(NRAD), vtheta_field_crop, vrad_field_crop,
+                  density=(5,5),
+                  color='w',
+                  linewidth=0.15)
 
 # draw velocity field ------------------------------------------------
 # todo
