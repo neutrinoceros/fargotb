@@ -15,8 +15,9 @@ import matplotlib.pyplot as plt
 #args = getScriptArgs()
 
 config = ("/home/crobert/Bureau/sandboxPLOT2D/data/in/phase0.par") #tmp
+bg_key = "l"#tmp
 NOUT = 20#tmp
-crop_limit = 5.#tmp
+crop_limit = 3.#tmp
 
 
 
@@ -51,14 +52,39 @@ q_p     = 0.001#tmp
 # same scale in both directions 
 # this will be easy to spot when we plot hill "sphere"
 fig = plt.figure()
-ax = fig.add_subplot(211,aspect='auto')
-ax2 = fig.add_subplot(212,aspect='auto')
+ax = fig.add_subplot(111,aspect='auto')
+#ax = fig.add_subplot(211,aspect='auto')
+#ax2 = fig.add_subplot(212,aspect='auto')
+
+bg_field, bgfile = get2Dfield(bg_key,NRAD,NSEC,OUTDIR,NOUT)
+bg_used_radii    = getrad(RMIN,RMAX,NRAD,DR,bg_key,SPACING)
+
+# crop plotting region, cut out fields (optional)  
+# by default, the planet should be centered (this may be hard, especially near angular boundaries)
+# dev note : croping should be done BEFORE plotting anything
+def Hill_radius(r_p,q_p) :
+    return r_p*(q_p/3)**(1./3)
+
+
+def findRadialLimits(r_p,q_p,rads,croper=5.) :
+    R_H = Hill_radius(r_p,q_p)
+    nr = len(rads)
+    jmin,jmax = 0,nr-1
+    while rads[jmin] < r_p-croper*R_H :
+        jmin +=1
+    while rads[jmax] > r_p+croper*R_H :
+        jmax -=1
+    return jmin,jmax
+
+
+def crop_field(field,jmin,jmax) :
+    cfield = field[jmin:jmax,:]
+    return cfield
+
+
 #plot background
 # define background field, vt, vr
 # useful options should be density, label, FLI
-bg_key = "d"#tmp
-bg_field, bgfile = get2Dfield(bg_key,NRAD,NSEC,OUTDIR,NOUT)
-bg_used_radii    = getrad(RMIN,RMAX,NRAD,DR,bg_key,SPACING)
 
 def rotate(field,thetas,theta_p) :
     ns = len(thetas)
@@ -72,43 +98,49 @@ def rotate(field,thetas,theta_p) :
     ffield  = np.concatenate((ffield1,ffield2),axis=1)
     return ffield,cesure
 
+
+Jmin,Jmax = findRadialLimits(r_p,q_p,bg_used_radii,crop_limit)
 bg_field,cesure = rotate(bg_field,base_theta,theta_p)
-ax.imshow(bg_field,cmap='viridis',aspect="auto")
-ax.set_ylim(0,NRAD)
+bg_used_radii_crop = bg_used_radii[Jmin:Jmax]
 
-# crop plotting region, cut out fields (optional)  
-# by default, the planet should be centered (this may be hard, especially near angular boundaries)
-# dev note : croping should be done BEFORE plotting anything
+bg_field_crop = bg_field[Jmin:Jmax,:]
 
 
-def findRadialLimits(r_p,q_p,rads,croper=5.) :
-    R_H = r_p*(q_p/3)**(1./3) # Hill Radius
-    nr = len(rads)
-    jmin,jmax = 0,nr-1
-    while rads[jmin] < r_p-croper*R_H :
-        jmin +=1
-    while rads[jmax] > r_p+croper*R_H :
-        jmax -=1
-    return jmin,jmax
-
-jmin,jmax = findRadialLimits(r_p,q_p,bg_used_radii,crop_limit)
-
-ax2.imshow(bg_field,cmap='viridis',aspect="auto")
-ax2.set_ylim(jmin,jmax)
 
 
+
+ax.imshow(bg_field_crop,cmap='viridis',aspect="auto")
+ax.set_ylim(0,Jmax-(Jmin+1))
 # set ticks
+
+
+
 ax.set_xticks([0,NSEC/4,NSEC/2,3*NSEC/4,NSEC])
 ax.set_xticklabels([r"$-\pi$",r"$-\pi/2$",r"$0$",r"$\pi/2$",r"$\pi$"])
 
+#test zone
+#ax2.imshow(bg_field,cmap='viridis',aspect="auto")
+#ax2.set_ylim(0,NRAD)
+#ax2.set_xticks([0,NSEC/4,NSEC/2,3*NSEC/4,NSEC])
+#ax2.set_xticklabels([r"$-\pi$",r"$-\pi/2$",r"$0$",r"$\pi/2$",r"$\pi$"])
 
-ax2.set_xticks([0,NSEC/4,NSEC/2,3*NSEC/4,NSEC])
-ax2.set_xticklabels([r"$-\pi$",r"$-\pi/2$",r"$0$",r"$\pi/2$",r"$\pi$"])
+# draw hill sphere(s) #todo : make this optional
+def circle(x0,y0,r,theta) :
+    return x0+r*np.cos(theta), y0+r*np.sin(theta)
 
-# draw hill sphere(s)
+R_H = Hill_radius(r_p,q_p)
+thetas=np.linspace(0,2*np.pi,100)
+
+j_p = 0
+while bg_used_radii_crop[j_p] < r_p :
+    j_p+=1
+
+ax.plot( *circle(NSEC/2,j_p,R_H/(r_p*dtheta),thetas),     c='k', ls='--')
+ax.plot( *circle(NSEC/2,j_p,0.3*R_H/(r_p*dtheta),thetas),     c='r', ls='-')
 
 # draw stream lines (optional)
 
 
 # print out or save figure (optional flag)
+#plt.show()
 fig.savefig("coucou.png")
