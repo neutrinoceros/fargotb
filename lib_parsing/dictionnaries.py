@@ -4,7 +4,9 @@
 # upper-case keys do not correspond to existing .dat files but rather
 # are computed using $RECIPES defined in the following
 
-TAGS = {"d"  : "dens",
+TAGS = {
+        # post-processed ----
+        "d"  : "dens",
         "t"  : "temperature",
         "p"  : "Pressure",
         "vr" : "vrad",
@@ -13,9 +15,11 @@ TAGS = {"d"  : "dens",
         "l"  : "label",
         "do" : "dustdens",
         "go" : "gasonlydens",
-        #--------------------exp
+        # post-processed ----
         "rf" : "radialFlow",
-        "PHI": "flow"
+        "f"  : "FLI",
+        # recipes -----------
+        "PHI": "flow"#deprecated
        }
 
 Centered  = ["dens", "temperature", "Pressure",
@@ -24,5 +28,6 @@ Centered  = ["dens", "temperature", "Pressure",
 
 Staggered = ["vrad", "flow"]
 
-AxLabels = {"d" : "Surface Density",
-            "l" : "Passive Tracor"}
+AxLabels = {"d"   : "Surface Density",
+            "l"   : "Passive Tracor",
+            "f"   : "FLI"}

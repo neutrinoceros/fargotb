@@ -76,7 +76,7 @@ parser.add_argument('-sl','--streamlines', action= 'store_true',
 # keywords arguments -------------------------------------------------
 parser.add_argument('-bg','--background',dest='bg_key',
                     help="define background field using keys (label, density, FLI ...)",
-                    choices=['l','d'], default = 'd')
+                    choices=['l','d','f'], default = 'd')
 parser.add_argument('-c' ,'--crop',      dest='crop_limit', type=float,
                     help="zoom around the planet",
                     default = 1000)
@@ -90,6 +90,10 @@ if args.thetacrop :
     azim_crop_limit = args.crop_limit
 else :
     azim_crop_limit = 1000
+
+if args.bg_key == "f" :
+    print "Sorry, FLI postprocessing is not implemented yet, come back later !"
+    exit(-1)
 
 # fetching of numerical configuration --------------------------------
 OUTDIR  = parseString(args.config, 'OutputDir'       )
