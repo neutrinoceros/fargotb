@@ -9,11 +9,13 @@ from lib_parsing import * # built-in module that comes with the toolbox
 import matplotlib.pyplot as plt
 import argparse
 
-#issues :
+#issues
 #     * background should be azimuthally cropped for the colormap to have correct scaling
 #     * xticks are uniformative in case of azimcropping
 #     * bug : ./augmentedmap.py ../data/in/phase0.par 20 -c 10 -tc yields wrong yticks
 
+#enhancements 
+#     * we could add the option of using cartesian coordinates
 
 # Defintions **********************************************************
 
@@ -105,16 +107,14 @@ RMAX    = parseValue (args.config, 'rmax',      float)
 ninterm = parseValue (args.config, 'ninterm'         )
 DT      = parseValue (args.config, 'DT',        float)
 
-# minimal postprocessing ------------ --------------------------------
+# minimal postprocessing ---------------------------------------------
 DR      = (RMAX-RMIN)/NRAD
 dtheta  = 2.*np.pi/NSEC
 
 base_theta    = np.linspace(0.,2*np.pi,NSEC)
 rotated_theta = np.linspace(-np.pi,np.pi,NSEC)
 
-
-
-# get planetary info **************************************************
+# get planetary info -------------------------------------------------
 lastline = np.loadtxt(OUTDIR+"planet0.dat")[-1]
 q_p = lastline[5]
 x_p = lastline[1]
@@ -122,10 +122,6 @@ y_p = lastline[2]
 
 r_p     = np.sqrt(x_p**2+y_p**2)
 theta_p = 0.0#by definition
-
-# MAIN LOOP ***********************************************************
-
-# we could add the option of using cartesian coordinates
 
 
 # define plotting objects (fig, ax), choosing aspect carefully to have 
@@ -138,8 +134,6 @@ bg_field, bgfile = get2Dfield(args.bg_key,NRAD,NSEC,OUTDIR,args.NOUT)
 bg_used_radii    = getrad(RMIN,RMAX,NRAD,DR,args.bg_key,SPACING)
 
 
-# crop plotting region, cut out fields (optional) *********************
-
 # plot background *****************************************************
 # define background field, vt, vr
 # useful options should be density, label, FLI
@@ -149,7 +143,7 @@ bg_field           = rotate(bg_field,base_theta,theta_p)
 bg_field_crop      = bg_field[Jmin:Jmax,:]
 bg_used_radii_crop = bg_used_radii[Jmin:Jmax]
 
-#These two lines need to be run after rotation...
+# These two lines need to be run after rotation...
 i_p = 0
 while base_theta[i_p] < theta_p :
     i_p += 1
@@ -157,22 +151,26 @@ j_p = 0
 while bg_used_radii_crop[j_p] < r_p :
     j_p += 1
 
-bg_used_theta = rotated_theta
+bg_used_theta = rotated_theta #alias
 
-#finding limits of the plot
+# finding limits of the plot
 Imin,Imax = findAzimLimits(r_p,q_p,bg_used_theta,azim_crop_limit)
 
 
+# PLOTTING ************************************************************
+# background and associated colorbar ---------------------------------
 im = ax.imshow(bg_field_crop,cmap='viridis',aspect="auto",
                interpolation='none')
+cb = fig.colorbar(im)
+cb.set_label(AxLabels[args.bg_key])
 
-# set ticks
+# ticks --------------------------------------------------------------
 ax.set_xticks([0,NSEC/4,NSEC/2,3*NSEC/4,NSEC])
 ax.set_xticklabels([r"$-\pi$",r"$-\pi/2$",r"$0$",r"$\pi/2$",r"$\pi$"])
 
 ytickslab = ax.get_yticks()
 new_ytickslab = []
-u=0
+u=0#todo simplify
 for tick in ytickslab[1:-1] :
     new_ytickslab.append(r"${0}$".format(round(bg_used_radii_crop[int(tick)],2)))
 
@@ -180,12 +178,13 @@ ax.set_yticklabels(new_ytickslab)
 ax.set_xlabel(r"$\theta$", size=20)
 ax.set_ylabel(r"$r$",      size=20)
 
-#set limits
+# set limits ---------------------------------------------------------
 ax.set_xlim(Imin,Imax)
 ax.set_ylim(0,Jmax-(Jmin+1))
 
 
-# draw hill sphere(s)
+# ADDITIONAL PLOTTING *************************************************
+# draw hill sphere(s) (optional) -------------------------------------
 if args.hillsphere :
     R_H = Hill_radius(r_p,q_p)
     thetas=np.linspace(0,2*np.pi,100)
@@ -194,16 +193,13 @@ if args.hillsphere :
     ax.plot( *circle(NSEC/2,j_p-1,0.3*R_H_code,thetas), c='r', ls='-')
 
 
-# draw stream lines ***************************************************
+# draw stream lines --------------------------------------------------
 # todo
 if args.streamlines :
     print "Sorry, STREAMLINES are not implemented yet, come back later !"
 
-# print out or save figure (optional flag) ****************************
-cb = fig.colorbar(im)
-cb.set_label(AxLabels[args.bg_key])
 
-#ax.plot(np.arange(NSEC),j_p*np.ones(NSEC),c='w',ls='--')#debug
+# PRINTING OUTPUT *****************************************************
 
 if args.output != ""  :
     fig.savefig(args.output)
