@@ -109,7 +109,7 @@ bg_field_crop = bg_field[Jmin:Jmax,:]
 
 
 
-ax.imshow(bg_field_crop,cmap='viridis',aspect="auto")
+im = ax.imshow(bg_field_crop,cmap='viridis',aspect="auto")
 ax.set_ylim(0,Jmax-(Jmin+1))
 
 
@@ -144,6 +144,8 @@ while bg_used_radii_crop[j_p] < r_p :
 ax.plot( *circle(NSEC/2,j_p,R_H/(r_p*dtheta),thetas),     c='k', ls='--')
 ax.plot( *circle(NSEC/2,j_p,0.3*R_H/(r_p*dtheta),thetas),     c='r', ls='-')
 
+cb = fig.colorbar(im)
+cb.set_label("background value")#tmp
 # draw stream lines (optional)
 
 
