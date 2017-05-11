@@ -23,3 +23,6 @@ Centered  = ["dens", "temperature", "Pressure",
              "vtheta"]
 
 Staggered = ["vrad", "flow"]
+
+AxLabels = {"d" : "Surface Density",
+            "l" : "Passive Tracor"}

@@ -180,7 +180,7 @@ ax.plot( *circle(NSEC/2,j_p-1,0.3*R_H_code,thetas), c='r', ls='-')
 
 # print out or save figure (optional flag) ****************************
 cb = fig.colorbar(im)
-cb.set_label("background value")#tmp
+cb.set_label(AxLabels[args.bg_key])
 
 #ax.plot(np.arange(NSEC),j_p*np.ones(NSEC),c='w',ls='--')#debug
 #plt.show()
