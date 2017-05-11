@@ -152,7 +152,7 @@ Imin,Imax = findAzimLimits(r_p,q_p,bg_used_theta,azim_crop)
 
 
 im = ax.imshow(bg_field_crop,cmap='viridis',aspect="auto",
-               interpolation='bicubic')
+               interpolation='none')
 
 # set ticks
 ax.set_xticks([0,NSEC/4,NSEC/2,3*NSEC/4,NSEC])
