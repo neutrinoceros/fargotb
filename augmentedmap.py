@@ -16,6 +16,8 @@ import matplotlib.pyplot as plt
 
 config = ("/home/crobert/Bureau/sandboxPLOT2D/data/in/phase0.par") #tmp
 NOUT = 20#tmp
+crop_limit = 5.#tmp
+
 
 
 OUTDIR  = parseString(config, 'OutputDir'       )
@@ -78,7 +80,6 @@ ax.set_ylim(0,NRAD)
 # by default, the planet should be centered (this may be hard, especially near angular boundaries)
 # dev note : croping should be done BEFORE plotting anything
 
-crop_limit = 5.#tmp
 
 def findRadialLimits(r_p,q_p,rads,croper=5.) :
     R_H = r_p*(q_p/3)**(1./3) # Hill Radius
@@ -94,6 +95,15 @@ jmin,jmax = findRadialLimits(r_p,q_p,bg_used_radii,crop_limit)
 
 ax2.imshow(bg_field,cmap='viridis',aspect="auto")
 ax2.set_ylim(jmin,jmax)
+
+
+# set ticks
+ax.set_xticks([0,NSEC/4,NSEC/2,3*NSEC/4,NSEC])
+ax.set_xticklabels([r"$-\pi$",r"$-\pi/2$",r"$0$",r"$\pi/2$",r"$\pi$"])
+
+
+ax2.set_xticks([0,NSEC/4,NSEC/2,3*NSEC/4,NSEC])
+ax2.set_xticklabels([r"$-\pi$",r"$-\pi/2$",r"$0$",r"$\pi/2$",r"$\pi$"])
 
 # draw hill sphere(s)
 
