@@ -16,6 +16,8 @@ import argparse
 
 #enhancements 
 #     * we could add the option of using cartesian coordinates
+#     * logscaling is not taken into account yet
+#     * yticks could be better
 
 # Defintions **********************************************************
 
