@@ -14,11 +14,12 @@ import matplotlib.pyplot as plt
 
 #args = getScriptArgs()
 
-config = ("/scratch/crobert/lab_2stepsStart/start/ref/in/phase0.par") #tmp
-NOUT = 20
+config = ("/home/crobert/Bureau/sandboxPLOT2D/data/in/phase0.par") #tmp
+NOUT = 20#tmp
 
 
 OUTDIR  = parseString(config, 'OutputDir'       )
+PlanetF = parseString(config, 'PlanetConfig'    )#to use
 SPACING = parseString(config, 'RadialSpacing'   )
 NRAD    = parseValue (config, 'nrad'            )
 NSEC    = parseValue (config, 'nsec'            )
@@ -48,17 +49,28 @@ crop_limit = 5. #(as a multiple of R_H)
 # optionnally, we could have the option of using cartesian coordinates
 
 
+# define plotting objects (fig, ax), choosing aspect carefully to have 
+# same scale in both directions 
+# this will be easy to spot when we plot hill "sphere"
+fig = plt.figure()
+ax = fig.add_subplot(111,aspect='auto')
+
 #plot background
 # define background field, vt, vr
 # useful options should be density, label, FLI
 bg_key = "d"#tmp
 bg_field, bgfile = get2Dfield(bg_key,NRAD,NSEC,OUTDIR,NOUT)
 bg_used_radii    = getrad(RMIN,RMAX,NRAD,DR,bg_key,SPACING)
+def flip(field) :
+    "flip the array upside down to accomodate imshow()"
+    nr,ns = field.shape
+    ffield = np.zeros((nr,ns))
+    for i in range(nr) :
+        ffield[i] = field[nr-(i+1)]
+    return ffield
 
-# define plotting objects (fig, ax), choosing aspect carefully to have 
-# same scale in both directions 
-# this will be easy to spot when we plot hill "sphere"
-fig = plt.figure()
+bg_field = flip(bg_field)
+ax.imshow(bg_field,cmap='viridis',aspect="auto")
 
 # draw hill sphere(s)
 
