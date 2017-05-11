@@ -62,10 +62,13 @@ def circle(x0,y0,r,theta) :
 # PARSING *************************************************************
 
 #--------------------------------------------------
-#args = getScriptArgs()
-config = ("/home/crobert/Bureau/sandboxPLOT2D/data/in/phase0.par") #tmp
+args = getScriptArgs()
+
+config,NOUT = args
+
+#config = ("/home/crobert/Bureau/sandboxPLOT2D/data/in/phase0.par") #tmp
 bg_key = "d"#tmp
-NOUT = 20#tmp
+# NOUT = 20#tmp
 crop_limit = 5.#tmp
 azim_crop  = False
 #--------------------------------------------------
@@ -149,8 +152,7 @@ ax.set_xticklabels([r"$-\pi$",r"$-\pi/2$",r"$0$",r"$\pi/2$",r"$\pi$"])
 ytickslab = ax.get_yticks()
 new_ytickslab = []
 u=0
-for tick in ytickslab[1:-2] :
-    print tick
+for tick in ytickslab[1:-1] :
     new_ytickslab.append(r"${0}$".format(round(bg_used_radii_crop[int(tick)],2)))
 
 ax.set_yticklabels(new_ytickslab)
