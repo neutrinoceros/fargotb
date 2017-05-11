@@ -35,7 +35,8 @@ DT      = parseValue (config, 'DT',        float)
 DR      = (RMAX-RMIN)/NRAD
 dtheta  = 2.*np.pi/NSEC
 
-base_theta = np.linspace(0.,2*np.pi,NSEC)
+base_theta    = np.linspace(0.,2*np.pi,NSEC)
+rotated_theta = np.linspace(-np.pi,np.pi,NSEC)
 
 
 # get planetary info
@@ -75,13 +76,13 @@ def findRadialLimits(r_p,q_p,rads,croper=5.) :
         jmax -=1
     return jmin,jmax
 
-def findAzimLimits(thetas,croper=5.) :
+def findAzimLimits(r_p,q_p,thetas,croper=5.) :
     R_H = Hill_radius(r_p,q_p)
     ns = len(thetas)
-    jmin,jmax = 0,nr-1
-    while r_p*(0-thetas[imin]) < r_p-croper*R_H :
+    imin,imax = 0,ns-1
+    while r_p*thetas[imin] < -croper*R_H :#FIXME
         imin +=1
-    while r_p*thetas[imax] > r_p+croper*R_H :
+    while r_p*thetas[imax] > croper*R_H :#FIXME
         imax -=1
     return imin,imax
 
@@ -109,8 +110,6 @@ def rotate(field,thetas,theta_p) :
 
 Jmin,Jmax = findRadialLimits(r_p,q_p,bg_used_radii,crop_limit)
 bg_field,cesure = rotate(bg_field,base_theta,theta_p)
-
-
 bg_used_radii_crop = bg_used_radii[Jmin:Jmax]
 bg_field_crop = bg_field[Jmin:Jmax,:]
 
@@ -122,26 +121,31 @@ j_p = 0
 while bg_used_radii_crop[j_p] < r_p :
     j_p += 1
 
-new_thetas1   = base_theta[i_p:-cesure]
-new_thetas2   = base_theta[-cesure:NSEC-1]
-bg_used_theta = np.concatenate((new_thetas1,new_thetas2),axis=0)
+bg_used_theta = rotated_theta
+
+#finding limits of the plot
+if azim_crop :
+    azim_crop = crop_limit
+else :
+    azim_crop = 1000
+Imin,Imax = findAzimLimits(r_p,q_p,bg_used_theta,azim_crop)
 
 
 im = ax.imshow(bg_field_crop,cmap='viridis',aspect="auto")
-ax.set_ylim(0,Jmax-(Jmin+1))
 
 
 # set ticks
 ax.set_xticks([0,NSEC/4,NSEC/2,3*NSEC/4,NSEC])
 ax.set_xticklabels([r"$-\pi$",r"$-\pi/2$",r"$0$",r"$\pi/2$",r"$\pi$"])
 
-
 ytickslab = [r"${0}$".format(round(bg_used_radii_crop[int(n)],2)) for n in ax.get_yticks()[:-1]]
 ax.set_yticklabels(ytickslab)
-
 ax.set_xlabel(r"$\theta$", size=20)
 ax.set_ylabel(r"$r$",      size=20)
 
+#set limits
+ax.set_xlim(Imin,Imax)
+ax.set_ylim(0,Jmax-(Jmin+1))
 # draw hill sphere(s) #todo : make this optional
 def circle(x0,y0,r,theta) :
     return x0+r*np.cos(theta), y0+r*np.sin(theta)
@@ -149,9 +153,9 @@ def circle(x0,y0,r,theta) :
 R_H = Hill_radius(r_p,q_p)
 thetas=np.linspace(0,2*np.pi,100)
 
-
-ax.plot( *circle(NSEC/2,j_p,R_H/(r_p*dtheta),thetas),         c='w', ls='--')
-ax.plot( *circle(NSEC/2,j_p,0.3*R_H/(r_p*dtheta),thetas),     c='r', ls='-')
+R_H_code = R_H/(r_p*dtheta)
+ax.plot( *circle(NSEC/2,j_p,R_H_code,thetas),         c='w', ls='--')
+ax.plot( *circle(NSEC/2,j_p,0.3*R_H_code,thetas),     c='r', ls='-')
 
 cb = fig.colorbar(im)
 cb.set_label("background value")#tmp
