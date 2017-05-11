@@ -171,12 +171,10 @@ ax.set_xticks([0,NSEC/4,NSEC/2,3*NSEC/4,NSEC])
 ax.set_xticklabels([r"$-\pi$",r"$-\pi/2$",r"$0$",r"$\pi/2$",r"$\pi$"])
 
 ytickslab = ax.get_yticks()
-new_ytickslab = []
-u=0#todo simplify
-for tick in ytickslab[1:-1] :
-    new_ytickslab.append(r"${0}$".format(round(bg_used_radii_crop[int(tick)],2)))
+ytickslab = [r"${0}$".format(round(bg_used_radii_crop[int(tick)],2))
+             for tick in ytickslab[1:-1]]
 
-ax.set_yticklabels(new_ytickslab)
+ax.set_yticklabels(ytickslab)
 ax.set_xlabel(r"$\theta$", size=20)
 ax.set_ylabel(r"$r$",      size=20)
 
