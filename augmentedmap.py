@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 #     * background should be azimuthally cropped for the colormap to have correct scaling
 #     * Hill spheres are not exactly centered
 #     * xticks are uniformative in case of azimcropping
+#     * imshow may or may not be interpolating stuff, and we don't want this to hide
+#       our resolution
 
 # Defintions **********************************************************
 def Hill_radius(r_p,q_p) :
@@ -65,7 +67,7 @@ config = ("/home/crobert/Bureau/sandboxPLOT2D/data/in/phase0.par") #tmp
 bg_key = "d"#tmp
 NOUT = 20#tmp
 crop_limit = 5.#tmp
-azim_crop = True
+azim_crop  = False
 #--------------------------------------------------
 
 
@@ -95,7 +97,7 @@ q_p     = 0.001#tmp
 
 # MAIN LOOP ***********************************************************
 
-# optionnally, we could have the option of using cartesian coordinates
+# we could add the option of using cartesian coordinates
 
 
 # define plotting objects (fig, ax), choosing aspect carefully to have 
@@ -103,8 +105,6 @@ q_p     = 0.001#tmp
 # this will be easy to spot when we plot hill "sphere"
 fig = plt.figure()
 ax = fig.add_subplot(111,aspect='auto')
-#ax = fig.add_subplot(211,aspect='auto')
-#ax2 = fig.add_subplot(212,aspect='auto')
 
 bg_field, bgfile = get2Dfield(bg_key,NRAD,NSEC,OUTDIR,NOUT)
 bg_used_radii    = getrad(RMIN,RMAX,NRAD,DR,bg_key,SPACING)
@@ -115,8 +115,6 @@ bg_used_radii    = getrad(RMIN,RMAX,NRAD,DR,bg_key,SPACING)
 # plot background *****************************************************
 # define background field, vt, vr
 # useful options should be density, label, FLI
-
-
 
 Jmin,Jmax = findRadialLimits(r_p,q_p,bg_used_radii,crop_limit)
 bg_field,cesure = rotate(bg_field,base_theta,theta_p)
@@ -148,8 +146,14 @@ im = ax.imshow(bg_field_crop,cmap='viridis',aspect="auto")
 ax.set_xticks([0,NSEC/4,NSEC/2,3*NSEC/4,NSEC])
 ax.set_xticklabels([r"$-\pi$",r"$-\pi/2$",r"$0$",r"$\pi/2$",r"$\pi$"])
 
-ytickslab = [r"${0}$".format(round(bg_used_radii_crop[int(n)],2)) for n in ax.get_yticks()[:-1]]
-ax.set_yticklabels(ytickslab)
+ytickslab = ax.get_yticks()
+new_ytickslab = []
+u=0
+for tick in ytickslab[1:-2] :
+    print tick
+    new_ytickslab.append(r"${0}$".format(round(bg_used_radii_crop[int(tick)],2)))
+
+ax.set_yticklabels(new_ytickslab)
 ax.set_xlabel(r"$\theta$", size=20)
 ax.set_ylabel(r"$r$",      size=20)
 
@@ -163,7 +167,7 @@ thetas=np.linspace(0,2*np.pi,100)
 
 R_H_code = R_H/(r_p*dtheta)
 #dev note : those are not proprely centered FIXME
-ax.plot( *circle(NSEC/2,j_p,R_H_code,thetas),         c='w', ls='--')
+ax.plot( *circle(NSEC/2,j_p,R_H_code,thetas),         c='r', ls='-')
 ax.plot( *circle(NSEC/2,j_p,0.3*R_H_code,thetas),     c='r', ls='-')
 
 cb = fig.colorbar(im)
@@ -174,5 +178,6 @@ cb.set_label("background value")#tmp
 
 
 # print out or save figure (optional flag) ****************************
+#ax.plot(np.arange(NSEC),j_p*np.ones(NSEC),c='w',ls='--')#debug
 #plt.show()
 fig.savefig("coucou.png")
