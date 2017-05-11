@@ -66,10 +66,11 @@ def circle(x0,y0,r,theta) :
 parser = argparse.ArgumentParser()
 parser.add_argument("config")
 parser.add_argument("NOUT", type=int)
-parser.add_argument('-bg','--background',dest='bg_key', choices=['l','d'], default = 'd')
-parser.add_argument('-c' ,'--crop',      dest='crop_limit', type=float, default = 1000)
+parser.add_argument('-bg','--background',dest='bg_key', choices=['l','d'], default = 'd',
+                    help="define background field using keys (label, density, FLI...)")
+parser.add_argument('-c' ,'--crop',      dest='crop_limit', type=float, default = 1000,
+                    help="narrow down the region of interest in mutliples of R_Hill around the planet")
 parser.add_argument('-tc','--thetacrop', action= 'store_true')
-
 
 args = parser.parse_args()
 config     = args.config
