@@ -9,17 +9,59 @@ from lib_parsing import * # built-in module that comes with the toolbox
 import matplotlib.pyplot as plt
 
 # Defintions **********************************************************
+def Hill_radius(r_p,q_p) :
+    return r_p*(q_p/3)**(1./3)
+
+
+def findRadialLimits(r_p,q_p,rads,croper=5.) :
+    R_H = Hill_radius(r_p,q_p)
+    nr = len(rads)
+    jmin,jmax = 0,nr-1
+    while rads[jmin] < r_p-croper*R_H :
+        jmin +=1
+    while rads[jmax] > r_p+croper*R_H :
+        jmax -=1
+    return jmin,jmax
+
+def findAzimLimits(r_p,q_p,thetas,croper=5.) :
+    R_H = Hill_radius(r_p,q_p)
+    ns = len(thetas)
+    imin,imax = 0,ns-1
+    while r_p*thetas[imin] < -croper*R_H :
+        imin +=1
+    while r_p*thetas[imax] > croper*R_H :
+        imax -=1
+    return imin,imax
+
+def crop_field(field,jmin,jmax) :
+    cfield = field[jmin:jmax,:]
+    return cfield
+
+def rotate(field,thetas,theta_p) :
+    ns = len(thetas)
+    i_p = 0
+    while thetas[i_p] < theta_p :
+        i_p += 1
+
+    cesure  = ns/2 - i_p
+    ffield1 = np.concatenate((field[:,-cesure:ns-1],field[:,0:i_p]),axis=1)
+    ffield2 = field[:,i_p:-cesure]
+    ffield  = np.concatenate((ffield1,ffield2),axis=1)
+    return ffield,cesure
+
+def circle(x0,y0,r,theta) :
+    return x0+r*np.cos(theta), y0+r*np.sin(theta)
 
 # PARSING *************************************************************
 
+#--------------------------------------------------
 #args = getScriptArgs()
-
 config = ("/home/crobert/Bureau/sandboxPLOT2D/data/in/phase0.par") #tmp
 bg_key = "d"#tmp
 NOUT = 20#tmp
 crop_limit = 5.#tmp
 azim_crop = True
-
+#--------------------------------------------------
 
 
 OUTDIR  = parseString(config, 'OutputDir'       )
@@ -64,50 +106,11 @@ bg_used_radii    = getrad(RMIN,RMAX,NRAD,DR,bg_key,SPACING)
 
 
 # crop plotting region, cut out fields (optional) *********************
-def Hill_radius(r_p,q_p) :
-    return r_p*(q_p/3)**(1./3)
-
-
-def findRadialLimits(r_p,q_p,rads,croper=5.) :
-    R_H = Hill_radius(r_p,q_p)
-    nr = len(rads)
-    jmin,jmax = 0,nr-1
-    while rads[jmin] < r_p-croper*R_H :
-        jmin +=1
-    while rads[jmax] > r_p+croper*R_H :
-        jmax -=1
-    return jmin,jmax
-
-def findAzimLimits(r_p,q_p,thetas,croper=5.) :
-    R_H = Hill_radius(r_p,q_p)
-    ns = len(thetas)
-    imin,imax = 0,ns-1
-    while r_p*thetas[imin] < -croper*R_H :#FIXME
-        imin +=1
-    while r_p*thetas[imax] > croper*R_H :#FIXME
-        imax -=1
-    return imin,imax
-
-def crop_field(field,jmin,jmax) :
-    cfield = field[jmin:jmax,:]
-    return cfield
-
 
 # plot background *****************************************************
 # define background field, vt, vr
 # useful options should be density, label, FLI
 
-def rotate(field,thetas,theta_p) :
-    ns = len(thetas)
-    i_p = 0
-    while thetas[i_p] < theta_p :
-        i_p += 1
-
-    cesure  = ns/2 - i_p
-    ffield1 = np.concatenate((field[:,-cesure:ns-1],field[:,0:i_p]),axis=1)
-    ffield2 = field[:,i_p:-cesure]
-    ffield  = np.concatenate((ffield1,ffield2),axis=1)
-    return ffield,cesure
 
 
 Jmin,Jmax = findRadialLimits(r_p,q_p,bg_used_radii,crop_limit)
@@ -149,8 +152,6 @@ ax.set_ylabel(r"$r$",      size=20)
 ax.set_xlim(Imin,Imax)
 ax.set_ylim(0,Jmax-(Jmin+1))
 # draw hill sphere(s) #todo : make this optional
-def circle(x0,y0,r,theta) :
-    return x0+r*np.cos(theta), y0+r*np.sin(theta)
 
 R_H = Hill_radius(r_p,q_p)
 thetas=np.linspace(0,2*np.pi,100)
