@@ -183,7 +183,9 @@ Imin,Imax = findAzimLimits(r_p,q_p,bg_used_theta,azim_crop_limit)
 
 # PLOTTING ************************************************************
 # background and associated colorbar ---------------------------------
-im = ax.imshow(bg_field_crop,cmap='viridis',aspect="auto",
+im = ax.imshow(bg_field_crop,
+               cmap=CMAPS[args.bg_key],
+               aspect="auto",
                interpolation='none')
 cb = fig.colorbar(im)
 cb.set_label(AxLabels[args.bg_key])
@@ -221,8 +223,9 @@ thetas=np.linspace(0,2*np.pi,100)
 
 # draw hill sphere(s) ------------------------------------------------
 if args.hillsphere :
-    ax.plot( *circle(NSEC/2,j_p-1,R_H_code,thetas),     c='r', ls='--')
-    ax.plot( *circle(NSEC/2,j_p-1,0.3*R_H_code,thetas), c='r', ls='-')
+    lc = SPOTOUTCOLORS[args.bg_key]
+    ax.plot( *circle(NSEC/2,j_p-1,R_H_code,thetas),     c=lc, ls='--')
+    ax.plot( *circle(NSEC/2,j_p-1,0.3*R_H_code,thetas), c=lc, ls='-')
 
 # draw stream lines --------------------------------------------------
 if args.streamlines :

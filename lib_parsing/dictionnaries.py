@@ -31,3 +31,10 @@ Staggered = ["vrad", "flow"]
 AxLabels = {"d"   : "Surface Density",
             "l"   : "Passive Tracor",
             "f"   : "FLI"}
+
+CMAPS = { 'd' : 'viridis',
+          'l' : 'plasma',
+          'f' : 'magma'}
+
+SPOTOUTCOLORS = { 'd' : 'red',
+                  'l' : 'springgreen'}#todo : find a color for fli mode
