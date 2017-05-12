@@ -13,7 +13,6 @@ import argparse
 #     * background should be azimuthally cropped for the colormap to have correct scaling
 #     * xticks are uniformative in case of azimcropping
 #     * bug : ./augmentedmap.py ../data/in/phase0.par 20 -c 10 -tc yields wrong yticks
-#     * bug : streamlines only work when no cropping is used
 
 #enhancements 
 #     * we could add the option of using cartesian coordinates
@@ -212,7 +211,9 @@ if args.hillsphere :
 # todo
 if args.streamlines :
     vtheta_field_crop -= OmegaFrame(r_p,q_p)#todo : do this only in FIXED frame
-    ax.streamplot(np.arange(NSEC), np.arange(NRAD), vtheta_field_crop, vrad_field_crop,
+    xxx = np.arange(NSEC)
+    yyy = np.arange(0,Jmax-Jmin)
+    ax.streamplot(xxx, yyy, vtheta_field_crop, vrad_field_crop,
                   density=(5,5),
                   color='w',
                   linewidth=0.15)
