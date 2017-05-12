@@ -6,12 +6,6 @@
 # --------------------------
 
 from lib_parsing import * # built-in module that comes with the toolbox
-import matplotlib.pyplot as plt
-import argparse
-from fractions import Fraction as frac
-from matplotlib.ticker import FuncFormatter
-
-#issues
 
 #enhancements 
 #     * we could add the option of using cartesian coordinates
@@ -37,8 +31,6 @@ def findRadialLimits(r_p,q_p,rads,croper=5.) :
     return jmin,jmax
 
 def findAzimLimits(r_p,q_p,thetas,croper=5.) :
-    #dev note : this routine seems to be identical to the previous one,
-    #           one can generalize their names and erase one of those
     R_H = Hill_radius(r_p,q_p)
     ns = len(thetas)
     imin,imax = 0,ns
@@ -49,10 +41,13 @@ def findAzimLimits(r_p,q_p,thetas,croper=5.) :
     return imin,imax
 
 def crop_field(field,jmin,jmax) :
+    #devnote : we may be able to crop in i as well here
     cfield = field[jmin:jmax,:]
     return cfield
 
 def rotate(field,thetas,theta_p) :
+    """this routine shifts the array along the theta axis
+    to make the planet appear in the middle of the plot"""
     ns = len(thetas)
     i_p = 0
     while thetas[i_p] < theta_p :
@@ -67,7 +62,7 @@ def rotate(field,thetas,theta_p) :
 def circle(x0,y0,r,theta) :
     return x0+r*np.cos(theta), y0+r*np.sin(theta)
 
-def sub_angle(f) :
+def get_pilabel_from_fraction(f) :
     num   = f.numerator
     den   = f.denominator
     if num == 0 :
@@ -241,7 +236,7 @@ else :
     xticks = [(t/np.pi+1.0)*NSEC/2 - Imin for t in thetaticks]
 
     xtickslab = [r"${0}\pi/{1}$".format(f.numerator,f.denominator) for f in fracticks]
-    xtickslab = [sub_angle(f) for f in fracticks]
+    xtickslab = [get_pilabel_from_fraction(f) for f in fracticks]#devnote : may be simplified
     ax.set_xticks(xticks)
     ax.set_xticklabels(xtickslab)
 
