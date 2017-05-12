@@ -37,4 +37,5 @@ CMAPS = { 'd' : 'viridis',
           'f' : 'magma'}
 
 SPOTOUTCOLORS = { 'd' : 'red',
-                  'l' : 'springgreen'}#todo : find a color for fli mode
+                  'l' : 'springgreen',
+                  'f' : 'springgreen'}#todo : check if that works
