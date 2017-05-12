@@ -12,7 +12,6 @@ import argparse
 #issues
 #     * background should be azimuthally cropped for the colormap to have correct scaling
 #     * xticks are uniformative in case of azimcropping
-#     * bug : ./augmentedmap.py ../data/in/phase0.par 20 -c 10 -tc yields wrong yticks
 
 #enhancements 
 #     * we could add the option of using cartesian coordinates
@@ -189,6 +188,9 @@ im = ax.imshow(bg_field_crop,cmap='viridis',aspect="auto",
 cb = fig.colorbar(im)
 cb.set_label(AxLabels[args.bg_key])
 
+# set limits ---------------------------------------------------------
+ax.set_ylim(0,Jmax-(Jmin+1))
+
 # ticks --------------------------------------------------------------
 
 if args.debug :
@@ -199,20 +201,16 @@ else :
 
     ytickslab = ax.get_yticks()
     ytickslab = [r"${0}$".format(round(bg_used_radii_crop[int(tick)],2))
-                 for tick in ytickslab[1:-1]]
+                 for tick in ytickslab[:-1]]
 
     ax.set_xticks(xticks)
     ax.set_xticklabels(xtickslab)
     ax.set_yticklabels(ytickslab)
 
 ax.set_xlabel(r"$\theta$", size=20)
-
 ax.set_ylabel(r"$r$",      size=20)
 
-# set limits ---------------------------------------------------------
-ax.set_xlim(Imin,Imax)
-ax.set_ylim(0,Jmax-(Jmin+1))
-
+ax.set_xlim(Imin,Imax)#weirdly, this line can not be put with its sibling up there without breaking -tc
 
 # OPTIONAL PLOTTING ***************************************************
 # draw hill sphere(s) ------------------------------------------------
