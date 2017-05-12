@@ -9,6 +9,7 @@ from lib_parsing import * # built-in module that comes with the toolbox
 import matplotlib.pyplot as plt
 import argparse
 from fractions import Fraction as frac
+from matplotlib.ticker import FuncFormatter
 
 #issues
 
@@ -109,6 +110,9 @@ parser.add_argument('-c' ,'--crop',      dest='crop_limit', type=float,
 parser.add_argument('-o' ,'--output',
                     help="define picture output file name",
                     default = "")
+parser.add_argument('-d','--streamlines-density',dest='sldensity', type=int,
+                    help="streamlines density",
+                    default = 5)
 
 # conversion ---------------------------------------------------------
 args = parser.parse_args()
@@ -212,7 +216,8 @@ im = ax.imshow(bg_field_crop,
                cmap=CMAPS[args.bg_key],
                aspect="auto",
                interpolation='none')
-cb = fig.colorbar(im,orientation='horizontal')
+cb = fig.colorbar(im,
+                  orientation='vertical')
 cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
 
 # set limits ---------------------------------------------------------
@@ -252,7 +257,7 @@ ax.set_ylabel(r"$r$",      size=20)
 
 
 # OPTIONAL PLOTTING ***************************************************
-xxx = np.arange(sector_range)#todo : this will have to be generalized for proper azimuthal cropping
+xxx = np.arange(sector_range)
 yyy = np.arange(0,Jmax-Jmin)
 R_H = Hill_radius(r_p,q_p)
 R_H_code = R_H/(r_p*dtheta)
@@ -267,7 +272,7 @@ if args.hillsphere :
 # draw stream lines --------------------------------------------------
 if args.streamlines :
     ax.streamplot(xxx, yyy, vtheta_field_crop, vrad_field_crop,
-                  density=(5,5),#todo : make density a parameter
+                  density=(args.sldensity,args.sldensity),
                   color='w',
                   arrowsize=0.7,
                   linewidth=0.15)
