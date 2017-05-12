@@ -40,10 +40,11 @@ Run this after a duplication in restart mode to eliminate redundant outputs in p
 
 ### gen_migrationrate
 translates date from orbitNNN.dat to
+
 | time | semi-major-axis | \dot{semi-major-axis} | theoretical radial velocity |
 
 
-###stitchup
+### stitchup
 can merge 2 simulations (inner disk + outer disk) to a single one
 
 
