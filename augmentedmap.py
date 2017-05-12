@@ -11,7 +11,6 @@ import argparse
 from fractions import Fraction as frac
 
 #issues
-#     * xticks are uniformative in case of azimcropping
 
 #enhancements 
 #     * we could add the option of using cartesian coordinates
@@ -207,26 +206,41 @@ ax.set_xlim(0,sector_range-1)
 
 # ticks --------------------------------------------------------------
 
-def sub_angles(ns,div) :
-    labels = [r"${0} \pi$".format(2*frac(k,div)-1) for k in range(div+1)]
-    #todo : make this look ever prettier
-    return labels
+def sub_angle(f) :
+    label = r"$"
+    num   = f.numerator
+    den   = f.denominator
+    if num == 0 :
+        label = r"$0$"
+    else :
+        if num == 1 :
+            num = ''
+        elif num == -1 :
+            num = '-'
+        if den == 1 :
+            label = r"${0}\pi$".format(num)
+        else :
+            label = r"${0}\pi/{1}$".format(num,den)
+    return label
 
 if args.debug :
     print "In --debug mode, orignial ticks are left on the x/y axis"
 else :
-    print angular_range,angular_range_frac
-    div = NSEC
-    while frac(1,div) < angular_range_frac :
-        div -=1
-    print div#1/div is the smalest fraction of 2pi contained in the angular range of the figure
-    div *= 4 #we want 4 ticks in total
+    maxdiv = NSEC
+    while frac(1,maxdiv) < angular_range_frac :
+        maxdiv -=1
+    if args.thetacrop :#fix
+        maxdiv+=1
+    div = maxdiv*4
+    fracticks  = [frac(2*n,div) for n in range(-2,3)]
+    thetaticks = [np.pi*f for f in fracticks]
 
-    #xticks = [float(NSEC*k)/div for k in range(div+1) if NSEC*k >= Imin*div and NSEC*k <= Imax*div]
-    # print xticks
-    # xtickslab = sub_angles(NSEC,div)
-    # ax.set_xticks(xticks)
-    # ax.set_xticklabels(xtickslab)
+    xticks = [(t/np.pi+1.0)*NSEC/2 - Imin for t in thetaticks]
+
+    xtickslab = [r"${0}\pi/{1}$".format(f.numerator,f.denominator) for f in fracticks]
+    xtickslab = [sub_angle(f) for f in fracticks]
+    ax.set_xticks(xticks)
+    ax.set_xticklabels(xtickslab)
 
     ytickslab = ax.get_yticks()
     ytickslab = [r"${0}$".format(round(bg_used_radii_crop[int(tick)],2))
