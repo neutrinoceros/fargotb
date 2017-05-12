@@ -213,19 +213,19 @@ ax.set_ylabel(r"$r$",      size=20)
 ax.set_xlim(Imin,Imax)#weirdly, this line can not be put with its sibling up there without breaking -tc
 
 # OPTIONAL PLOTTING ***************************************************
+xxx = np.arange(NSEC)#todo : this will have to be generalized for proper azimuthal cropping
+yyy = np.arange(0,Jmax-Jmin)
+R_H = Hill_radius(r_p,q_p)
+R_H_code = R_H/(r_p*dtheta)
+thetas=np.linspace(0,2*np.pi,100)
+
 # draw hill sphere(s) ------------------------------------------------
 if args.hillsphere :
-    R_H = Hill_radius(r_p,q_p)
-    thetas=np.linspace(0,2*np.pi,100)
-    R_H_code = R_H/(r_p*dtheta)
     ax.plot( *circle(NSEC/2,j_p-1,R_H_code,thetas),     c='r', ls='--')
     ax.plot( *circle(NSEC/2,j_p-1,0.3*R_H_code,thetas), c='r', ls='-')
 
-
 # draw stream lines --------------------------------------------------
 if args.streamlines :
-    xxx = np.arange(NSEC)
-    yyy = np.arange(0,Jmax-Jmin)
     ax.streamplot(xxx, yyy, vtheta_field_crop, vrad_field_crop,
                   density=(5,5),#todo : make density a parameter
                   color='w',
