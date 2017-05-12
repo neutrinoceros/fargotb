@@ -66,6 +66,22 @@ def rotate(field,thetas,theta_p) :
 def circle(x0,y0,r,theta) :
     return x0+r*np.cos(theta), y0+r*np.sin(theta)
 
+def sub_angle(f) :
+    label = r"$"
+    num   = f.numerator
+    den   = f.denominator
+    if num == 0 :
+        label = r"$0$"
+    else :
+        if num == 1 :
+            num = ''
+        elif num == -1 :
+            num = '-'
+        if den == 1 :
+            label = r"${0}\pi$".format(num)
+        else :
+            label = r"${0}\pi/{1}$".format(num,den)
+    return label
 
 # PARSING *************************************************************
 
@@ -205,23 +221,6 @@ ax.set_ylim(0,Jmax-(Jmin+1))
 ax.set_xlim(0,sector_range-1)
 
 # ticks --------------------------------------------------------------
-
-def sub_angle(f) :
-    label = r"$"
-    num   = f.numerator
-    den   = f.denominator
-    if num == 0 :
-        label = r"$0$"
-    else :
-        if num == 1 :
-            num = ''
-        elif num == -1 :
-            num = '-'
-        if den == 1 :
-            label = r"${0}\pi$".format(num)
-        else :
-            label = r"${0}\pi/{1}$".format(num,den)
-    return label
 
 if args.debug :
     print "In --debug mode, orignial ticks are left on the x/y axis"
