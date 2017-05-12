@@ -26,16 +26,19 @@ Centered  = ["dens", "temperature", "Pressure",
              "espilon", "label", "dustdens", "gasonlydens",
              "vtheta"]
 
-Staggered = ["vrad", "flow"]
+Staggered = ["vrad", "flow", "radialFlow"]
 
-AxLabels = {"d"   : r"$\Sigma$",
-            "l"   : r"$\eta$",
-            "f"   : "FLI"}
+AxLabels = {'d'   : r"$\Sigma$",
+            'l'   : r"$\eta$",
+            'rf'  : r"$\dot{M}$",
+            'f'   : "FLI"}
 
 CMAPS = { 'd' : 'viridis',
           'l' : 'plasma',
+          'rf': 'inferno',
           'f' : 'magma'}
 
-SPOTOUTCOLORS = { 'd' : 'red',
-                  'l' : 'springgreen',
-                  'f' : 'springgreen'}#todo : check if that works
+SPOTOUTCOLORS = { 'd'  : 'red',
+                  'l'  : 'springgreen',
+                  'rf' : 'springgreen',
+                  'f'  : 'springgreen'}#todo : check if that works

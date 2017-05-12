@@ -97,8 +97,8 @@ parser.add_argument('--debug', action= 'store_true',
                     help="print debug informations")
 # keywords arguments -------------------------------------------------
 parser.add_argument('-bg','--background',dest='bg_key',
-                    help="define background field using keys (label, density, FLI ...)",
-                    choices=['l','d','f'], default = 'd')
+                    help="define background field using keys (label, density, radial flow FLI ...)",
+                    choices=['l','d','rf','f'], default = 'd')
 parser.add_argument('-c' ,'--crop',      dest='crop_limit', type=float,
                     help="zoom around the planet",
                     default = 1000)
@@ -116,7 +116,11 @@ if args.thetacrop :
 else :
     azim_crop_limit = 1000
 
-if args.bg_key == "f" :
+if args.bg_key == 'rf' :
+    #here, put verif of the existence of the postprocessed file
+    pass
+
+if args.bg_key == 'f' :
     print "Sorry, FLI postprocessing is not implemented yet, come back later !"
     exit(-1)
 
@@ -207,10 +211,18 @@ vtheta_field_crop  = vtheta_field_crop [:,Imin:Imax]
 
 # PLOTTING ************************************************************
 # background and associated colorbar ---------------------------------
-im = ax.imshow(bg_field_crop,
-               cmap=CMAPS[args.bg_key],
-               aspect="auto",
-               interpolation='none')
+try :
+    im = ax.imshow(bg_field_crop,
+                   cmap=CMAPS[args.bg_key],
+                   aspect="auto",
+                   interpolation='none')
+except ValueError :
+    print "Warning : color map not available, using default gnuplot style."
+    im = ax.imshow(bg_field_crop,
+                   cmap='gnuplot',
+                   aspect="auto",
+                   interpolation='none')
+
 cb = fig.colorbar(im,
                   orientation='vertical')
 cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
