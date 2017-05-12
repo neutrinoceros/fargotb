@@ -28,8 +28,8 @@ Centered  = ["dens", "temperature", "Pressure",
 
 Staggered = ["vrad", "flow"]
 
-AxLabels = {"d"   : "Surface Density",
-            "l"   : "Passive Tracor",
+AxLabels = {"d"   : r"$\Sigma$",
+            "l"   : r"$\eta$",
             "f"   : "FLI"}
 
 CMAPS = { 'd' : 'viridis',

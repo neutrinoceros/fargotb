@@ -67,7 +67,6 @@ def circle(x0,y0,r,theta) :
     return x0+r*np.cos(theta), y0+r*np.sin(theta)
 
 def sub_angle(f) :
-    label = r"$"
     num   = f.numerator
     den   = f.denominator
     if num == 0 :
@@ -213,8 +212,8 @@ im = ax.imshow(bg_field_crop,
                cmap=CMAPS[args.bg_key],
                aspect="auto",
                interpolation='none')
-cb = fig.colorbar(im)
-cb.set_label(AxLabels[args.bg_key])
+cb = fig.colorbar(im,orientation='horizontal')
+cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
 
 # set limits ---------------------------------------------------------
 ax.set_ylim(0,Jmax-(Jmin+1))
@@ -228,7 +227,7 @@ else :
     maxdiv = NSEC
     while frac(1,maxdiv) < angular_range_frac :
         maxdiv -=1
-    if args.thetacrop :#fix
+    if args.thetacrop and args.crop_limit < 1000 :#fix
         maxdiv+=1
     div = maxdiv*4
     fracticks  = [frac(2*n,div) for n in range(-2,3)]
@@ -270,6 +269,7 @@ if args.streamlines :
     ax.streamplot(xxx, yyy, vtheta_field_crop, vrad_field_crop,
                   density=(5,5),#todo : make density a parameter
                   color='w',
+                  arrowsize=0.7,
                   linewidth=0.15)
 
 # draw velocity field ------------------------------------------------
