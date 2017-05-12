@@ -109,6 +109,7 @@ if args.bg_key == "f" :
 # fetching of numerical configuration --------------------------------
 OUTDIR  = parseString(args.config, 'OutputDir'       )
 SPACING = parseString(args.config, 'RadialSpacing'   )
+Frame   = parseString(args.config, 'Frame'           )
 NRAD    = parseValue (args.config, 'nrad'            )
 NSEC    = parseValue (args.config, 'nsec'            )
 RMIN    = parseValue (args.config, 'rmin',      float)
@@ -220,7 +221,9 @@ if args.hillsphere :
 # draw stream lines --------------------------------------------------
 # todo
 if args.streamlines :
-    vtheta_field_crop -= OmegaFrame(r_p,q_p)#todo : do this only in FIXED frame
+    if Frame.upper() == "FIXED" :
+        #Streamlines are only interesting in the Co-orbital frame
+        vtheta_field_crop -= OmegaFrame(r_p,q_p)
     xxx = np.arange(NSEC)
     yyy = np.arange(0,Jmax-Jmin)
     ax.streamplot(xxx, yyy, vtheta_field_crop, vrad_field_crop,
