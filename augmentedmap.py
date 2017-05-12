@@ -82,6 +82,8 @@ parser.add_argument('-sl','--streamlines', action= 'store_true',
                     help="add streamlines (NOT IMPLEMENTED YET)")
 parser.add_argument('-q','--quiver', action= 'store_true',
                     help="add quiver of velocity field (NOT IMPLEMENTED YET)")
+parser.add_argument('--debug', action= 'store_true',
+                    help="print debug informations")
 # keywords arguments -------------------------------------------------
 parser.add_argument('-bg','--background',dest='bg_key',
                     help="define background field using keys (label, density, FLI ...)",
@@ -181,15 +183,23 @@ cb = fig.colorbar(im)
 cb.set_label(AxLabels[args.bg_key])
 
 # ticks --------------------------------------------------------------
-ax.set_xticks([0,NSEC/4,NSEC/2,3*NSEC/4,NSEC])
-ax.set_xticklabels([r"$-\pi$",r"$-\pi/2$",r"$0$",r"$\pi/2$",r"$\pi$"])
 
-ytickslab = ax.get_yticks()
-ytickslab = [r"${0}$".format(round(bg_used_radii_crop[int(tick)],2))
-             for tick in ytickslab[1:-1]]
+if args.debug :
+    print "In --debug mode, orignial ticks are left on the x/y axis"
+else :
+    xticks = [0,NSEC/4,NSEC/2,3*NSEC/4,NSEC]
+    xtickslab = [r"$-\pi$",r"$-\pi/2$",r"$0$",r"$\pi/2$",r"$\pi$"]
 
-ax.set_yticklabels(ytickslab)
+    ytickslab = ax.get_yticks()
+    ytickslab = [r"${0}$".format(round(bg_used_radii_crop[int(tick)],2))
+                 for tick in ytickslab[1:-1]]
+
+    ax.set_xticks(xticks)
+    ax.set_xticklabels(xtickslab)
+    ax.set_yticklabels(ytickslab)
+
 ax.set_xlabel(r"$\theta$", size=20)
+
 ax.set_ylabel(r"$r$",      size=20)
 
 # set limits ---------------------------------------------------------
