@@ -232,10 +232,10 @@ if args.streamlines :
                   linewidth=0.15)
 
 # draw velocity field ------------------------------------------------
-# todo
 if args.quiver :
-    print "Sorry, QUIVER is not implemented yet, come back later !"
-
+    ax.quiver(xxx, yyy, vtheta_field_crop, vrad_field_crop,
+              color='k',
+              alpha = 0.4)
 
 # PRINTING OUTPUT *****************************************************
 
