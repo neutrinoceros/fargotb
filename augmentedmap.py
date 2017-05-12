@@ -8,9 +8,9 @@
 from lib_parsing import * # built-in module that comes with the toolbox
 import matplotlib.pyplot as plt
 import argparse
+from fractions import Fraction as frac
 
 #issues
-#     * background should be azimuthally cropped for the colormap to have correct scaling
 #     * xticks are uniformative in case of azimcropping
 
 #enhancements 
@@ -37,12 +37,14 @@ def findRadialLimits(r_p,q_p,rads,croper=5.) :
     return jmin,jmax
 
 def findAzimLimits(r_p,q_p,thetas,croper=5.) :
+    #dev note : this routine seems to be identical to the previous one,
+    #           one can generalize their names and erase one of those
     R_H = Hill_radius(r_p,q_p)
     ns = len(thetas)
     imin,imax = 0,ns
     while r_p*thetas[imin] < -croper*R_H :
         imin +=1
-    while r_p*thetas[imax-1] > croper*R_H :
+    while r_p*thetas[imax-2] > croper*R_H :#todo : check -2 ???
         imax -=1
     return imin,imax
 
@@ -153,12 +155,13 @@ bg_field           = rotate(bg_field,     base_theta,theta_p)
 vrad_field         = rotate(vrad_field,   base_theta,theta_p)
 vtheta_field       = rotate(vtheta_field, base_theta,theta_p)
 
-# cropping
+# radial cropping
 Jmin,Jmax = findRadialLimits(r_p,q_p,bg_used_radii,args.crop_limit)
 bg_field_crop      = bg_field     [Jmin:Jmax,:]
 vrad_field_crop    = vrad_field   [Jmin:Jmax,:]
 vtheta_field_crop  = vtheta_field [Jmin:Jmax,:]
 bg_used_radii_crop = bg_used_radii[Jmin:Jmax  ]
+
 
 # get rid of the keplerian component as
 # Streamlines and velocity field are only
@@ -179,7 +182,15 @@ bg_used_theta = rotated_theta #alias
 
 # finding limits of the plot
 Imin,Imax = findAzimLimits(r_p,q_p,bg_used_theta,azim_crop_limit)
+sector_range         = Imax-Imin
+angular_range      = sector_range *2*np.pi/NSEC
+angular_range_frac = angular_range/(2.0*np.pi)
 
+# azimuthal cropping
+Jmin,Jmax = findRadialLimits(r_p,q_p,bg_used_radii,args.crop_limit)
+bg_field_crop      = bg_field_crop     [:,Imin:Imax]
+vrad_field_crop    = vrad_field_crop   [:,Imin:Imax]
+vtheta_field_crop  = vtheta_field_crop [:,Imin:Imax]
 
 # PLOTTING ************************************************************
 # background and associated colorbar ---------------------------------
@@ -192,30 +203,44 @@ cb.set_label(AxLabels[args.bg_key])
 
 # set limits ---------------------------------------------------------
 ax.set_ylim(0,Jmax-(Jmin+1))
+ax.set_xlim(0,sector_range-1)
 
 # ticks --------------------------------------------------------------
+
+def sub_angles(ns,div) :
+    labels = [r"${0} \pi$".format(2*frac(k,div)-1) for k in range(div+1)]
+    #todo : make this look ever prettier
+    return labels
 
 if args.debug :
     print "In --debug mode, orignial ticks are left on the x/y axis"
 else :
-    xticks = [0,NSEC/4,NSEC/2,3*NSEC/4,NSEC]
-    xtickslab = [r"$-\pi$",r"$-\pi/2$",r"$0$",r"$\pi/2$",r"$\pi$"]
+    print angular_range,angular_range_frac
+    div = NSEC
+    while frac(1,div) < angular_range_frac :
+        div -=1
+    print div#1/div is the smalest fraction of 2pi contained in the angular range of the figure
+    div *= 4 #we want 4 ticks in total
+
+    #xticks = [float(NSEC*k)/div for k in range(div+1) if NSEC*k >= Imin*div and NSEC*k <= Imax*div]
+    # print xticks
+    # xtickslab = sub_angles(NSEC,div)
+    # ax.set_xticks(xticks)
+    # ax.set_xticklabels(xtickslab)
 
     ytickslab = ax.get_yticks()
     ytickslab = [r"${0}$".format(round(bg_used_radii_crop[int(tick)],2))
                  for tick in ytickslab[:-1]]
 
-    ax.set_xticks(xticks)
-    ax.set_xticklabels(xtickslab)
     ax.set_yticklabels(ytickslab)
 
 ax.set_xlabel(r"$\theta$", size=20)
 ax.set_ylabel(r"$r$",      size=20)
 
-ax.set_xlim(Imin,Imax)#weirdly, this line can not be put with its sibling up there without breaking -tc
+
 
 # OPTIONAL PLOTTING ***************************************************
-xxx = np.arange(NSEC)#todo : this will have to be generalized for proper azimuthal cropping
+xxx = np.arange(sector_range)#todo : this will have to be generalized for proper azimuthal cropping
 yyy = np.arange(0,Jmax-Jmin)
 R_H = Hill_radius(r_p,q_p)
 R_H_code = R_H/(r_p*dtheta)
@@ -224,8 +249,8 @@ thetas=np.linspace(0,2*np.pi,100)
 # draw hill sphere(s) ------------------------------------------------
 if args.hillsphere :
     lc = SPOTOUTCOLORS[args.bg_key]
-    ax.plot( *circle(NSEC/2,j_p-1,R_H_code,thetas),     c=lc, ls='--')
-    ax.plot( *circle(NSEC/2,j_p-1,0.3*R_H_code,thetas), c=lc, ls='-')
+    ax.plot( *circle(sector_range/2,j_p-1,R_H_code,thetas),     c=lc, ls='--')
+    ax.plot( *circle(sector_range/2,j_p-1,0.3*R_H_code,thetas), c=lc, ls='-')
 
 # draw stream lines --------------------------------------------------
 if args.streamlines :
