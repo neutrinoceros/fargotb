@@ -98,7 +98,7 @@ parser.add_argument('--debug', action= 'store_true',
 # keywords arguments -------------------------------------------------
 parser.add_argument('-bg','--background',dest='bg_key',
                     help="define background field using keys (label, density, radial flow FLI ...)",
-                    choices=['l','d','rf','f'], default = 'd')
+                    choices=['l','d','rf','f','blank'], default = 'd')
 parser.add_argument('-c' ,'--crop',      dest='crop_limit', type=float,
                     help="zoom around the planet",
                     default = 1000)
@@ -120,9 +120,12 @@ if args.bg_key == 'rf' :
     #here, put verif of the existence of the postprocessed file
     pass
 
-if args.bg_key == 'f' :
+elif args.bg_key == 'f' :
     print "Sorry, FLI postprocessing is not implemented yet, come back later !"
     exit(-1)
+
+elif args.bg_key == 'blank' :
+    pass
 
 # fetching of numerical configuration --------------------------------
 OUTDIR  = parseString(args.config, 'OutputDir'       )
@@ -162,10 +165,16 @@ ax = fig.add_subplot(111,aspect='auto')
 # plot background *****************************************************
 # define background field, vt, vr
 
-bg_field,     bgfile = get2Dfield(args.bg_key,NRAD,NSEC,OUTDIR,args.NOUT)
+try :
+    bg_field,     bgfile = get2Dfield(args.bg_key,NRAD,NSEC,OUTDIR,args.NOUT)
+    bg_used_radii        = getrad(RMIN,RMAX,NRAD,DR,args.bg_key,SPACING)
+except KeyError :#thats how we handle the blank case
+    bg_field,     bgfile = get2Dfield('d',NRAD,NSEC,OUTDIR,args.NOUT)
+    bg_used_radii        = getrad(RMIN,RMAX,NRAD,DR,'d',SPACING)
+
 vrad_field,   vrfile = get2Dfield('vr',NRAD,NSEC,OUTDIR,args.NOUT)
 vtheta_field, vtfile = get2Dfield('vt',NRAD,NSEC,OUTDIR,args.NOUT)
-bg_used_radii        = getrad(RMIN,RMAX,NRAD,DR,args.bg_key,SPACING)
+
 
 # rotation
 bg_field           = rotate(bg_field,     base_theta,theta_p)
@@ -211,21 +220,21 @@ vtheta_field_crop  = vtheta_field_crop [:,Imin:Imax]
 
 # PLOTTING ************************************************************
 # background and associated colorbar ---------------------------------
-try :
-    im = ax.imshow(bg_field_crop,
-                   cmap=CMAPS[args.bg_key],
-                   aspect="auto",
-                   interpolation='none')
-except ValueError :
-    print "Warning : color map not available, using default gnuplot style."
-    im = ax.imshow(bg_field_crop,
-                   cmap='gnuplot',
-                   aspect="auto",
-                   interpolation='none')
+if args.bg_key != 'blank' :
+    try :
+        im = ax.imshow(bg_field_crop,
+                       cmap=CMAPS[args.bg_key],
+                       aspect="auto",
+                       interpolation='none')
+    except ValueError :
+        print "Warning : color map not available, using default gnuplot style."
+        im = ax.imshow(bg_field_crop,
+                       cmap='gnuplot',
+                       aspect="auto",
+                       interpolation='none')
 
-cb = fig.colorbar(im,
-                  orientation='vertical')
-cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
+    cb = fig.colorbar(im,orientation='vertical')
+    cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
 
 # set limits ---------------------------------------------------------
 ax.set_ylim(0,Jmax-(Jmin+1))
@@ -278,9 +287,14 @@ if args.hillsphere :
 
 # draw stream lines --------------------------------------------------
 if args.streamlines :
+    if args.bg_key == 'blank' :
+        slcolor = 'b'
+    else :
+        slcolor = 'w'
+
     ax.streamplot(xxx, yyy, vtheta_field_crop, vrad_field_crop,
                   density=(args.sldensity,args.sldensity),
-                  color='w',
+                  color=slcolor,
                   arrowsize=0.7,
                   linewidth=0.15)
 
