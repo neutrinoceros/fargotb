@@ -71,15 +71,15 @@ def circle(x0,y0,r,theta) :
 
 parser = argparse.ArgumentParser()
 # mandatories --------------------------------------------------------
-parser.add_argument("config")
-parser.add_argument("NOUT", type=int)
+parser.add_argument('config', help="path to configuration file .par")
+parser.add_argument('NOUT', type=int, help="output number")
 # switches -----------------------------------------------------------
 parser.add_argument('-tc','--thetacrop',   action= 'store_true',
                     help="crop the figure in the azimuthal direction")
 parser.add_argument('-s', '--hillsphere',  action= 'store_true',
                     help="traces 0.3*R_H and R_H levels")
 parser.add_argument('-sl','--streamlines', action= 'store_true',
-                    help="add streamlines (NOT IMPLEMENTED YET)")
+                    help="add streamlines")
 parser.add_argument('-q','--quiver', action= 'store_true',
                     help="add quiver of velocity field (NOT IMPLEMENTED YET)")
 parser.add_argument('--debug', action= 'store_true',
