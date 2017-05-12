@@ -2,6 +2,8 @@
 __second release notes__
 
 *This software suite is developed by* [Clément Robert](mailto:clement.robert@protonmail.com) *for* [FARGO](http://fargo.in2p3.fr/)*, a project started by Frédéric Masset.*
+![illustration](gallery/zoom_quiver.png?raw=true)
+
 
 
 ## Content
