@@ -134,16 +134,15 @@ r_p     = np.sqrt(x_p**2+y_p**2)
 theta_p = 0.0#by definition
 
 
-# define plotting objects (fig, ax), choosing aspect carefully to have 
-# same scale in both directions 
-# this will be easy to spot when we plot hill "sphere"
+# define plotting objects (fig, ax),
+# todo : choose aspect carefully to have same scale in both directions
+# errors are easy to spot when we plot Hill "spheres"
 fig = plt.figure()
 ax = fig.add_subplot(111,aspect='auto')
 
 
 # plot background *****************************************************
 # define background field, vt, vr
-# useful options should be density, label, FLI
 
 bg_field,     bgfile = get2Dfield(args.bg_key,NRAD,NSEC,OUTDIR,args.NOUT)
 vrad_field,   vrfile = get2Dfield('vr',NRAD,NSEC,OUTDIR,args.NOUT)
@@ -161,6 +160,13 @@ bg_field_crop      = bg_field     [Jmin:Jmax,:]
 vrad_field_crop    = vrad_field   [Jmin:Jmax,:]
 vtheta_field_crop  = vtheta_field [Jmin:Jmax,:]
 bg_used_radii_crop = bg_used_radii[Jmin:Jmax  ]
+
+# get rid of the keplerian component as
+# Streamlines and velocity field are only
+# interesting in the Co-orbital frame
+if Frame.upper() == "FIXED" :
+    vtheta_field_crop -= OmegaFrame(r_p,q_p)
+
 
 # These two lines need to be run after rotation...
 i_p = 0
@@ -208,8 +214,8 @@ ax.set_xlim(Imin,Imax)
 ax.set_ylim(0,Jmax-(Jmin+1))
 
 
-# ADDITIONAL PLOTTING *************************************************
-# draw hill sphere(s) (optional) -------------------------------------
+# OPTIONAL PLOTTING ***************************************************
+# draw hill sphere(s) ------------------------------------------------
 if args.hillsphere :
     R_H = Hill_radius(r_p,q_p)
     thetas=np.linspace(0,2*np.pi,100)
@@ -219,15 +225,11 @@ if args.hillsphere :
 
 
 # draw stream lines --------------------------------------------------
-# todo
 if args.streamlines :
-    if Frame.upper() == "FIXED" :
-        #Streamlines are only interesting in the Co-orbital frame
-        vtheta_field_crop -= OmegaFrame(r_p,q_p)
     xxx = np.arange(NSEC)
     yyy = np.arange(0,Jmax-Jmin)
     ax.streamplot(xxx, yyy, vtheta_field_crop, vrad_field_crop,
-                  density=(5,5),
+                  density=(5,5),#todo : make density a parameter
                   color='w',
                   linewidth=0.15)
 
