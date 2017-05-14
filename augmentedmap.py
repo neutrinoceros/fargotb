@@ -85,6 +85,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('config', help="path to configuration file .par")
 parser.add_argument('NOUT', type=int, help="output number")
 # switches -----------------------------------------------------------
+parser.add_argument('-c', '--center',  action= 'store_true',
+                    help="traces 0.3*R_H and R_H levels")
 parser.add_argument('-tc','--thetacrop',   action= 'store_true',
                     help="crop the figure in the azimuthal direction")
 parser.add_argument('-s', '--hillsphere',  action= 'store_true',
@@ -99,7 +101,7 @@ parser.add_argument('--debug', action= 'store_true',
 parser.add_argument('-bg','--background',dest='bg_key',
                     help="define background field using keys (label, density, radial flow FLI ...)",
                     choices=['l','d','rf','f','blank'], default = 'd')
-parser.add_argument('-c' ,'--crop',      dest='crop_limit', type=float,
+parser.add_argument('-z' ,'--zoom',      dest='crop_limit', type=float,
                     help="zoom around the planet",
                     default = 1000)
 parser.add_argument('-o' ,'--output',
@@ -177,9 +179,10 @@ vtheta_field, vtfile = get2Dfield('vt',NRAD,NSEC,OUTDIR,args.NOUT)
 
 
 # shifting to center the planet
-bg_field           = shift(bg_field,     base_theta,theta_p)
-vrad_field         = shift(vrad_field,   base_theta,theta_p)
-vtheta_field       = shift(vtheta_field, base_theta,theta_p)
+if args.center :
+    bg_field           = shift(bg_field,     base_theta,theta_p)
+    vrad_field         = shift(vrad_field,   base_theta,theta_p)
+    vtheta_field       = shift(vtheta_field, base_theta,theta_p)
 
 # radial cropping
 Jmin,Jmax = findRadialLimits(r_p,q_p,bg_used_radii,args.crop_limit)
