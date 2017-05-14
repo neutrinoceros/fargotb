@@ -211,7 +211,7 @@ bg_used_theta = rotated_theta #alias
 
 # finding limits of the plot
 Imin,Imax = findAzimLimits(r_p,q_p,bg_used_theta,azim_crop_limit)
-sector_range         = Imax-Imin
+sector_range       = Imax-Imin
 angular_range      = sector_range *2*np.pi/NSEC
 angular_range_frac = angular_range/(2.0*np.pi)
 
