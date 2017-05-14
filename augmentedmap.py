@@ -45,7 +45,7 @@ def crop_field(field,jmin,jmax) :
     cfield = field[jmin:jmax,:]
     return cfield
 
-def rotate(field,thetas,theta_p) :
+def shift(field,thetas,theta_p) :
     """this routine shifts the array along the theta axis
     to make the planet appear in the middle of the plot"""
     ns = len(thetas)
@@ -176,10 +176,10 @@ vrad_field,   vrfile = get2Dfield('vr',NRAD,NSEC,OUTDIR,args.NOUT)
 vtheta_field, vtfile = get2Dfield('vt',NRAD,NSEC,OUTDIR,args.NOUT)
 
 
-# rotation
-bg_field           = rotate(bg_field,     base_theta,theta_p)
-vrad_field         = rotate(vrad_field,   base_theta,theta_p)
-vtheta_field       = rotate(vtheta_field, base_theta,theta_p)
+# shifting to center the planet
+bg_field           = shift(bg_field,     base_theta,theta_p)
+vrad_field         = shift(vrad_field,   base_theta,theta_p)
+vtheta_field       = shift(vtheta_field, base_theta,theta_p)
 
 # radial cropping
 Jmin,Jmax = findRadialLimits(r_p,q_p,bg_used_radii,args.crop_limit)
