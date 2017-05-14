@@ -312,4 +312,8 @@ if args.quiver :
 if args.output != ""  :
     fig.savefig(args.output)
 else :
+    print "This is the interactive live mode. Use -o or --output to save your picture"
+    plt.ion()
     plt.show()
+    plt.ioff()
+    raw_input("press enter to quit     ")
