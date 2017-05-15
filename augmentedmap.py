@@ -40,11 +40,6 @@ def findAzimLimits(r_p,q_p,thetas,croper=5.) :
         imax -=1
     return imin,imax
 
-def crop_field(field,jmin,jmax) :
-    #devnote : we may be able to crop in i as well here
-    cfield = field[jmin:jmax,:]
-    return cfield
-
 def shift(field,thetas,theta_p) :
     """this routine shifts the array along the theta axis
     to make the planet appear in the middle of the plot"""
