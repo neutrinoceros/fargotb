@@ -6,6 +6,9 @@
 # --------------------------
 
 from lib_parsing import * # built-in module that comes with the toolbox
+from matplotlib.patches import Rectangle
+from matplotlib.collections import PatchCollection
+import matplotlib.cm as cm
 
 #enhancements 
 #     * we could add the option of using cartesian coordinates
@@ -218,25 +221,82 @@ vtheta_field_crop  = vtheta_field_crop [:,Imin:Imax]
 
 # PLOTTING ************************************************************
 # background and associated colorbar ---------------------------------
-if args.bg_key != 'blank' :
-    try :
-        im = ax.imshow(bg_field_crop,
-                       cmap=CMAPS[args.bg_key],
-                       aspect="auto",
-                       interpolation='none')
-    except ValueError :
-        print "Warning : color map not available, using default gnuplot style."
-        im = ax.imshow(bg_field_crop,
-                       cmap='gnuplot',
-                       aspect="auto",
-                       interpolation='none')
+# if args.bg_key != 'blank' :
+#     try :
+#         im = ax.imshow(bg_field_crop,
+#                        cmap=CMAPS[args.bg_key],
+#                        aspect="auto",
+#                        interpolation='none')
+#     except ValueError :
+#         print "Warning : color map not available, using default gnuplot style."
+#         im = ax.imshow(bg_field_crop,
+#                        cmap='gnuplot',
+#                        aspect="auto",
+#                        interpolation='none')
 
-    cb = fig.colorbar(im,orientation='vertical')
-    cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
+
+from matplotlib.patches import Rectangle
+from matplotlib.collections import PatchCollection
+import matplotlib.cm as cm
+# if args.bg_key != 'blank' :
+#     try :
+#         im = ax.imshow(bg_field_crop,
+#                        cmap=CMAPS[args.bg_key],
+#                        aspect="auto",
+#                        interpolation='none')
+#     except ValueError :
+#         print "Warning : color map not available, using default gnuplot style."
+#         im = ax.imshow(bg_field_crop,
+#                        cmap='gnuplot',
+#                        aspect="auto",
+#                        interpolation='none')
+
+def gen_patchcollection(grid_x,grid_y,data) :
+    dimX = len(grid_x)
+    dimY = len(grid_y)
+    patches = []
+    for i in range(dimX) :
+        for j in range(dimY) :
+            xy = grid_x[i], grid_y[j]
+            try :
+                width  = grid_x[i+1] - grid_x[i]
+            except IndexError :
+                pass
+            try :
+                height = grid_y[j+1] - grid_y[j]
+            except IndexError :
+                pass
+            rect = Rectangle(xy=xy, width=width, height=height,
+                             #rasterized=True,#todo : check usage of this line
+                             linewidth=0,
+                             linestyle="None")
+            patches.append(rect)
+    patchcollection = PatchCollection(patches,linewidth=0,cmap=cm.viridis)
+    data1d = data.reshape(-1)
+    patchcollection.set_array(data1d)
+    return patchcollection
+
+
+im = ax.add_collection(gen_patchcollection(base_theta,bg_used_radii,bg_field.T))
+print bg_field.shape, base_theta.shape,bg_used_radii.shape
+ax.set_aspect('equal')
+ax.set_ylim(RMIN, RMAX)
+ax.set_xlim(0,2*np.pi)
+
+#ax.set_xlim([grid_x[0], grid_x[-1]])
+#ax.set_ylim([grid_y[0], grid_y[-1]])
+
+# im = ax.imshow(bg_field_crop,
+#                cmap=CMAPS[args.bg_key],
+#                aspect="auto",
+#                interpolation='none')
+
+cb = fig.colorbar(im,orientation='vertical')
+cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
 
 # set limits ---------------------------------------------------------
-ax.set_ylim(0,Jmax-(Jmin+1))
-ax.set_xlim(0,sector_range-1)
+#ax.set_ylim(0,Jmax-(Jmin+1))
+#ax.set_xlim(0,sector_range-1)
 
 # ticks --------------------------------------------------------------
 
