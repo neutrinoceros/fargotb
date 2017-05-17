@@ -76,6 +76,32 @@ def get_pilabel_from_fraction(f) :
             label = r"${0}\pi/{1}$".format(num,den)
     return label
 
+def gen_patchcollection(grid_x,grid_y,data) :
+    dimX = len(grid_x)
+    dimY = len(grid_y)
+    patches = []
+    for i in range(dimX) :
+        for j in range(dimY) :
+            xy = grid_x[i], grid_y[j]
+            try :
+                width  = grid_x[i+1] - grid_x[i]
+            except IndexError :
+                pass
+            try :
+                height = grid_y[j+1] - grid_y[j]
+            except IndexError :
+                pass
+            rect = Rectangle(xy=xy, width=width, height=height,
+                             #rasterized=True,#todo : check usage of this line
+                             linewidth=0,
+                             linestyle="None")
+            patches.append(rect)
+    patchcollection = PatchCollection(patches,linewidth=0,cmap=cm.viridis)
+    data1d = data.reshape(-1)
+    patchcollection.set_array(data1d)
+    return patchcollection
+
+
 # PARSING *************************************************************
 
 parser = argparse.ArgumentParser()
@@ -92,7 +118,9 @@ parser.add_argument('-s', '--hillsphere',  action= 'store_true',
 parser.add_argument('-sl','--streamlines', action= 'store_true',
                     help="add streamlines")
 parser.add_argument('-q','--quiver', action= 'store_true',
-                    help="add quiver of velocity field (NOT IMPLEMENTED YET)")
+                    help="add quiver of velocity field")
+parser.add_argument('--scaling', action= 'store_true',
+                    help="use real (log?) scaling (much longer to compute image)")
 parser.add_argument('--debug', action= 'store_true',
                     help="print debug informations")
 # keywords arguments -------------------------------------------------
@@ -235,96 +263,51 @@ vtheta_field_crop  = vtheta_field_crop [:,Imin:Imax]
 #                        interpolation='none')
 
 
-from matplotlib.patches import Rectangle
-from matplotlib.collections import PatchCollection
-import matplotlib.cm as cm
-# if args.bg_key != 'blank' :
-#     try :
-#         im = ax.imshow(bg_field_crop,
-#                        cmap=CMAPS[args.bg_key],
-#                        aspect="auto",
-#                        interpolation='none')
-#     except ValueError :
-#         print "Warning : color map not available, using default gnuplot style."
-#         im = ax.imshow(bg_field_crop,
-#                        cmap='gnuplot',
-#                        aspect="auto",
-#                        interpolation='none')
+if args.scaling and SPACING.lower() == "logarithmic" :
+    im = ax.add_collection(gen_patchcollection(base_theta,bg_used_radii,bg_field.T))
+    ax.set_aspect('equal')
+    ax.set_ylim(RMIN, RMAX)
+    ax.set_xlim(0,2*np.pi)
+    #todo :check, maybe add a step in each direction
+    ax.set_xlim([base_theta[0], base_theta[-1]])
+    ax.set_ylim([bg_used_radii[0], bg_used_radii[-1]])
 
-def gen_patchcollection(grid_x,grid_y,data) :
-    dimX = len(grid_x)
-    dimY = len(grid_y)
-    patches = []
-    for i in range(dimX) :
-        for j in range(dimY) :
-            xy = grid_x[i], grid_y[j]
-            try :
-                width  = grid_x[i+1] - grid_x[i]
-            except IndexError :
-                pass
-            try :
-                height = grid_y[j+1] - grid_y[j]
-            except IndexError :
-                pass
-            rect = Rectangle(xy=xy, width=width, height=height,
-                             #rasterized=True,#todo : check usage of this line
-                             linewidth=0,
-                             linestyle="None")
-            patches.append(rect)
-    patchcollection = PatchCollection(patches,linewidth=0,cmap=cm.viridis)
-    data1d = data.reshape(-1)
-    patchcollection.set_array(data1d)
-    return patchcollection
+else :#using imshow to run much faster
+    im = ax.imshow(bg_field_crop,
+                   cmap=CMAPS[args.bg_key],
+                   aspect="auto",
+                   interpolation='none')
+    # set limits ---------------------------------------------------------
+    ax.set_ylim(0,Jmax-(Jmin+1))
+    ax.set_xlim(0,sector_range-1)
+    # ticks --------------------------------------------------------------
+    if args.debug :
+        print "In --debug mode, original ticks are left on the x/y axis"
+    else :
+        maxdiv = NSEC
+        while frac(1,maxdiv) < angular_range_frac :
+            maxdiv -=1
+        if args.thetacrop and args.crop_limit < 1000 :#fix
+            maxdiv+=1
+        div = maxdiv*4
+        fracticks  = [frac(2*n,div) for n in range(-2,3)]
+        thetaticks = [np.pi*f for f in fracticks]
 
+        xticks = [(t/np.pi+1.0)*NSEC/2 - Imin for t in thetaticks]
 
-im = ax.add_collection(gen_patchcollection(base_theta,bg_used_radii,bg_field.T))
-print bg_field.shape, base_theta.shape,bg_used_radii.shape
-ax.set_aspect('equal')
-ax.set_ylim(RMIN, RMAX)
-ax.set_xlim(0,2*np.pi)
+        xtickslab = [r"${0}\pi/{1}$".format(f.numerator,f.denominator) for f in fracticks]
+        xtickslab = [get_pilabel_from_fraction(f) for f in fracticks]#devnote : may be simplified
+        ax.set_xticks(xticks)
+        ax.set_xticklabels(xtickslab)
 
-#ax.set_xlim([grid_x[0], grid_x[-1]])
-#ax.set_ylim([grid_y[0], grid_y[-1]])
+        ytickslab = ax.get_yticks()
+        ytickslab = [r"${0}$".format(round(bg_used_radii_crop[int(tick)],2))
+                     for tick in ytickslab[:-1]]
+        ax.set_yticklabels(ytickslab)
 
-# im = ax.imshow(bg_field_crop,
-#                cmap=CMAPS[args.bg_key],
-#                aspect="auto",
-#                interpolation='none')
 
 cb = fig.colorbar(im,orientation='vertical')
 cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
-
-# set limits ---------------------------------------------------------
-#ax.set_ylim(0,Jmax-(Jmin+1))
-#ax.set_xlim(0,sector_range-1)
-
-# ticks --------------------------------------------------------------
-
-if args.debug :
-    print "In --debug mode, orignial ticks are left on the x/y axis"
-else :
-    maxdiv = NSEC
-    while frac(1,maxdiv) < angular_range_frac :
-        maxdiv -=1
-    if args.thetacrop and args.crop_limit < 1000 :#fix
-        maxdiv+=1
-    div = maxdiv*4
-    fracticks  = [frac(2*n,div) for n in range(-2,3)]
-    thetaticks = [np.pi*f for f in fracticks]
-
-    xticks = [(t/np.pi+1.0)*NSEC/2 - Imin for t in thetaticks]
-
-    xtickslab = [r"${0}\pi/{1}$".format(f.numerator,f.denominator) for f in fracticks]
-    xtickslab = [get_pilabel_from_fraction(f) for f in fracticks]#devnote : may be simplified
-    ax.set_xticks(xticks)
-    ax.set_xticklabels(xtickslab)
-
-    ytickslab = ax.get_yticks()
-    ytickslab = [r"${0}$".format(round(bg_used_radii_crop[int(tick)],2))
-                 for tick in ytickslab[:-1]]
-
-    ax.set_yticklabels(ytickslab)
-
 ax.set_xlabel(r"$\theta$", size=20)
 ax.set_ylabel(r"$r$",      size=20)
 
