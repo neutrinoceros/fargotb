@@ -166,6 +166,8 @@ RMAX    = parseValue (args.config, 'rmax',      float)
 ninterm = parseValue (args.config, 'ninterm'         )
 DT      = parseValue (args.config, 'DT',        float)
 
+usePhysicalUnits = args.scaling and SPACING.lower() == "logarithmic"
+
 # minimal postprocessing ---------------------------------------------
 DR      = (RMAX-RMIN)/NRAD
 dtheta  = 2.*np.pi/NSEC
@@ -251,26 +253,23 @@ vtheta_field_crop  = vtheta_field_crop [:,Imin:Imax]
 # background and associated colorbar ---------------------------------
 # if args.bg_key != 'blank' :
 #     try :
-#         im = ax.imshow(bg_field_crop,
-#                        cmap=CMAPS[args.bg_key],
-#                        aspect="auto",
-#                        interpolation='none')
-#     except ValueError :
-#         print "Warning : color map not available, using default gnuplot style."
-#         im = ax.imshow(bg_field_crop,
-#                        cmap='gnuplot',
-#                        aspect="auto",
-#                        interpolation='none')
+#        im = ax.imshow(bg_field_crop,
+    #                    cmap=CMAPS[args.bg_key],
+    #                    aspect="auto",
+    #                    interpolation='none')
+    # except ValueError :
+    #     print "Warning : color map not available, using default gnuplot style."
+    #     im = ax.imshow(bg_field_crop,
+    #                    cmap='gnuplot',
+    #                    aspect="auto",
+    #                    interpolation='none')
 
 
-if args.scaling and SPACING.lower() == "logarithmic" :
+if usePhysicalUnits :
     im = ax.add_collection(gen_patchcollection(base_theta,bg_used_radii,bg_field.T))
     ax.set_aspect('equal')
-    ax.set_ylim(RMIN, RMAX)
-    ax.set_xlim(0,2*np.pi)
-    #todo :check, maybe add a step in each direction
-    ax.set_xlim([base_theta[0], base_theta[-1]])
-    ax.set_ylim([bg_used_radii[0], bg_used_radii[-1]])
+    #ax.set_ylim(RMIN, RMAX)
+    #ax.set_xlim(0,2*np.pi)
 
 else :#using imshow to run much faster
     im = ax.imshow(bg_field_crop,
@@ -296,7 +295,8 @@ else :#using imshow to run much faster
         xticks = [(t/np.pi+1.0)*NSEC/2 - Imin for t in thetaticks]
 
         xtickslab = [r"${0}\pi/{1}$".format(f.numerator,f.denominator) for f in fracticks]
-        xtickslab = [get_pilabel_from_fraction(f) for f in fracticks]#devnote : may be simplified
+        xtickslab = [get_pilabel_from_fraction(f) for f in fracticks]
+        #devnote : may be simplified
         ax.set_xticks(xticks)
         ax.set_xticklabels(xtickslab)
 
@@ -314,17 +314,32 @@ ax.set_ylabel(r"$r$",      size=20)
 
 
 # OPTIONAL PLOTTING ***************************************************
-xxx = np.arange(sector_range)
-yyy = np.arange(0,Jmax-Jmin)
 R_H = Hill_radius(r_p,q_p)
 R_H_code = R_H/(r_p*dtheta)
+if usePhysicalUnits :
+    xgrid = base_theta#updgrade needed
+    ygrid = bg_used_radii
+    rh = R_H
+else :
+    xgrid = np.arange(sector_range)
+    ygrid = np.arange(0,Jmax-Jmin)
+    rh = R_H
+
 thetas=np.linspace(0,2*np.pi,100)
 
 # draw hill sphere(s) ------------------------------------------------
 if args.hillsphere :
+    if usePhysicalUnits :
+        print "hello"
+        xcenter   = theta_p
+        ycenter   = r_p
+    else :
+        xcenter   = sector_range/2
+        ycenter   = j_p-1
+
     lc = SPOTOUTCOLORS[args.bg_key]
-    ax.plot( *circle(sector_range/2,j_p-1,R_H_code,thetas),     c=lc, ls='--')
-    ax.plot( *circle(sector_range/2,j_p-1,0.3*R_H_code,thetas), c=lc, ls='-')
+    ax.plot( *circle(xcenter,ycenter,rh,thetas),     c=lc, ls='--')
+    ax.plot( *circle(xcenter,ycenter,0.3*rh,thetas), c=lc, ls='-')
 
 # draw stream lines --------------------------------------------------
 if args.streamlines :
@@ -332,16 +347,18 @@ if args.streamlines :
         slcolor = 'b'
     else :
         slcolor = 'w'
-
-    ax.streamplot(xxx, yyy, vtheta_field_crop, vrad_field_crop,
-                  density=(args.sldensity,args.sldensity),
-                  color=slcolor,
-                  arrowsize=0.7,
-                  linewidth=0.15)
+    if usePhysicalUnits and not args.debug :
+        print "Error : this feature (streamlines in logscaling) is currently broken, you can print it with --debug."
+    else :
+        ax.streamplot(xgrid, ygrid, vtheta_field, vrad_field,
+                      density=(args.sldensity,args.sldensity),
+                      color=slcolor,
+                      arrowsize=0.7,
+                      linewidth=0.15)
 
 # draw velocity field ------------------------------------------------
 if args.quiver :
-    ax.quiver(xxx, yyy, vtheta_field_crop, vrad_field_crop,
+    ax.quiver(xgrid, ygrid, vtheta_field_crop, vrad_field_crop,
               color='k',
               alpha = 0.4)
 
