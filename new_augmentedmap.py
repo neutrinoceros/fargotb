@@ -49,7 +49,7 @@ if args.thetazoom :
 else :
     azim_zoom = 1000
 
-if args.zoom :
+if azim_zoom < 1000 :
     args.center = True
 
 if args.bg_key == 'rf' :
@@ -123,16 +123,15 @@ vrad_field,   vrfile = get2Dfield('vr',NRAD,NSEC,OUTDIR,args.NOUT)
 vtheta_field, vtfile = get2Dfield('vt',NRAD,NSEC,OUTDIR,args.NOUT)
 
 
-used_theta = base_theta
+used_theta = base_theta -np.pi
 ang_width = np.pi
 # shifting to center the planet
 if args.center :
     bg_field           = shift(bg_field,     base_theta,theta_p)
     #vrad_field         = shift(vrad_field,   base_theta,theta_p)
     #vtheta_field       = shift(vtheta_field, base_theta,theta_p)
-    used_theta = base_theta - (np.pi+theta_p)
-    #print used_theta
-    ang_width  = 2*np.pi
+    used_theta -= theta_p
+    #ang_width  = 2*np.pi
 if args.zoom < 1000. :
     Jmin,Jmax = findRadialLimits(r_p,bg_used_radii,args.zoom*R_H)
     bg_field      = bg_field     [Jmin:Jmax,:]
