@@ -162,13 +162,13 @@ else :
 TMIN_ = -ang_width
 TMAX_ = TMIN_+2*ang_width
 
-
 # PLOTTING ************************************************************
 # background and associated colorbar ---------------------------------
 if args.bg_key in TAGS.keys() :
-    im = ax.add_collection(gen_patchcollection(used_theta,bg_used_radii,bg_field.T))
+    im = ax.add_collection(gen_patchcollection(used_theta,bg_used_radii,bg_field.T,args.bg_key))
     cb = fig.colorbar(im,orientation='horizontal')
     cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
+
 ax.set_aspect('equal')
 ax.set_xlabel(r"$\theta$", size=20)
 ax.set_ylabel(r"$r$",      size=20)

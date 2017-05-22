@@ -1,9 +1,10 @@
+from dictionnaries import *
 import numpy as np
 from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection
 import matplotlib.cm as cm
 
-def gen_patchcollection(grid_x,grid_y,data) :
+def gen_patchcollection(grid_x,grid_y,data,key) :
     dimX = len(grid_x)
     dimY = len(grid_y)
     patches = []
@@ -23,7 +24,8 @@ def gen_patchcollection(grid_x,grid_y,data) :
                              linewidth=0,
                              linestyle="None")
             patches.append(rect)
-    patchcollection = PatchCollection(patches,linewidth=0,cmap=cm.viridis)
+    cmap=CMAPS[key]
+    patchcollection = PatchCollection(patches,linewidth=0,cmap=cmap)
     data1d = data.reshape(-1)
     patchcollection.set_array(data1d)
     return patchcollection
