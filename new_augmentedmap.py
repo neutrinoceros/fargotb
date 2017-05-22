@@ -16,7 +16,7 @@ parser.add_argument('NOUT', type=int, help="output number")
 # switches -----------------------------------------------------------
 parser.add_argument('-c', '--center',  action= 'store_true',
                     help="traces 0.3*R_H and R_H levels")
-parser.add_argument('-tc','--thetacrop',   action= 'store_true',
+parser.add_argument('-tc','--thetazoom',   action= 'store_true',
                     help="crop the figure in the azimuthal direction")
 parser.add_argument('-s', '--hillsphere',  action= 'store_true',
                     help="traces 0.3*R_H and R_H levels")
@@ -32,7 +32,7 @@ parser.add_argument('--debug', action= 'store_true',
 parser.add_argument('-bg','--background',dest='bg_key',
                     help="define background field using keys (label, density, radial flow FLI ...)",
                     choices=['l','d','rf','f','blank'], default = 'd')
-parser.add_argument('-z' ,'--zoom',      dest='crop_limit', type=float,
+parser.add_argument('-z' ,'--zoom', type=float,
                     help="zoom around the planet",
                     default = 1000)
 parser.add_argument('-o' ,'--output',
@@ -44,10 +44,13 @@ parser.add_argument('-d','--streamlines-density',dest='sldensity', type=int,
 
 # conversion ---------------------------------------------------------
 args = parser.parse_args()
-if args.thetacrop :
-    azim_crop_limit = args.crop_limit
+if args.thetazoom :
+    azim_zoom = args.zoom
 else :
-    azim_crop_limit = 1000
+    azim_zoom = 1000
+
+if args.zoom :
+    args.center = True
 
 if args.bg_key == 'rf' :
     #here, put verif of the existence of the postprocessed file
@@ -91,7 +94,6 @@ r_p     = np.sqrt(x_p**2+y_p**2)
 theta_p = 0.0#by definition
 
 
-
 # define plotting objects (fig, ax),
 # todo : choose aspect carefully to have same scale in both directions
 # errors are easy to spot when we plot Hill "spheres"
@@ -117,6 +119,17 @@ vtheta_field, vtfile = get2Dfield('vt',NRAD,NSEC,OUTDIR,args.NOUT)
 if args.center :
     pass#temp
 
+if args.zoom < 1000. :
+    if args.azim_zoom :
+        pass
+    pass
+else :
+    RMIN_ = RMIN
+    RMAX_ = RMAX
+    ang_width = np.pi
+
+TMIN_ = np.pi-ang_width
+TMAX_ = TMIN_+2*ang_width
 
 
 # PLOTTING ************************************************************
@@ -129,8 +142,8 @@ cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
 ax.set_xlabel(r"$\theta$", size=20)
 ax.set_ylabel(r"$r$",      size=20)
 
-ax.set_ylim(RMIN, RMAX)
-ax.set_xlim(0,2*np.pi)
+ax.set_ylim(RMIN_, RMAX_)
+ax.set_xlim(np.pi-ang_width,np.pi+ang_width)
 
 
 # OPTIONAL PLOTTING ***************************************************
