@@ -126,6 +126,7 @@ if args.zoom < 1000. :
     RMAX_ = r_p + args.zoom * R_H
 
     if args.thetazoom :
+        ang_width = args.zoom * R_H/r_p
         pass
     pass
 
