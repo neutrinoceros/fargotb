@@ -122,17 +122,23 @@ else :#blank case
 vrad_field,   vrfile = get2Dfield('vr',NRAD,NSEC,OUTDIR,args.NOUT)
 vtheta_field, vtfile = get2Dfield('vt',NRAD,NSEC,OUTDIR,args.NOUT)
 
+# get rid of the keplerian component as
+# Streamlines and velocity field are only
+# interesting in the Co-orbital frame
+if Frame.upper() == "FIXED" :
+    vtheta_field -= OmegaFrame(r_p,q_p)
+
 
 used_theta = base_theta -np.pi
 ang_width = np.pi
 
 if args.center :
     # shifting to center the planet
-    bg_field           = shift(bg_field,     base_theta,theta_p)
-    vrad_field         = shift(vrad_field,   base_theta,theta_p)
-    vtheta_field       = shift(vtheta_field, base_theta,theta_p)
-    used_theta -= theta_p
-
+    bg_field,corr           = shift(bg_field,     base_theta,theta_p)
+    vrad_field,corr         = shift(vrad_field,   base_theta,theta_p)
+    vtheta_field,corr       = shift(vtheta_field, base_theta,theta_p)
+    used_theta -= theta_p + dtheta/2 + corr
+    
 if args.zoom < 1000. :
     Jmin,Jmax = findRadialLimits(r_p,bg_used_radii,args.zoom*R_H)
     bg_field      = bg_field     [Jmin:Jmax,:]

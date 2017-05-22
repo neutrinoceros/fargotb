@@ -42,7 +42,7 @@ def findRadialLimits(r_p,rads,croper) :
 def findAzimuthalLimits(r_p,thetas,croper) :
     ns = len(thetas)
     imin,imax = 0,ns
-    while r_p*thetas[imin] < -croper :
+    while r_p*thetas[imin-1] < -croper :
         imin +=1
     while r_p*thetas[imax-2] > croper :#todo : check -2 ???
         imax -=1
@@ -56,8 +56,9 @@ def shift(field,thetas,theta_p) :
     i_p = 0
     while thetas[i_p] < theta_p :
         i_p += 1
+    corr = thetas[i_p] - theta_p
     cesure  = ns/2 - i_p
     rfield1 = np.concatenate((field[:,-cesure:ns-1],field[:,0:i_p+1]),axis=1)
     rfield2 = field[:,i_p:-cesure]
     rfield  = np.concatenate((rfield1,rfield2),axis=1)
-    return rfield
+    return rfield,corr
