@@ -93,6 +93,7 @@ y_p = lastline[2]
 r_p     = np.sqrt(x_p**2+y_p**2)
 theta_p = 0.0#by definition
 
+R_H     = Hill_radius(r_p,q_p)
 
 # define plotting objects (fig, ax),
 # todo : choose aspect carefully to have same scale in both directions
@@ -119,14 +120,18 @@ vtheta_field, vtfile = get2Dfield('vt',NRAD,NSEC,OUTDIR,args.NOUT)
 if args.center :
     pass#temp
 
+ang_width = np.pi
 if args.zoom < 1000. :
-    if args.azim_zoom :
+    RMIN_ = r_p - args.zoom * R_H
+    RMAX_ = r_p + args.zoom * R_H
+
+    if args.thetazoom :
         pass
     pass
+
 else :
     RMIN_ = RMIN
     RMAX_ = RMAX
-    ang_width = np.pi
 
 TMIN_ = np.pi-ang_width
 TMAX_ = TMIN_+2*ang_width
