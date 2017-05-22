@@ -128,10 +128,10 @@ ang_width = np.pi
 # shifting to center the planet
 if args.center :
     bg_field           = shift(bg_field,     base_theta,theta_p)
-    #vrad_field         = shift(vrad_field,   base_theta,theta_p)
-    #vtheta_field       = shift(vtheta_field, base_theta,theta_p)
+    vrad_field         = shift(vrad_field,   base_theta,theta_p)
+    vtheta_field       = shift(vtheta_field, base_theta,theta_p)
     used_theta -= theta_p
-    #ang_width  = 2*np.pi
+
 if args.zoom < 1000. :
     Jmin,Jmax = findRadialLimits(r_p,bg_used_radii,args.zoom*R_H)
     bg_field      = bg_field     [Jmin:Jmax,:]
@@ -143,10 +143,12 @@ if args.zoom < 1000. :
     RMAX_ = r_p + args.zoom * R_H
 
     if args.thetazoom :
+        Imin,Imax = findAzimuthalLimits(r_p,used_theta,args.zoom*R_H)
+        bg_field      = bg_field     [:,Imin:Imax]
+        vrad_field    = vrad_field   [:,Imin:Imax]
+        vtheta_field  = vtheta_field [:,Imin:Imax]
+        used_theta    = used_theta   [Imin:Imax  ]
         ang_width = args.zoom * R_H/r_p
-        pass
-    pass
-
 else :
     RMIN_ = RMIN
     RMAX_ = RMAX

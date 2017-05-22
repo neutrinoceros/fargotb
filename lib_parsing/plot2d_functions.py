@@ -39,6 +39,16 @@ def findRadialLimits(r_p,rads,croper) :
     return jmin,jmax
 
 
+def findAzimuthalLimits(r_p,thetas,croper) :
+    ns = len(thetas)
+    imin,imax = 0,ns
+    while r_p*thetas[imin] < -croper :
+        imin +=1
+    while r_p*thetas[imax-2] > croper :#todo : check -2 ???
+        imax -=1
+    return imin,imax
+
+
 def shift(field,thetas,theta_p) :
     """this routine shifts the array along the theta axis
     to make the planet appear in the middle of the plot"""
@@ -46,7 +56,6 @@ def shift(field,thetas,theta_p) :
     i_p = 0
     while thetas[i_p] < theta_p :
         i_p += 1
-
     cesure  = ns/2 - i_p
     rfield1 = np.concatenate((field[:,-cesure:ns-1],field[:,0:i_p+1]),axis=1)
     rfield2 = field[:,i_p:-cesure]
