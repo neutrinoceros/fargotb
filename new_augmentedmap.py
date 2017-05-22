@@ -85,13 +85,20 @@ base_theta    = np.linspace(0.,2*np.pi,NSEC)
 rotated_theta = np.linspace(-np.pi,np.pi,NSEC)
 
 # get planetary info -------------------------------------------------
-lastline = np.loadtxt(OUTDIR+"planet0.dat")[-1]
-q_p = lastline[5]
-x_p = lastline[1]
-y_p = lastline[2]
+planet_dat  = np.loadtxt(OUTDIR+"planet0.dat")
+line_number = 0
+i = 0
+while line_number < args.NOUT :
+    line = planet_dat[i]
+    line_number = line[0]
+    i += 1
+
+q_p = line[5]
+x_p = line[1]
+y_p = line[2]
 
 r_p     = np.sqrt(x_p**2+y_p**2)
-theta_p = 0.0#by definition
+theta_p = atan2(x_p,y_p)
 
 R_H     = Hill_radius(r_p,q_p)
 
@@ -116,10 +123,15 @@ vrad_field,   vrfile = get2Dfield('vr',NRAD,NSEC,OUTDIR,args.NOUT)
 vtheta_field, vtfile = get2Dfield('vt',NRAD,NSEC,OUTDIR,args.NOUT)
 
 
+used_theta = base_theta
+ang_width = np.pi
 # shifting to center the planet
 if args.center :
-    pass#temp
-ang_width = np.pi
+    used_theta = base_theta - (np.pi+theta_p)
+    ang_width  = 2*np.pi
+    #bg_field           = shift(bg_field,     base_theta,theta_p)
+    #vrad_field         = shift(vrad_field,   base_theta,theta_p)
+    #vtheta_field       = shift(vtheta_field, base_theta,theta_p)
 if args.zoom < 1000. :
     Jmin,Jmax = findRadialLimits(r_p,bg_used_radii,args.zoom*R_H)
     bg_field      = bg_field     [Jmin:Jmax,:]
@@ -145,8 +157,8 @@ TMAX_ = TMIN_+2*ang_width
 
 # PLOTTING ************************************************************
 # background and associated colorbar ---------------------------------
-im = ax.add_collection(gen_patchcollection(base_theta,bg_used_radii,bg_field.T))
-ax.set_aspect('equal')
+im = ax.add_collection(gen_patchcollection(used_theta,bg_used_radii,bg_field.T))
+#ax.set_aspect('equal')
 
 cb = fig.colorbar(im,orientation='horizontal')
 cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)

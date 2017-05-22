@@ -1,8 +1,9 @@
+import numpy as np
 from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection
 import matplotlib.cm as cm
 
-def gen_patchcollection(grid_x,grid_y,data) :
+def gen_patchcollection(grid_x,grid_y,data,) :
     dimX = len(grid_x)
     dimY = len(grid_y)
     patches = []
@@ -36,3 +37,18 @@ def findRadialLimits(r_p,rads,croper) :
     while rads[jmax-2] > r_p+croper :#todo : check -2 ???
         jmax -=1
     return jmin,jmax
+
+
+def shift(field,thetas,theta_p) :
+    """this routine shifts the array along the theta axis
+    to make the planet appear in the middle of the plot"""
+    ns = len(thetas)
+    i_p = 0
+    while thetas[i_p] < theta_p :
+        i_p += 1
+
+    cesure  = ns/2 - i_p
+    rfield1 = np.concatenate((field[:,-cesure:ns-1],field[:,0:i_p+1]),axis=1)
+    rfield2 = field[:,i_p:-cesure]
+    rfield  = np.concatenate((rfield1,rfield2),axis=1)
+    return rfield
