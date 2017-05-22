@@ -197,7 +197,13 @@ if args.streamlines :
     pass
 # draw velocity field ------------------------------------------------
 if args.quiver :
-    pass
+    #note : "DR is not a constant in log radialspacing, but it's a good enough approximation
+    #here, as we represent v_t and v_r from a same point even though they are not technically
+    #defined at the same locations.
+    ax.quiver(used_theta+dtheta/2, bg_used_radii+DR/2, vtheta_field, vrad_field,
+              color='k',
+              alpha = 0.4)
+
 # PRINTING OUTPUT *****************************************************
 if args.output != ""  :
     fig.savefig(args.output)
