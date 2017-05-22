@@ -128,7 +128,6 @@ vtheta_field, vtfile = get2Dfield('vt',NRAD,NSEC,OUTDIR,args.NOUT)
 if Frame.upper() == "FIXED" :
     vtheta_field -= OmegaFrame(r_p,q_p)
 
-
 used_theta = base_theta -np.pi
 ang_width = np.pi
 
@@ -166,11 +165,11 @@ TMAX_ = TMIN_+2*ang_width
 
 # PLOTTING ************************************************************
 # background and associated colorbar ---------------------------------
-im = ax.add_collection(gen_patchcollection(used_theta,bg_used_radii,bg_field.T))
+if args.bg_key in TAGS.keys() :
+    im = ax.add_collection(gen_patchcollection(used_theta,bg_used_radii,bg_field.T))
+    cb = fig.colorbar(im,orientation='horizontal')
+    cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
 ax.set_aspect('equal')
-
-cb = fig.colorbar(im,orientation='horizontal')
-cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
 ax.set_xlabel(r"$\theta$", size=20)
 ax.set_ylabel(r"$r$",      size=20)
 
