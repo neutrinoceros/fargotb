@@ -26,3 +26,13 @@ def gen_patchcollection(grid_x,grid_y,data) :
     data1d = data.reshape(-1)
     patchcollection.set_array(data1d)
     return patchcollection
+
+
+def findRadialLimits(r_p,rads,croper) :
+    nr = len(rads)
+    jmin,jmax = 0,nr
+    while rads[jmin] < r_p-croper :
+        jmin +=1
+    while rads[jmax-2] > r_p+croper :#todo : check -2 ???
+        jmax -=1
+    return jmin,jmax

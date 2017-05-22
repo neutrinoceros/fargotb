@@ -119,9 +119,14 @@ vtheta_field, vtfile = get2Dfield('vt',NRAD,NSEC,OUTDIR,args.NOUT)
 # shifting to center the planet
 if args.center :
     pass#temp
-
 ang_width = np.pi
 if args.zoom < 1000. :
+    Jmin,Jmax = findRadialLimits(r_p,bg_used_radii,args.zoom*R_H)
+    bg_field      = bg_field     [Jmin:Jmax,:]
+    vrad_field    = vrad_field   [Jmin:Jmax,:]
+    vtheta_field  = vtheta_field [Jmin:Jmax,:]
+    bg_used_radii = bg_used_radii[Jmin:Jmax  ]
+
     RMIN_ = r_p - args.zoom * R_H
     RMAX_ = r_p + args.zoom * R_H
 
