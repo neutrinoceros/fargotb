@@ -3,7 +3,7 @@ from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection
 import matplotlib.cm as cm
 
-def gen_patchcollection(grid_x,grid_y,data,) :
+def gen_patchcollection(grid_x,grid_y,data) :
     dimX = len(grid_x)
     dimY = len(grid_y)
     patches = []
@@ -17,7 +17,7 @@ def gen_patchcollection(grid_x,grid_y,data,) :
             try :
                 height = grid_y[j+1] - grid_y[j]
             except IndexError :
-                pass
+                    pass
             rect = Rectangle(xy=xy, width=width, height=height,
                              #rasterized=True,#todo : check usage of this line
                              linewidth=0,

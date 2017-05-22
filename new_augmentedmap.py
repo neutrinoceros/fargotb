@@ -127,11 +127,12 @@ used_theta = base_theta
 ang_width = np.pi
 # shifting to center the planet
 if args.center :
-    used_theta = base_theta - (np.pi+theta_p)
-    ang_width  = 2*np.pi
-    #bg_field           = shift(bg_field,     base_theta,theta_p)
+    bg_field           = shift(bg_field,     base_theta,theta_p)
     #vrad_field         = shift(vrad_field,   base_theta,theta_p)
     #vtheta_field       = shift(vtheta_field, base_theta,theta_p)
+    used_theta = base_theta - (np.pi+theta_p)
+    #print used_theta
+    ang_width  = 2*np.pi
 if args.zoom < 1000. :
     Jmin,Jmax = findRadialLimits(r_p,bg_used_radii,args.zoom*R_H)
     bg_field      = bg_field     [Jmin:Jmax,:]
@@ -151,7 +152,7 @@ else :
     RMIN_ = RMIN
     RMAX_ = RMAX
 
-TMIN_ = np.pi-ang_width
+TMIN_ = -ang_width
 TMAX_ = TMIN_+2*ang_width
 
 
@@ -165,8 +166,8 @@ cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
 ax.set_xlabel(r"$\theta$", size=20)
 ax.set_ylabel(r"$r$",      size=20)
 
-ax.set_ylim(RMIN_, RMAX_)
-ax.set_xlim(np.pi-ang_width,np.pi+ang_width)
+ax.set_ylim(RMIN_,RMAX_)
+ax.set_xlim(TMIN_,TMAX_)
 
 
 # OPTIONAL PLOTTING ***************************************************
