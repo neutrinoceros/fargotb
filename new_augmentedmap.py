@@ -125,8 +125,9 @@ vtheta_field, vtfile = get2Dfield('vt',NRAD,NSEC,OUTDIR,args.NOUT)
 
 used_theta = base_theta -np.pi
 ang_width = np.pi
-# shifting to center the planet
+
 if args.center :
+    # shifting to center the planet
     bg_field           = shift(bg_field,     base_theta,theta_p)
     vrad_field         = shift(vrad_field,   base_theta,theta_p)
     vtheta_field       = shift(vtheta_field, base_theta,theta_p)
@@ -160,7 +161,7 @@ TMAX_ = TMIN_+2*ang_width
 # PLOTTING ************************************************************
 # background and associated colorbar ---------------------------------
 im = ax.add_collection(gen_patchcollection(used_theta,bg_used_radii,bg_field.T))
-#ax.set_aspect('equal')
+ax.set_aspect('equal')
 
 cb = fig.colorbar(im,orientation='horizontal')
 cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
@@ -172,9 +173,19 @@ ax.set_xlim(TMIN_,TMAX_)
 
 
 # OPTIONAL PLOTTING ***************************************************
+thetas=np.linspace(0,2*np.pi,100)
+XCENTER = theta_p
+if args.center :
+    XCENTER = 0.0
+
 # draw hill sphere(s) ------------------------------------------------
 if args.hillsphere :
-    pass
+    xcenter   = theta_p
+    ycenter   = r_p
+    lc = SPOTOUTCOLORS[args.bg_key]
+    ax.plot( *circle(xcenter,ycenter,R_H,thetas),     c=lc, ls='--')
+    ax.plot( *circle(xcenter,ycenter,0.3*R_H,thetas), c=lc, ls='-')
+
 # draw stream lines --------------------------------------------------
 if args.streamlines :
     pass
