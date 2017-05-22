@@ -4,6 +4,7 @@ from fieldGettingFunctions import *
 from recipes               import *
 from fileManagingFunctions import *
 from get1Dfield            import *
+from plot2d_functions      import *
 
 import matplotlib.pyplot as plt
 import argparse

@@ -6,10 +6,6 @@
 # --------------------------
 
 from lib_parsing import * # built-in module that comes with the toolbox
-from matplotlib.patches import Rectangle
-from matplotlib.collections import PatchCollection
-import matplotlib.cm as cm
-
 
 # PARSING *************************************************************
 
@@ -75,7 +71,8 @@ RMAX    = parseValue (args.config, 'rmax',      float)
 ninterm = parseValue (args.config, 'ninterm'         )
 DT      = parseValue (args.config, 'DT',        float)
 
-usePhysicalUnits = args.scaling and SPACING.lower() == "logarithmic"
+#usePhysicalUnits = args.scaling and SPACING.lower() == "logarithmic"
+usePhysicalUnits = True #hardcoding
 
 # minimal postprocessing ---------------------------------------------
 DR      = (RMAX-RMIN)/NRAD
@@ -92,3 +89,66 @@ y_p = lastline[2]
 
 r_p     = np.sqrt(x_p**2+y_p**2)
 theta_p = 0.0#by definition
+
+
+
+# define plotting objects (fig, ax),
+# todo : choose aspect carefully to have same scale in both directions
+# errors are easy to spot when we plot Hill "spheres"
+fig = plt.figure()
+ax = fig.add_subplot(111,aspect='auto')
+
+
+# plot background *****************************************************
+# define background field, vt, vr
+
+if args.bg_key in TAGS.keys() :
+    bg_field,     bgfile = get2Dfield(args.bg_key,NRAD,NSEC,OUTDIR,args.NOUT)
+    bg_used_radii        = getrad(RMIN,RMAX,NRAD,DR,args.bg_key,SPACING)
+else :#blank case
+    bg_field,     bgfile = get2Dfield('d',NRAD,NSEC,OUTDIR,args.NOUT)
+    bg_used_radii        = getrad(RMIN,RMAX,NRAD,DR,'d',SPACING)
+
+vrad_field,   vrfile = get2Dfield('vr',NRAD,NSEC,OUTDIR,args.NOUT)
+vtheta_field, vtfile = get2Dfield('vt',NRAD,NSEC,OUTDIR,args.NOUT)
+
+
+# shifting to center the planet
+if args.center :
+    pass#temp
+
+
+
+# PLOTTING ************************************************************
+# background and associated colorbar ---------------------------------
+im = ax.add_collection(gen_patchcollection(base_theta,bg_used_radii,bg_field.T))
+ax.set_aspect('equal')
+
+cb = fig.colorbar(im,orientation='horizontal')
+cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
+ax.set_xlabel(r"$\theta$", size=20)
+ax.set_ylabel(r"$r$",      size=20)
+
+ax.set_ylim(RMIN, RMAX)
+ax.set_xlim(0,2*np.pi)
+
+
+# OPTIONAL PLOTTING ***************************************************
+# draw hill sphere(s) ------------------------------------------------
+if args.hillsphere :
+    pass
+# draw stream lines --------------------------------------------------
+if args.streamlines :
+    pass
+# draw velocity field ------------------------------------------------
+if args.quiver :
+    pass
+# PRINTING OUTPUT *****************************************************
+if args.output != ""  :
+    fig.savefig(args.output)
+else :
+    print "This is the interactive live mode. Use -o or --output to save your picture"
+    plt.ion()
+    plt.show()
+    plt.ioff()
+    raw_input("press enter to quit     ")
