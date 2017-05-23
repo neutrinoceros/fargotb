@@ -46,8 +46,10 @@ parser.add_argument('-d','--streamlines-density',dest='sldensity', type=int,
 args = parser.parse_args()
 if args.thetazoom :
     azim_zoom = args.zoom
+    orientationcm = 'vertical'
 else :
     azim_zoom = 1000
+    orientationcm = 'horizontal'
 
 if azim_zoom < 1000 :
     args.center = True
@@ -166,7 +168,7 @@ TMAX_ = TMIN_+2*ang_width
 # background and associated colorbar ---------------------------------
 if args.bg_key in TAGS.keys() :
     im = ax.add_collection(gen_patchcollection(used_theta,bg_used_radii,bg_field.T,args.bg_key))
-    cb = fig.colorbar(im,orientation='horizontal')
+    cb = fig.colorbar(im,orientation=orientationcm)
     cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
 
 ax.set_aspect('equal')
@@ -205,7 +207,7 @@ if args.quiver :
 
 # PRINTING OUTPUT *****************************************************
 if args.output != ""  :
-    fig.savefig(args.output)
+    fig.savefig(args.output,dpi=300)
 else :
     print "This is the interactive live mode. Use -o or --output to save your picture"
     plt.ion()
