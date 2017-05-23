@@ -38,19 +38,19 @@ def findRadialLimits(r_p,rads,croper) :
     jmin,jmax = 0,nr
     while rads[jmin+1] < r_p-croper :
         jmin +=1
-    while rads[jmax-2] > r_p+croper :#todo : check -2 ???
+    while rads[jmax-2] > r_p+croper :
         jmax -=1
-    return jmin,jmax
+    return jmin-1,jmax-1
 
 
 def findAzimuthalLimits(r_p,thetas,croper) :
     ns = len(thetas)
     imin,imax = 0,ns
-    while r_p*thetas[imin-1] < -croper :
+    while r_p*thetas[imin] < -croper :
         imin +=1
-    while r_p*thetas[imax-2] > croper :#todo : check -2 ???
+    while r_p*thetas[imax-2] > croper :
         imax -=1
-    return imin,imax
+    return imin-1,imax-1
 
 
 def shift(field,thetas,theta_p) :
