@@ -63,6 +63,6 @@ def shift(field,thetas,theta_p) :
     corr = thetas[i_p] - theta_p
     cesure  = ns/2 - i_p
     rfield1 = np.concatenate((field[:,-cesure+1:ns],field[:,0:i_p+1]),axis=1)
-    rfield2 = field[:,i_p+1:-cesure]
+    rfield2 = field[:,i_p+1:-cesure+1]
     rfield  = np.concatenate((rfield1,rfield2),axis=1)
     return rfield,corr
