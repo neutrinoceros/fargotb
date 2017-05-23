@@ -25,7 +25,9 @@ def gen_patchcollection(grid_x,grid_y,data,key) :
                              linestyle="None")
             patches.append(rect)
     cmap=CMAPS[key]
-    patchcollection = PatchCollection(patches,linewidth=0,cmap=cmap)
+    patchcollection = PatchCollection(patches,
+                                      linewidth=0,
+                                      cmap=cmap)
     data1d = data.reshape(-1)
     patchcollection.set_array(data1d)
     return patchcollection
@@ -34,7 +36,7 @@ def gen_patchcollection(grid_x,grid_y,data,key) :
 def findRadialLimits(r_p,rads,croper) :
     nr = len(rads)
     jmin,jmax = 0,nr
-    while rads[jmin] < r_p-croper :
+    while rads[jmin+1] < r_p-croper :
         jmin +=1
     while rads[jmax-2] > r_p+croper :#todo : check -2 ???
         jmax -=1
@@ -61,6 +63,6 @@ def shift(field,thetas,theta_p) :
     corr = thetas[i_p] - theta_p
     cesure  = ns/2 - i_p
     rfield1 = np.concatenate((field[:,-cesure:ns-1],field[:,0:i_p+1]),axis=1)
-    rfield2 = field[:,i_p:-cesure]
+    rfield2 = field[:,i_p+1:-cesure]
     rfield  = np.concatenate((rfield1,rfield2),axis=1)
     return rfield,corr
