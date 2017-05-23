@@ -58,7 +58,7 @@ def shift(field,thetas,theta_p) :
     to make the planet appear in the middle of the plot"""
     ns = len(thetas)
     i_p = 0
-    while thetas[i_p] < theta_p :
+    while thetas[i_p] < theta_p +np.pi :
         i_p += 1
     corr = thetas[i_p] - theta_p
     cesure  = ns/2 - i_p
