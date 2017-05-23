@@ -138,7 +138,6 @@ if args.center :
     bg_field,corr           = shift(bg_field,     base_theta,theta_p)
     vrad_field,corr         = shift(vrad_field,   base_theta,theta_p)
     vtheta_field,corr       = shift(vtheta_field, base_theta,theta_p)
-    used_theta -= theta_p + dtheta/2 + corr
     
 if args.zoom < 1000. :
     Jmin,Jmax = findRadialLimits(r_p,bg_used_radii,args.zoom*R_H)
@@ -181,17 +180,16 @@ ax.set_xlim(TMIN_,TMAX_)
 
 # OPTIONAL PLOTTING ***************************************************
 thetas=np.linspace(0,2*np.pi,100)
-XCENTER = theta_p
+XCENTER = (theta_p -np.pi)%np.pi
 if args.center :
     XCENTER = 0.0
 
 # draw hill sphere(s) ------------------------------------------------
 if args.hillsphere :
-    xcenter   = theta_p
     ycenter   = r_p
     lc = SPOTOUTCOLORS[args.bg_key]
-    ax.plot( *circle(xcenter,ycenter,R_H,thetas),     c=lc, ls='--')
-    ax.plot( *circle(xcenter,ycenter,0.3*R_H,thetas), c=lc, ls='-')
+    ax.plot( *circle(XCENTER,ycenter,R_H,thetas),     c=lc, ls='--')
+    ax.plot( *circle(XCENTER,ycenter,0.3*R_H,thetas), c=lc, ls='-')
 
 # draw stream lines --------------------------------------------------
 if args.streamlines :
