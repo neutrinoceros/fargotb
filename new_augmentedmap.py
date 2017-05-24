@@ -28,6 +28,8 @@ parser.add_argument('--scaling', action= 'store_true',
                     help="use real (log?) scaling (much longer to compute image)")
 parser.add_argument('--debug', action= 'store_true',
                     help="print debug informations")
+parser.add_argument('--raw', action= 'store_true',
+                    help="skip aspect = equal")
 # keywords arguments -------------------------------------------------
 parser.add_argument('-bg','--background',dest='bg_key',
                     help="define background field using keys (label, density, radial flow FLI ...)",
@@ -108,7 +110,11 @@ R_H     = Hill_radius(r_p,q_p)
 # todo : choose aspect carefully to have same scale in both directions
 # errors are easy to spot when we plot Hill "spheres"
 fig = plt.figure()
-ax = fig.add_subplot(111,aspect='auto')
+ax = fig.add_subplot(111)
+if args.raw :
+    ax.set_aspect('auto')
+else :
+    ax.set_aspect('equal')
 
 
 # plot background *****************************************************
@@ -173,7 +179,6 @@ if args.bg_key in TAGS.keys() :
     cb = fig.colorbar(im,orientation=orientationcm)
     cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
 
-ax.set_aspect('equal')
 ax.set_xlabel(r"$\theta$", size=20)
 ax.set_ylabel(r"$r$",      size=20)
 
