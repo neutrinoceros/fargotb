@@ -191,6 +191,9 @@ if args.hillsphere :
     lc = SPOTOUTCOLORS[args.bg_key]
     ax.plot( *circle(XCENTER,ycenter,R_H,thetas),     c=lc, ls='--')
     ax.plot( *circle(XCENTER,ycenter,0.3*R_H,thetas), c=lc, ls='-')
+    if args.thetazoom and args.zoom <= 5.0 :
+        ax.scatter(XCENTER,ycenter,marker='+', color='r')
+
 
 # draw stream lines --------------------------------------------------
 if args.streamlines :
