@@ -115,11 +115,13 @@ ax = fig.add_subplot(111,aspect='auto')
 # define background field, vt, vr
 
 if args.bg_key in TAGS.keys() :
-    bg_field,     bgfile = get2Dfield(args.bg_key,NRAD,NSEC,OUTDIR,args.NOUT)
-    used_radii        = getrad(RMIN,RMAX,NRAD,DR,args.bg_key,SPACING)
+    key_tmp = args.bg_key
 else :#blank case
-    bg_field,     bgfile = get2Dfield('d',NRAD,NSEC,OUTDIR,args.NOUT)
-    used_radii        = getrad(RMIN,RMAX,NRAD,DR,'d',SPACING)
+    key_tmp = 'd'
+
+bg_field,     bgfile = get2Dfield(key_tmp,NRAD,NSEC,OUTDIR,args.NOUT)
+rmed                 = getrad(RMIN,RMAX,NRAD,DR,'d',SPACING)
+used_radii           = getRinf(RMIN,RMAX,NRAD,DR,SPACING)
 
 vrad_field,   vrfile = get2Dfield('vr',NRAD,NSEC,OUTDIR,args.NOUT)
 vtheta_field, vtfile = get2Dfield('vt',NRAD,NSEC,OUTDIR,args.NOUT)
