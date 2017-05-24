@@ -194,7 +194,7 @@ if args.hillsphere :
     ax.plot( *circle(XCENTER,ycenter,R_H,thetas),     c=lc, ls='--')
     ax.plot( *circle(XCENTER,ycenter,0.3*R_H,thetas), c=lc, ls='-')
     if args.thetazoom and args.zoom <= 5.0 :
-        ax.scatter(XCENTER,ycenter,marker='+', color='r')
+        ax.scatter(XCENTER,ycenter,marker='+', c=lc)
 
 
 # draw stream lines --------------------------------------------------
