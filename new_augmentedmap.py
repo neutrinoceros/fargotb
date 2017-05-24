@@ -138,7 +138,8 @@ if args.center :
     bg_field,corr           = shift(bg_field,     used_theta,theta_p)
     vrad_field,corr         = shift(vrad_field,   used_theta,theta_p)
     vtheta_field,corr       = shift(vtheta_field, used_theta,theta_p)
-    
+    used_theta -= corr
+
 if args.zoom < 1000. :
     Jmin,Jmax = findRadialLimits(r_p,bg_used_radii,args.zoom*R_H)
     bg_field      = bg_field     [Jmin:Jmax,:]
