@@ -204,7 +204,7 @@ if args.hillsphere :
 
 # draw stream lines --------------------------------------------------
 if args.streamlines :
-    pass
+    print "Streamlines are not implemented yet, come back later :) "
 # draw velocity field ------------------------------------------------
 if args.quiver :
     #note : "DR is not a constant in log radialspacing, but it's a good enough approximation
