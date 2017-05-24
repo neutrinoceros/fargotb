@@ -116,10 +116,10 @@ ax = fig.add_subplot(111,aspect='auto')
 
 if args.bg_key in TAGS.keys() :
     bg_field,     bgfile = get2Dfield(args.bg_key,NRAD,NSEC,OUTDIR,args.NOUT)
-    bg_used_radii        = getrad(RMIN,RMAX,NRAD,DR,args.bg_key,SPACING)
+    used_radii        = getrad(RMIN,RMAX,NRAD,DR,args.bg_key,SPACING)
 else :#blank case
     bg_field,     bgfile = get2Dfield('d',NRAD,NSEC,OUTDIR,args.NOUT)
-    bg_used_radii        = getrad(RMIN,RMAX,NRAD,DR,'d',SPACING)
+    used_radii        = getrad(RMIN,RMAX,NRAD,DR,'d',SPACING)
 
 vrad_field,   vrfile = get2Dfield('vr',NRAD,NSEC,OUTDIR,args.NOUT)
 vtheta_field, vtfile = get2Dfield('vt',NRAD,NSEC,OUTDIR,args.NOUT)
@@ -141,11 +141,11 @@ if args.center :
     used_theta -= corr
 
 if args.zoom < 1000. :
-    Jmin,Jmax = findRadialLimits(r_p,bg_used_radii,args.zoom*R_H)
+    Jmin,Jmax = findRadialLimits(r_p,used_radii,args.zoom*R_H)
     bg_field      = bg_field     [Jmin:Jmax,:]
     vrad_field    = vrad_field   [Jmin:Jmax,:]
     vtheta_field  = vtheta_field [Jmin:Jmax,:]
-    bg_used_radii = bg_used_radii[Jmin:Jmax  ]
+    used_radii = used_radii[Jmin:Jmax  ]
 
     RMIN_ = r_p - args.zoom * R_H
     RMAX_ = r_p + args.zoom * R_H
@@ -167,7 +167,7 @@ TMAX_ = TMIN_+2*ang_width
 # PLOTTING ************************************************************
 # background and associated colorbar ---------------------------------
 if args.bg_key in TAGS.keys() :
-    im = ax.add_collection(gen_patchcollection(used_theta,bg_used_radii,bg_field.T,args.bg_key))
+    im = ax.add_collection(gen_patchcollection(used_theta,used_radii,bg_field.T,args.bg_key))
     cb = fig.colorbar(im,orientation=orientationcm)
     cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
 
@@ -203,7 +203,7 @@ if args.quiver :
     #note : "DR is not a constant in log radialspacing, but it's a good enough approximation
     #here, as we represent v_t and v_r from a same point even though they are not technically
     #defined at the same locations.
-    ax.quiver(used_theta+dtheta/2, bg_used_radii+DR/2, vtheta_field, vrad_field,
+    ax.quiver(used_theta+dtheta/2, used_radii+DR/2, vtheta_field, vrad_field,
               color='k',
               alpha = 0.4)
 
