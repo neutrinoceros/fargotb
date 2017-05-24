@@ -16,7 +16,7 @@ parser.add_argument('NOUT', type=int, help="output number")
 # switches -----------------------------------------------------------
 parser.add_argument('-c', '--center',  action= 'store_true',
                     help="traces 0.3*R_H and R_H levels")
-parser.add_argument('-tc','--thetazoom',   action= 'store_true',
+parser.add_argument('-tz','--thetazoom',   action= 'store_true',
                     help="crop the figure in the azimuthal direction")
 parser.add_argument('-s', '--hillsphere',  action= 'store_true',
                     help="traces 0.3*R_H and R_H levels")
