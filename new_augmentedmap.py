@@ -205,14 +205,19 @@ if args.hillsphere :
 # draw stream lines --------------------------------------------------
 if args.streamlines :
     print "Streamlines are not implemented yet, come back later :) "
+
 # draw velocity field ------------------------------------------------
 if args.quiver :
     #note : "DR is not a constant in log radialspacing, but it's a good enough approximation
     #here, as we represent v_t and v_r from a same point even though they are not technically
     #defined at the same locations.
+    if args.bg_key == 'blank' :
+        alpha = 1.
+    else :
+        alpha = 0.4
     ax.quiver(used_theta+dtheta/2, used_radii+DR/2, vtheta_field, vrad_field,
               color='k',
-              alpha = 0.4)
+              alpha = alpha)
 
 # PRINTING OUTPUT *****************************************************
 if args.output != ""  :
