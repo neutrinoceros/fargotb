@@ -203,7 +203,32 @@ if args.hillsphere :
 
 
 # draw stream lines --------------------------------------------------
-if args.streamlines :
+if args.streamlines :    # if args.bg_key == 'blank' :
+    #     slcolor = 'b'
+    # else :
+    #     slcolor = 'w'
+
+    # print vrad_field.shape
+    # even_radii = np.linspace(np.min(used_radii),np.max(used_radii),len(used_radii))
+    # even_theta = used_theta + np.pi/NSEC
+    # #need proper interpolation...
+    # for n in range(len(vtheta_field)-1) :#loop in the azitumthal direction, is it lines or columns again??
+    #     vt = vtheta_field[:,n]
+    #     vr = vtheta_field[:,n]
+    #     vt_interp = np.interp(even_radii, used_radii, vt, period=None)
+    #     vr_interp = np.interp(even_radii, used_radii, vr, period=None)
+    #     if n==0 :
+    #         vt_new = vt_interp
+    #         vr_new = vr_interp
+    #     else :
+    #         vt_new = np.column_stack((vt_new,vt_interp))
+    #         vr_new = np.column_stack((vr_new,vr_interp))
+
+    # ax.streamplot(even_theta, even_radii, vt_new, vr_new,
+    #               density=(args.sldensity,args.sldensity),
+    #               color=slcolor,
+    #               arrowsize=0.7,
+    #               linewidth=1.0)
     print "Streamlines are not implemented yet, come back later :) "
 
 # draw velocity field ------------------------------------------------
