@@ -7,6 +7,9 @@
 
 from lib_parsing import * # built-in module that comes with the toolbox
 
+# bugs :
+#     -q -c does not work without -tz...
+
 # PARSING *************************************************************
 
 parser = argparse.ArgumentParser()
