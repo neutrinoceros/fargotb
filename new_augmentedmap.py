@@ -45,7 +45,7 @@ parser.add_argument('-o' ,'--output',
                     default = "")
 parser.add_argument('-d','--streamlines-density',dest='sldensity', type=int,
                     help="streamlines density",
-                    default = 5)
+                    default = 2)
 
 # conversion ---------------------------------------------------------
 args = parser.parse_args()
@@ -206,33 +206,69 @@ if args.hillsphere :
 
 
 # draw stream lines --------------------------------------------------
-if args.streamlines :    # if args.bg_key == 'blank' :
-    #     slcolor = 'b'
-    # else :
-    #     slcolor = 'w'
+def bilinear_interpolate(field, xgrid, ygrid, x, y):
+    I = 0
+    while xgrid[I] < x :
+        I+=1
+    x0 = xgrid[I-1]
+    x1 = xgrid[I]
+    J = 0
+    while ygrid[J] < y :
+        J+=1
+    y0 = ygrid[J-1]
+    y1 = ygrid[J]
 
-    # print vrad_field.shape
-    # even_radii = np.linspace(np.min(used_radii),np.max(used_radii),len(used_radii))
-    # even_theta = used_theta + np.pi/NSEC
-    # #need proper interpolation...
-    # for n in range(len(vtheta_field)-1) :#loop in the azitumthal direction, is it lines or columns again??
-    #     vt = vtheta_field[:,n]
-    #     vr = vtheta_field[:,n]
-    #     vt_interp = np.interp(even_radii, used_radii, vt, period=None)
-    #     vr_interp = np.interp(even_radii, used_radii, vr, period=None)
-    #     if n==0 :
-    #         vt_new = vt_interp
-    #         vr_new = vr_interp
-    #     else :
-    #         vt_new = np.column_stack((vt_new,vt_interp))
-    #         vr_new = np.column_stack((vr_new,vr_interp))
+    va = field[ J-1, I-1 ]
+    vb = field[ J  , I-1 ]
+    vc = field[ J-1, I   ]
+    vd = field[ J  , I   ]
 
-    # ax.streamplot(even_theta, even_radii, vt_new, vr_new,
-    #               density=(args.sldensity,args.sldensity),
-    #               color=slcolor,
-    #               arrowsize=0.7,
-    #               linewidth=1.0)
-    print "Streamlines are not implemented yet, come back later :) "
+    wa = (x1-x) * (y1-y)
+    wb = (x1-x) * (y-y0)
+    wc = (x-x0) * (y1-y)
+    wd = (x-x0) * (y-y0)
+    return wa*va + wb*vb + wc*vc + wd*vd
+
+
+if args.streamlines :
+    if args.bg_key == 'blank' :
+        slcolor = 'b'
+    else :
+        slcolor = 'w'
+
+    even_radii = np.linspace(np.min(used_radii),np.max(used_radii),2*len(used_radii))
+    even_theta = used_theta
+
+    interp_vt = np.zeros((len(even_radii),len(even_theta)))
+    interp_vr = np.zeros((len(even_radii),len(even_theta)))
+    for i in range(1,len(even_radii)-1) :
+        rad = even_radii[i]
+        for j in range(1,len(even_theta)-1) :
+            theta = even_theta[j]
+            interp_vt[i,j] = bilinear_interpolate(vtheta_field,
+                                                  used_theta,used_radii,
+                                                  theta,rad)
+            interp_vr[i,j] = bilinear_interpolate(vrad_field,
+                                                  used_theta,used_radii,
+                                                  theta,rad)
+
+    if args.debug :
+        print "in debug mode, a quiver object is plotted instead of streamlines."
+        ax.quiver(even_theta+dtheta/2,
+                  even_radii+DR/2,
+                  interp_vt, interp_vr,
+                  color='r')
+
+    else :
+        ax.streamplot(even_theta+dtheta/2,
+                      even_radii+DR/2,
+                      interp_vt, interp_vr,
+                      density=(args.sldensity,args.sldensity),
+                      color=slcolor,
+                      arrowsize=0.7,
+                      linewidth=0.5)
+
+        print "Warning : borders are not yet taken into accout in the streamlines rendering algo."
 
 # draw velocity field ------------------------------------------------
 if args.quiver :
