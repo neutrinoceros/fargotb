@@ -272,9 +272,10 @@ if args.streamlines :
 
 # draw velocity field ------------------------------------------------
 if args.quiver :
-    #note : "DR is not a constant in log radialspacing, but it's a good enough approximation
-    #here, as we represent v_t and v_r from a same point even though they are not technically
-    #defined at the same locations.
+    #note : "DR is not a constant in log radialspacing,
+    #       but it's a good enough approximation
+    # here, as we represent v_t and v_r from a same point eventhough
+    # they are not technically defined at the same locations.
     if args.bg_key == 'blank' :
         alpha = 1.
     else :
