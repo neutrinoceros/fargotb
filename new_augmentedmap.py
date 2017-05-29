@@ -46,6 +46,9 @@ parser.add_argument('-o' ,'--output',
 parser.add_argument('-d','--streamlines-density',dest='sldensity', type=int,
                     help="streamlines density",
                     default = 2)
+parser.add_argument('--dpi', type=int,
+                    help="resolution of the output image",
+                    default = 100);
 
 # conversion ---------------------------------------------------------
 args = parser.parse_args()
@@ -265,8 +268,8 @@ if args.streamlines :
                       interp_vt, interp_vr,
                       density=(args.sldensity,args.sldensity),
                       color=slcolor,
-                      arrowsize=0.7,
-                      linewidth=0.5)
+                      arrowsize=args.dpi/100,
+                      linewidth=0.2)
 
         print "Warning : borders are not yet taken into accout in the streamlines rendering algo."
 
@@ -286,7 +289,7 @@ if args.quiver :
 
 # PRINTING OUTPUT *****************************************************
 if args.output != ""  :
-    fig.savefig(args.output,dpi=300)
+    fig.savefig(args.output,dpi=args.dpi)
 else :
     print "This is the interactive live mode. Use -o or --output to save your picture"
     plt.ion()
