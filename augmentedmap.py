@@ -6,101 +6,9 @@
 # --------------------------
 
 from lib_parsing import * # built-in module that comes with the toolbox
-from matplotlib.patches import Rectangle
-from matplotlib.collections import PatchCollection
-import matplotlib.cm as cm
 
-#enhancements 
-#     * we could add the option of using cartesian coordinates
-#     * logscaling is not taken into account yet
-#     * yticks could be better
-
-# Defintions **********************************************************
-
-def Hill_radius(r_p,q_p) :
-    return r_p*(q_p/3)**(1./3)
-
-def OmegaFrame(r_p,q_p) :
-    return np.sqrt((1.+q_p)/r_p**3)#todo : check
-
-def findRadialLimits(r_p,q_p,rads,croper=5.) :
-    R_H = Hill_radius(r_p,q_p)
-    nr = len(rads)
-    jmin,jmax = 0,nr
-    while rads[jmin] < r_p-croper*R_H :
-        jmin +=1
-    while rads[jmax-2] > r_p+croper*R_H :#todo : check -2 ???
-        jmax -=1
-    return jmin,jmax
-
-def findAzimLimits(r_p,q_p,thetas,croper=5.) :
-    R_H = Hill_radius(r_p,q_p)
-    ns = len(thetas)
-    imin,imax = 0,ns
-    while r_p*thetas[imin] < -croper*R_H :
-        imin +=1
-    while r_p*thetas[imax-2] > croper*R_H :#todo : check -2 ???
-        imax -=1
-    return imin,imax
-
-def shift(field,thetas,theta_p) :
-    """this routine shifts the array along the theta axis
-    to make the planet appear in the middle of the plot"""
-    ns = len(thetas)
-    i_p = 0
-    while thetas[i_p] < theta_p :
-        i_p += 1
-
-    cesure  = ns/2 - i_p
-    rfield1 = np.concatenate((field[:,-cesure:ns-1],field[:,0:i_p+1]),axis=1)
-    rfield2 = field[:,i_p:-cesure]
-    rfield  = np.concatenate((rfield1,rfield2),axis=1)
-    return rfield
-
-def circle(x0,y0,r,theta) :
-    return x0+r*np.cos(theta), y0+r*np.sin(theta)
-
-def get_pilabel_from_fraction(f) :
-    num   = f.numerator
-    den   = f.denominator
-    if num == 0 :
-        label = r"$0$"
-    else :
-        if num == 1 :
-            num = ''
-        elif num == -1 :
-            num = '-'
-        if den == 1 :
-            label = r"${0}\pi$".format(num)
-        else :
-            label = r"${0}\pi/{1}$".format(num,den)
-    return label
-
-def gen_patchcollection(grid_x,grid_y,data) :
-    dimX = len(grid_x)
-    dimY = len(grid_y)
-    patches = []
-    for i in range(dimX) :
-        for j in range(dimY) :
-            xy = grid_x[i], grid_y[j]
-            try :
-                width  = grid_x[i+1] - grid_x[i]
-            except IndexError :
-                pass
-            try :
-                height = grid_y[j+1] - grid_y[j]
-            except IndexError :
-                pass
-            rect = Rectangle(xy=xy, width=width, height=height,
-                             #rasterized=True,#todo : check usage of this line
-                             linewidth=0,
-                             linestyle="None")
-            patches.append(rect)
-    patchcollection = PatchCollection(patches,linewidth=0,cmap=cm.viridis)
-    data1d = data.reshape(-1)
-    patchcollection.set_array(data1d)
-    return patchcollection
-
+# bugs :
+#     -q -c does not work without -tz...
 
 # PARSING *************************************************************
 
@@ -111,7 +19,7 @@ parser.add_argument('NOUT', type=int, help="output number")
 # switches -----------------------------------------------------------
 parser.add_argument('-c', '--center',  action= 'store_true',
                     help="traces 0.3*R_H and R_H levels")
-parser.add_argument('-tc','--thetacrop',   action= 'store_true',
+parser.add_argument('-tz','--thetazoom',   action= 'store_true',
                     help="crop the figure in the azimuthal direction")
 parser.add_argument('-s', '--hillsphere',  action= 'store_true',
                     help="traces 0.3*R_H and R_H levels")
@@ -123,11 +31,13 @@ parser.add_argument('--scaling', action= 'store_true',
                     help="use real (log?) scaling (much longer to compute image)")
 parser.add_argument('--debug', action= 'store_true',
                     help="print debug informations")
+parser.add_argument('--raw', action= 'store_true',
+                    help="skip aspect = equal")
 # keywords arguments -------------------------------------------------
 parser.add_argument('-bg','--background',dest='bg_key',
                     help="define background field using keys (label, density, radial flow FLI ...)",
                     choices=['l','d','rf','f','blank'], default = 'd')
-parser.add_argument('-z' ,'--zoom',      dest='crop_limit', type=float,
+parser.add_argument('-z' ,'--zoom', type=float,
                     help="zoom around the planet",
                     default = 1000)
 parser.add_argument('-o' ,'--output',
@@ -135,14 +45,22 @@ parser.add_argument('-o' ,'--output',
                     default = "")
 parser.add_argument('-d','--streamlines-density',dest='sldensity', type=int,
                     help="streamlines density",
-                    default = 5)
+                    default = 2)
+parser.add_argument('--dpi', type=int,
+                    help="resolution of the output image",
+                    default = 100);
 
 # conversion ---------------------------------------------------------
 args = parser.parse_args()
-if args.thetacrop :
-    azim_crop_limit = args.crop_limit
+if args.thetazoom :
+    azim_zoom = args.zoom
+    orientationcm = 'vertical'
 else :
-    azim_crop_limit = 1000
+    azim_zoom = 1000
+    orientationcm = 'horizontal'
+
+if azim_zoom < 1000 :
+    args.center = True
 
 if args.bg_key == 'rf' :
     #here, put verif of the existence of the postprocessed file
@@ -166,7 +84,8 @@ RMAX    = parseValue (args.config, 'rmax',      float)
 ninterm = parseValue (args.config, 'ninterm'         )
 DT      = parseValue (args.config, 'DT',        float)
 
-usePhysicalUnits = args.scaling and SPACING.lower() == "logarithmic"
+#usePhysicalUnits = args.scaling and SPACING.lower() == "logarithmic"
+usePhysicalUnits = True #hardcoding
 
 # minimal postprocessing ---------------------------------------------
 DR      = (RMAX-RMIN)/NRAD
@@ -176,196 +95,201 @@ base_theta    = np.linspace(0.,2*np.pi,NSEC)
 rotated_theta = np.linspace(-np.pi,np.pi,NSEC)
 
 # get planetary info -------------------------------------------------
-lastline = np.loadtxt(OUTDIR+"planet0.dat")[-1]
-q_p = lastline[5]
-x_p = lastline[1]
-y_p = lastline[2]
+planet_dat  = np.loadtxt(OUTDIR+"planet0.dat")
+line_number = 0
+i = 0
+while line_number < args.NOUT :
+    line = planet_dat[i]
+    line_number = line[0]
+    i += 1
+
+q_p = line[5]
+x_p = line[1]
+y_p = line[2]
 
 r_p     = np.sqrt(x_p**2+y_p**2)
-theta_p = 0.0#by definition
+theta_p = atan2(x_p,y_p)
 
+R_H     = Hill_radius(r_p,q_p)
 
 # define plotting objects (fig, ax),
 # todo : choose aspect carefully to have same scale in both directions
 # errors are easy to spot when we plot Hill "spheres"
 fig = plt.figure()
-ax = fig.add_subplot(111,aspect='auto')
+ax = fig.add_subplot(111)
+if args.raw :
+    ax.set_aspect('auto')
+else :
+    ax.set_aspect('equal')
 
 
 # plot background *****************************************************
 # define background field, vt, vr
 
-try :
-    bg_field,     bgfile = get2Dfield(args.bg_key,NRAD,NSEC,OUTDIR,args.NOUT)
-    bg_used_radii        = getrad(RMIN,RMAX,NRAD,DR,args.bg_key,SPACING)
-except KeyError :#thats how we handle the blank case
-    bg_field,     bgfile = get2Dfield('d',NRAD,NSEC,OUTDIR,args.NOUT)
-    bg_used_radii        = getrad(RMIN,RMAX,NRAD,DR,'d',SPACING)
+if args.bg_key in TAGS.keys() :
+    key_tmp = args.bg_key
+else :#blank case
+    key_tmp = 'd'
+
+bg_field,     bgfile = get2Dfield(key_tmp,NRAD,NSEC,OUTDIR,args.NOUT)
+rmed                 = getrad(RMIN,RMAX,NRAD,DR,'d',SPACING)
+used_radii           = getRinf(RMIN,RMAX,NRAD,DR,SPACING)
 
 vrad_field,   vrfile = get2Dfield('vr',NRAD,NSEC,OUTDIR,args.NOUT)
 vtheta_field, vtfile = get2Dfield('vt',NRAD,NSEC,OUTDIR,args.NOUT)
-
-
-# shifting to center the planet
-if args.center :
-    bg_field           = shift(bg_field,     base_theta,theta_p)
-    vrad_field         = shift(vrad_field,   base_theta,theta_p)
-    vtheta_field       = shift(vtheta_field, base_theta,theta_p)
-
-# radial cropping
-Jmin,Jmax = findRadialLimits(r_p,q_p,bg_used_radii,args.crop_limit)
-bg_field_crop      = bg_field     [Jmin:Jmax,:]
-vrad_field_crop    = vrad_field   [Jmin:Jmax,:]
-vtheta_field_crop  = vtheta_field [Jmin:Jmax,:]
-bg_used_radii_crop = bg_used_radii[Jmin:Jmax  ]
-
 
 # get rid of the keplerian component as
 # Streamlines and velocity field are only
 # interesting in the Co-orbital frame
 if Frame.upper() == "FIXED" :
-    vtheta_field_crop -= OmegaFrame(r_p,q_p)
+    vtheta_field -= OmegaFrame(r_p,q_p)
 
+used_theta = base_theta -np.pi
+ang_width = np.pi
 
-# These two lines need to be run after rotation...
-i_p = 0
-while base_theta[i_p] < theta_p :
-    i_p += 1
-j_p = 0
-while bg_used_radii_crop[j_p] < r_p :
-    j_p += 1
+if args.center :
+    # shifting to center the planet
+    bg_field,corr           = shift(bg_field,     used_theta,theta_p)
+    vrad_field,corr         = shift(vrad_field,   used_theta,theta_p)
+    vtheta_field,corr       = shift(vtheta_field, used_theta,theta_p)
+    used_theta -= corr
 
-bg_used_theta = rotated_theta #alias
+if args.zoom < 1000. :
+    Jmin,Jmax = findRadialLimits(r_p,used_radii,args.zoom*R_H)
+    bg_field      = bg_field     [Jmin:Jmax,:]
+    vrad_field    = vrad_field   [Jmin:Jmax,:]
+    vtheta_field  = vtheta_field [Jmin:Jmax,:]
+    used_radii = used_radii[Jmin:Jmax  ]
 
-# finding limits of the plot
-Imin,Imax = findAzimLimits(r_p,q_p,bg_used_theta,azim_crop_limit)
-sector_range       = Imax-Imin
-angular_range      = sector_range *2*np.pi/NSEC
-angular_range_frac = angular_range/(2.0*np.pi)
+    RMIN_ = r_p - args.zoom * R_H
+    RMAX_ = r_p + args.zoom * R_H
 
-# azimuthal cropping
-Jmin,Jmax = findRadialLimits(r_p,q_p,bg_used_radii,args.crop_limit)
-bg_field_crop      = bg_field_crop     [:,Imin:Imax]
-vrad_field_crop    = vrad_field_crop   [:,Imin:Imax]
-vtheta_field_crop  = vtheta_field_crop [:,Imin:Imax]
+    if args.thetazoom :
+        Imin,Imax = findAzimuthalLimits(r_p,used_theta,args.zoom*R_H)
+        bg_field      = bg_field     [:,Imin:Imax]
+        vrad_field    = vrad_field   [:,Imin:Imax]
+        vtheta_field  = vtheta_field [:,Imin:Imax]
+        used_theta    = used_theta   [Imin:Imax  ]
+        ang_width = args.zoom * R_H/r_p
+else :
+    RMIN_ = RMIN
+    RMAX_ = RMAX
+
+TMIN_ = -ang_width
+TMAX_ = TMIN_+2*ang_width
 
 # PLOTTING ************************************************************
 # background and associated colorbar ---------------------------------
-# if args.bg_key != 'blank' :
-#     try :
-#        im = ax.imshow(bg_field_crop,
-    #                    cmap=CMAPS[args.bg_key],
-    #                    aspect="auto",
-    #                    interpolation='none')
-    # except ValueError :
-    #     print "Warning : color map not available, using default gnuplot style."
-    #     im = ax.imshow(bg_field_crop,
-    #                    cmap='gnuplot',
-    #                    aspect="auto",
-    #                    interpolation='none')
+if args.bg_key in TAGS.keys() :
+    im = ax.add_collection(gen_patchcollection(used_theta,used_radii,bg_field.T,args.bg_key))
+    cb = fig.colorbar(im,orientation=orientationcm)
+    cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
 
-
-if usePhysicalUnits :
-    im = ax.add_collection(gen_patchcollection(base_theta,bg_used_radii,bg_field.T))
-    ax.set_aspect('equal')
-    #ax.set_ylim(RMIN, RMAX)
-    #ax.set_xlim(0,2*np.pi)
-
-else :#using imshow to run much faster
-    im = ax.imshow(bg_field_crop,
-                   cmap=CMAPS[args.bg_key],
-                   aspect="auto",
-                   interpolation='none')
-    # set limits ---------------------------------------------------------
-    ax.set_ylim(0,Jmax-(Jmin+1))
-    ax.set_xlim(0,sector_range-1)
-    # ticks --------------------------------------------------------------
-    if args.debug :
-        print "In --debug mode, original ticks are left on the x/y axis"
-    else :
-        maxdiv = NSEC
-        while frac(1,maxdiv) < angular_range_frac :
-            maxdiv -=1
-        if args.thetacrop and args.crop_limit < 1000 :#fix
-            maxdiv+=1
-        div = maxdiv*4
-        fracticks  = [frac(2*n,div) for n in range(-2,3)]
-        thetaticks = [np.pi*f for f in fracticks]
-
-        xticks = [(t/np.pi+1.0)*NSEC/2 - Imin for t in thetaticks]
-
-        xtickslab = [r"${0}\pi/{1}$".format(f.numerator,f.denominator) for f in fracticks]
-        xtickslab = [get_pilabel_from_fraction(f) for f in fracticks]
-        #devnote : may be simplified
-        ax.set_xticks(xticks)
-        ax.set_xticklabels(xtickslab)
-
-        ytickslab = ax.get_yticks()
-        ytickslab = [r"${0}$".format(round(bg_used_radii_crop[int(tick)],2))
-                     for tick in ytickslab[:-1]]
-        ax.set_yticklabels(ytickslab)
-
-
-cb = fig.colorbar(im,orientation='vertical')
-cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
 ax.set_xlabel(r"$\theta$", size=20)
 ax.set_ylabel(r"$r$",      size=20)
 
+ax.set_ylim(RMIN_,RMAX_)
+ax.set_xlim(TMIN_,TMAX_)
 
 
 # OPTIONAL PLOTTING ***************************************************
-R_H = Hill_radius(r_p,q_p)
-R_H_code = R_H/(r_p*dtheta)
-if usePhysicalUnits :
-    xgrid = base_theta#updgrade needed
-    ygrid = bg_used_radii
-    rh = R_H
-else :
-    xgrid = np.arange(sector_range)
-    ygrid = np.arange(0,Jmax-Jmin)
-    rh = R_H
-
 thetas=np.linspace(0,2*np.pi,100)
+XCENTER = (theta_p -np.pi)%np.pi
+if args.center :
+    XCENTER = 0.0
 
 # draw hill sphere(s) ------------------------------------------------
 if args.hillsphere :
-    if usePhysicalUnits :
-        print "hello"
-        xcenter   = theta_p
-        ycenter   = r_p
-    else :
-        xcenter   = sector_range/2
-        ycenter   = j_p-1
-
+    ycenter   = r_p
     lc = SPOTOUTCOLORS[args.bg_key]
-    ax.plot( *circle(xcenter,ycenter,rh,thetas),     c=lc, ls='--')
-    ax.plot( *circle(xcenter,ycenter,0.3*rh,thetas), c=lc, ls='-')
+    ax.plot( *circle(XCENTER,ycenter,R_H,thetas),     c=lc, ls='--')
+    ax.plot( *circle(XCENTER,ycenter,0.3*R_H,thetas), c=lc, ls='-')
+    if args.thetazoom and args.zoom <= 5.0 :
+        ax.scatter(XCENTER,ycenter,marker='+', c=lc)
+
 
 # draw stream lines --------------------------------------------------
+def bilinear_interpolate(field, xgrid, ygrid, x, y):
+    I = 0
+    while xgrid[I] < x :
+        I+=1
+    x0 = xgrid[I-1]
+    x1 = xgrid[I]
+    J = 0
+    while ygrid[J] < y :
+        J+=1
+    y0 = ygrid[J-1]
+    y1 = ygrid[J]
+
+    va = field[ J-1, I-1 ]
+    vb = field[ J  , I-1 ]
+    vc = field[ J-1, I   ]
+    vd = field[ J  , I   ]
+
+    wa = (x1-x) * (y1-y)
+    wb = (x1-x) * (y-y0)
+    wc = (x-x0) * (y1-y)
+    wd = (x-x0) * (y-y0)
+    return wa*va + wb*vb + wc*vc + wd*vd
+
+
 if args.streamlines :
     if args.bg_key == 'blank' :
         slcolor = 'b'
     else :
         slcolor = 'w'
-    if usePhysicalUnits and not args.debug :
-        print "Error : this feature (streamlines in logscaling) is currently broken, you can print it with --debug."
+
+    even_radii = np.linspace(np.min(used_radii),np.max(used_radii),2*len(used_radii))
+    even_theta = used_theta
+
+    interp_vt = np.zeros((len(even_radii),len(even_theta)))
+    interp_vr = np.zeros((len(even_radii),len(even_theta)))
+    for i in range(1,len(even_radii)-1) :
+        rad = even_radii[i]
+        for j in range(1,len(even_theta)-1) :
+            theta = even_theta[j]
+            interp_vt[i,j] = bilinear_interpolate(vtheta_field,
+                                                  used_theta,used_radii,
+                                                  theta,rad)
+            interp_vr[i,j] = bilinear_interpolate(vrad_field,
+                                                  used_theta,used_radii,
+                                                  theta,rad)
+
+    if args.debug :
+        print "in debug mode, a quiver object is plotted instead of streamlines."
+        ax.quiver(even_theta+dtheta/2,
+                  even_radii+DR/2,
+                  interp_vt, interp_vr,
+                  color='r')
+
     else :
-        ax.streamplot(xgrid, ygrid, vtheta_field, vrad_field,
+        ax.streamplot(even_theta+dtheta/2,
+                      even_radii+DR/2,
+                      interp_vt, interp_vr,
                       density=(args.sldensity,args.sldensity),
                       color=slcolor,
-                      arrowsize=0.7,
-                      linewidth=0.15)
+                      arrowsize=args.dpi/100,
+                      linewidth=0.2)
+
+        print "Warning : borders are not yet taken into accout in the streamlines rendering algo."
 
 # draw velocity field ------------------------------------------------
 if args.quiver :
-    ax.quiver(xgrid, ygrid, vtheta_field_crop, vrad_field_crop,
+    #note : "DR is not a constant in log radialspacing,
+    #       but it's a good enough approximation
+    # here, as we represent v_t and v_r from a same point eventhough
+    # they are not technically defined at the same locations.
+    if args.bg_key == 'blank' :
+        alpha = 1.
+    else :
+        alpha = 0.4
+    ax.quiver(used_theta+dtheta/2, used_radii+DR/2, vtheta_field, vrad_field,
               color='k',
-              alpha = 0.4)
+              alpha = alpha)
 
 # PRINTING OUTPUT *****************************************************
-
 if args.output != ""  :
-    fig.savefig(args.output)
+    fig.savefig(args.output,dpi=args.dpi)
 else :
     print "This is the interactive live mode. Use -o or --output to save your picture"
     plt.ion()
