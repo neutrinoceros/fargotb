@@ -200,8 +200,8 @@ ax.set_xlim(TMIN_,TMAX_)
 
 
 # OPTIONAL PLOTTING ***************************************************
-thetas=np.linspace(0,2*np.pi,100)
-XCENTER = (theta_p -np.pi)%np.pi
+thetas  = np.linspace(0,2*np.pi,100)
+XCENTER = (theta_p -np.pi)
 if args.center :
     XCENTER = 0.0
 
