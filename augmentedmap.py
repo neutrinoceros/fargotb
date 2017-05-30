@@ -6,6 +6,7 @@
 # --------------------------
 
 from lib_parsing import * # built-in module that comes with the toolbox
+import matplotlib.ticker as ticker
 
 # bugs :
 #     -q -c does not work without -tz...
@@ -180,9 +181,23 @@ TMAX_ = TMIN_+2*ang_width
 
 # PLOTTING ************************************************************
 # background and associated colorbar ---------------------------------
+def sci_fmt(x, pos):
+    a, b = '{:.2e}'.format(x).split('e')
+    b = int(b)
+    label = '${}$'.format(a)
+    if b != 0 :
+        label += r'$\times 10^{{{}}}$'.format(b)
+    return label
+
 if args.bg_key in TAGS.keys() :
     im = ax.add_collection(gen_patchcollection(used_theta,used_radii,bg_field.T,args.bg_key))
-    cb = fig.colorbar(im,orientation=orientationcm)
+    if args.bg_key == 'l' :
+        fmt = None
+    else :
+        fmt = ticker.FuncFormatter(sci_fmt)
+    cb = fig.colorbar(im,
+                      orientation=orientationcm,
+                      format=fmt)
     cb.set_label(AxLabels[args.bg_key],size=20, rotation=0)
 
 ax.set_xlabel(r"$\theta$", size=20)
