@@ -181,14 +181,6 @@ TMAX_ = TMIN_+2*ang_width
 
 # PLOTTING ************************************************************
 # background and associated colorbar ---------------------------------
-def sci_fmt(x, pos):
-    a, b = '{:.2e}'.format(x).split('e')
-    b = int(b)
-    label = '${}$'.format(a)
-    if b != 0 :
-        label += r'$\times 10^{{{}}}$'.format(b)
-    return label
-
 if args.bg_key in TAGS.keys() :
     im = ax.add_collection(gen_patchcollection(used_theta,used_radii,bg_field.T,args.bg_key))
     if args.bg_key == 'l' :
@@ -224,30 +216,6 @@ if args.hillsphere :
 
 
 # draw stream lines --------------------------------------------------
-def bilinear_interpolate(field, xgrid, ygrid, x, y):
-    I = 0
-    while xgrid[I] < x :
-        I+=1
-    x0 = xgrid[I-1]
-    x1 = xgrid[I]
-    J = 0
-    while ygrid[J] < y :
-        J+=1
-    y0 = ygrid[J-1]
-    y1 = ygrid[J]
-
-    va = field[ J-1, I-1 ]
-    vb = field[ J  , I-1 ]
-    vc = field[ J-1, I   ]
-    vd = field[ J  , I   ]
-
-    wa = (x1-x) * (y1-y)
-    wb = (x1-x) * (y-y0)
-    wc = (x-x0) * (y1-y)
-    wd = (x-x0) * (y-y0)
-    return wa*va + wb*vb + wc*vc + wd*vd
-
-
 if args.streamlines :
     if args.bg_key == 'blank' :
         slcolor = 'b'

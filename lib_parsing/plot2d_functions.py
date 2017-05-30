@@ -68,3 +68,13 @@ def shift(field,thetas,theta_p) :
     rfield2 = np.concatenate((field[:,i_p+1:],field[:,:to_transport]),axis=1)
     rfield  = np.concatenate((rfield1,rfield2),axis=1)
     return rfield,corr
+
+
+def sci_fmt(x, pos):
+    a, b = '{:.2e}'.format(x).split('e')
+    b = int(b)
+    label = '${}$'.format(a)
+    if b != 0 :
+        label += r'$\times 10^{{{}}}$'.format(b)
+    return label
+
