@@ -60,9 +60,11 @@ def shift(field,thetas,theta_p) :
     i_p = 0
     while thetas[i_p] < theta_p +np.pi :
         i_p += 1
-    corr = thetas[i_p] - (theta_p+np.pi)
-    cesure  = ns/2 - i_p
-    rfield1 = np.concatenate((field[:,-cesure+1:ns],field[:,0:i_p+1]),axis=1)
-    rfield2 = field[:,i_p+1:-cesure+1]
+    i_p-=1
+    corr = 2 *((theta_p+np.pi) - thetas[i_p])
+    to_transport = i_p - ns/2
+
+    rfield1 = field[:,to_transport:i_p+1]
+    rfield2 = np.concatenate((field[:,i_p+1:],field[:,:to_transport]),axis=1)
     rfield  = np.concatenate((rfield1,rfield2),axis=1)
     return rfield,corr
