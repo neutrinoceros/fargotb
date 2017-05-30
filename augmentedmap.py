@@ -254,12 +254,12 @@ if args.streamlines :
                       arrowsize=args.dpi/100,
                       linewidth=0.2)
 
-        print "Warning : borders are not yet taken into accout in the streamlines rendering algo."
+        print "Warning : borders are not yet taken into account in the streamlines rendering algo."
 
 # draw velocity field ------------------------------------------------
 if args.quiver :
     #note : "DR is not a constant in log radialspacing,
-    #       but it's a good enough approximation
+    #       but it's a good enough approximation
     # here, as we represent v_t and v_r from a same point eventhough
     # they are not technically defined at the same locations.
     if args.bg_key == 'blank' :
