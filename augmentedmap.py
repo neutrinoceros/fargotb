@@ -71,8 +71,8 @@ elif args.bg_key == 'f' :
     print "Sorry, FLI postprocessing is not implemented yet, come back later !"
     exit(-1)
 
-elif args.bg_key == 'blank' :
-    pass
+if args.sldensity != 2 :
+    args.streamlines = True
 
 # fetching of numerical configuration --------------------------------
 OUTDIR  = parseString(args.config, 'OutputDir'       )
@@ -263,7 +263,7 @@ if args.quiver :
     # here, as we represent v_t and v_r from a same point eventhough
     # they are not technically defined at the same locations.
     if args.bg_key == 'blank' :
-        alpha = 1.
+        alpha = 0.6
     else :
         alpha = 0.4
     ax.quiver(used_theta+dtheta/2, used_radii+DR/2, vtheta_field, vrad_field,
