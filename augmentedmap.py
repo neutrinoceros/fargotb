@@ -26,6 +26,8 @@ parser.add_argument('-s', '--hillsphere',  action= 'store_true',
                     help="traces 0.3*R_H and R_H levels")
 parser.add_argument('-sl','--streamlines', action= 'store_true',
                     help="add streamlines")
+parser.add_argument('-t','--trajectories', action= 'store_true',
+                    help="add trajectories")
 parser.add_argument('-q','--quiver', action= 'store_true',
                     help="add quiver of velocity field")
 parser.add_argument('--scaling', action= 'store_true',
@@ -255,6 +257,10 @@ if args.streamlines :
                       linewidth=0.2)
 
         print "Warning : borders are not yet taken into account in the streamlines rendering algo."
+
+# draw trajectories (!= streamlines) ---------------------------------
+if args.trajectories :
+    pass
 
 # draw velocity field ------------------------------------------------
 if args.quiver :
