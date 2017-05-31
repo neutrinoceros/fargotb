@@ -262,20 +262,23 @@ if args.streamlines :
 if args.trajectories :
     #todo : completion bar
     #density should be a parameter
-    L = len(used_radii)
-    K = len(used_theta)
-    for i in range(1,L-1) :
-        for j in range(1,K-1) :
+    div = 3
+    L = len(used_radii)/div
+    K = len(used_theta)/div
+    for i in range(1,L) :
+        ii = i*div
+        for j in range(1,K) :
+            jj = j*div
             #init
             rs = []
             ts = []
-            r0 = used_radii[i]
-            t0 = used_theta[j]
-            vr0 = vrad_field   [i,j]
-            vt0 = vtheta_field [i,j]
+            r0 = used_radii[ii]
+            t0 = used_theta[jj]
+            vr0 = vrad_field   [ii,jj]
+            vt0 = vtheta_field [ii,jj]
             #integrate
             step = 1.
-            for n in range(int(2e3)) :
+            for n in range(int(5e4)) :
                 if r0 < used_radii[1] or r0 > used_radii[-2] :
                     pass
                 elif t0 < used_theta[1] or t0 > used_theta[-2] :
