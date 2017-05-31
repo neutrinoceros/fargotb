@@ -260,7 +260,52 @@ if args.streamlines :
 
 # draw trajectories (!= streamlines) ---------------------------------
 if args.trajectories :
-    pass
+    #todo : completion bar
+    #density should be a parameter
+    L = len(used_radii)
+    K = len(used_theta)
+    for i in range(1,L-1) :
+        for j in range(1,K-1) :
+            #init
+            rs = []
+            ts = []
+            r0 = used_radii[i]
+            t0 = used_theta[j]
+            vr0 = vrad_field   [i,j]
+            vt0 = vtheta_field [i,j]
+            #integrate
+            step = 1.
+            for n in range(int(5e3)) :
+                #half a step
+                rint  = r0   + step/2       * vr0
+                tint  = t0   + step/2 /rint * vt0
+                vrint   = bilinear_interpolate(vrad_field,
+                                               used_theta,used_radii,
+                                               tint,rint)
+                vtint   = bilinear_interpolate(vtheta_field,
+                                               used_theta,used_radii,
+                                               tint,rint)
+
+                #and another
+                r1    = rint + step/2       * vrint
+                t1    = tint + step/2 /r1   * vtint
+                vt1   = bilinear_interpolate(vtheta_field,
+                                             used_theta,used_radii,
+                                             t1,r1)
+                vr1   = bilinear_interpolate(vrad_field,
+                                             used_theta,used_radii,
+                                             t1,r1)
+
+                #loop
+                rs.append(r1)
+                ts.append(t1)
+                r0, t0  = r1, t1
+                vr0,vt0 = vr1,vt1
+                if r0 < used_radii[1] or r0 > used_radii[-2] :
+                    break
+                if t0 < used_theta[1] or t0 > used_theta[-2] :
+                    break
+            ax.plot(ts,rs,c='g')
 
 # draw velocity field ------------------------------------------------
 if args.quiver :
