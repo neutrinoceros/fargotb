@@ -20,6 +20,8 @@ def getSigmaInf(nrad,nsec,rmin,rmax,dr,outdir,nout,Rinf,Rmed) :
 def getflow(nrad,nsec,rmin,rmax,dr,outdir,nout,Rinf,Rmed) :
     """new method : define flow at Rinf by shifting density
     --extrapolation based on what is found is fargo--"""
+    print "warning : this method is known for showing a distorted version of the mass flow"
+    print "use -rf instead of '-f'"
     sigmaInf,filesig = getSigmaInf(nrad,nsec,rmin,rmax,dr,outdir,nout,Rinf,Rmed)
 
     sigma,filesig = get2Dfield('d' ,nrad,nsec,outdir,nout)
@@ -30,7 +32,7 @@ def getflow(nrad,nsec,rmin,rmax,dr,outdir,nout,Rinf,Rmed) :
     for i in range(nrad) :
         flow2D[i] *= Rinf[i]
     return flow2D, used_files
-    
+
 # -----------------------------------------------------------
 
 RECIPES = {"sigmaInf" : getSigmaInf,
