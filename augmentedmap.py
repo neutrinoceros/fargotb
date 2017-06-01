@@ -242,7 +242,9 @@ if args.streamlines :
 
     interp_vt = np.zeros((len(even_radii),len(even_theta)))
     interp_vr = np.zeros((len(even_radii),len(even_theta)))
-    for i in range(1,len(even_radii)-1) :
+    print "Rendering Streamlines"
+    print "--------------------------"
+    for i in tqdm(range(1,len(even_radii)-1)) :
         rad = even_radii[i]
         for j in range(1,len(even_theta)-1) :
             theta = even_theta[j]
@@ -265,13 +267,17 @@ if args.streamlines :
                   color='g')
 
     else :
+        #speed = np.sqrt(interp_vt**2 + interp_vr**2)
+        #lw = 2.0*speed/speed.max()
+        lw = 0.2
         ax.streamplot(even_theta+dtheta/2,
                       even_radii,
                       interp_vt, interp_vr,
-                      density=(args.sldensity,args.sldensity),
+                      density=args.sldensity,
                       color=slcolor,
                       arrowsize=args.dpi/100,
-                      linewidth=0.2)
+                      #minlength=args.zoom*R_H*2,
+                      linewidth=lw)
 
         print "Warning : borders are not yet taken into account in the streamlines rendering algo."
 

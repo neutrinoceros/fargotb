@@ -3,12 +3,15 @@ import numpy as np
 from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection
 import matplotlib.cm as cm
+from tqdm import *
 
 def gen_patchcollection(grid_x,grid_y,data,key) :
     dimX = len(grid_x)
     dimY = len(grid_y)
     patches = []
-    for i in range(dimX) :
+    print "Computing background"
+    print "--------------------------"
+    for i in tqdm(range(dimX)) :
         for j in range(dimY) :
             xy = grid_x[i], grid_y[j]
             try :
