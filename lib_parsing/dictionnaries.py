@@ -19,6 +19,8 @@ TAGS = {
         "rf" : "radialFlow",
         "f"  : "FLI",
         # recipes -----------
+        "VTC": "vtcent",
+        "VRC": "vrcent",
         "PHI": "flow"#deprecated
        }
 

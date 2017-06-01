@@ -33,8 +33,35 @@ def getflow(nrad,nsec,rmin,rmax,dr,outdir,nout,Rinf,Rmed) :
         flow2D[i] *= Rinf[i]
     return flow2D, used_files
 
+
+def getVThetaCent(nrad,nsec,rmin,rmax,dr,outdir,nout,Rinf,Rmed) :
+    vtheta,filevtheta = get2Dfield('vt',nrad,nsec,outdir,nout)
+    vt_cent = vtheta * 0.0
+    for i in range(nrad) :
+        for j in range(nsec) :
+            if j == nsec-1 :
+                vt_cent[i,j] = 0.5 * (vtheta[i,j] + vtheta[i,0])
+            else :
+                vt_cent[i,j] = 0.5 * (vtheta[i,j] + vtheta[i,j+1])
+    return vt_cent, filevtheta
+
+
+def getVRadCent(nrad,nsec,rmin,rmax,dr,outdir,nout,Rinf,Rmed) :
+    vrad,filevrad = get2Dfield('vr',nrad,nsec,outdir,nout)
+    vr_cent = vrad * 0.0
+    for i in range(nrad) :
+        for j in range(nsec) :
+            if i == nrad-1 :
+                vr_cent[i,j] = vrad[i,j]
+            else :
+                vr_cent[i,j] = ( (Rmed[i]  -Rinf[i])*vrad[i+1,j]\
+                                  +(Rinf[i+1]-Rmed[i])*vrad[i,j]) / (Rinf[i+1]+Rinf[i])
+    return vr_cent, filevrad
+
+
 # -----------------------------------------------------------
 
 RECIPES = {"sigmaInf" : getSigmaInf,
-           "flow" : getflow
-           }
+           "flow"     : getflow,
+           "vtcent"   : getVThetaCent,
+           "vrcent"   : getVRadCent}

@@ -135,11 +135,15 @@ else :#blank case
     key_tmp = 'd'
 
 bg_field,     bgfile = get2Dfield(key_tmp,NRAD,NSEC,OUTDIR,args.NOUT)
-rmed                 = getrad(RMIN,RMAX,NRAD,DR,'d',SPACING)
-used_radii           = getRinf(RMIN,RMAX,NRAD,DR,SPACING)
+Rinf                 = getRinf(RMIN,RMAX,NRAD,DR,SPACING)
+Rmed                 = getRmed(RMIN,RMAX,NRAD,DR,SPACING)
+used_radii           = Rinf.copy()
 
 vrad_field,   vrfile = get2Dfield('vr',NRAD,NSEC,OUTDIR,args.NOUT)
 vtheta_field, vtfile = get2Dfield('vt',NRAD,NSEC,OUTDIR,args.NOUT)
+
+vrad_cent,   vrfile = getVRadCent   (NRAD,NSEC,RMIN,RMAX,DR,OUTDIR,args.NOUT,Rinf,Rmed)
+vtheta_cent, vtfile = getVThetaCent (NRAD,NSEC,RMIN,RMAX,DR,OUTDIR,args.NOUT,Rinf,Rmed)
 
 # get rid of the keplerian component as
 # Streamlines and velocity field are only
@@ -162,7 +166,7 @@ if args.zoom < 1000. :
     bg_field      = bg_field     [Jmin:Jmax,:]
     vrad_field    = vrad_field   [Jmin:Jmax,:]
     vtheta_field  = vtheta_field [Jmin:Jmax,:]
-    used_radii = used_radii[Jmin:Jmax  ]
+    used_radii    = used_radii   [Jmin:Jmax  ]
 
     RMIN_ = r_p - args.zoom * R_H
     RMAX_ = r_p + args.zoom * R_H
