@@ -275,61 +275,60 @@ if args.streamlines :
 
         print "Warning : borders are not yet taken into account in the streamlines rendering algo."
 
-# draw trajectories (!= streamlines) ---------------------------------
+# # draw trajectories (!= streamlines) ---------------------------------
 if args.trajectories :
-    #todo : completion bar
-    #density should be a parameter
-    div = 3
-    L = len(used_radii)/div
-    K = len(used_theta)/div
-    for i in range(1,L) :
-        ii = i*div
-        for j in range(1,K) :
-            jj = j*div
-            #init
-            rs = []
-            ts = []
-            r0 = used_radii[ii]
-            t0 = used_theta[jj]
-            vr0 = vrad_field   [ii,jj]
-            vt0 = vtheta_field [ii,jj]
-            #integrate
-            step = 1.
-            for n in range(int(5e4)) :
-                if r0 < used_radii[1] or r0 > used_radii[-2] :
-                    pass
-                elif t0 < used_theta[1] or t0 > used_theta[-2] :
-                    pass
+    print "broken feature : trajectories"
+#     #todo : completion bar
+#     #density should be a parameter
+#     div = 3
+#     L = len(Rmed)/div
+#     K = len(used_theta)/div
+#     for i in range(1,L) :
+#         ii = i*div
+#         for j in range(1,K) :
+#             jj = j*div
+#             #init
+#             rs = []
+#             ts = []
+#             r0 = Rmed[ii]
+#             t0 = used_theta[jj]
+#             vr0 = vrad_cent   [ii,jj]
+#             vt0 = vtheta_cent [ii,jj]
+#             #integrate
+#             step = 1e-2
+#             for n in range(int(5e4)) :
+#                 if r0 < Rmed[1] or r0 > Rmed[-2] :
+#                     pass
+#                 elif t0 < used_theta[1] or t0 > used_theta[-2] :
+#                     pass
+#                 else :
+#                     #half a step
+#                     rint  = r0   + step/2       * vr0
+#                     tint  = t0   + step/2 /rint * vt0
+#                     vrint = bilinear_interpolate(vrad_cent,
+#                                                  used_theta,Rmed,
+#                                                  tint,rint)
+#                     vtint = bilinear_interpolate(vtheta_field,
+#                                                  used_theta,Rmed,
+#                                                  tint,rint)
 
-                else :
-                    #half a step
-                    rint  = r0   + step/2       * vr0
-                    tint  = t0   + step/2 /rint * vt0
-                    vrint   = bilinear_interpolate(vrad_field,
-                                                   used_theta,used_radii,
-                                                   tint,rint)
-                    vtint   = bilinear_interpolate(vtheta_field,
-                                                   used_theta,used_radii,
-                                                   tint,rint)
-
-                    #and another
-                    r1    = rint + step/2       * vrint
-                    t1    = tint + step/2 /r1   * vtint
-                    vt1   = bilinear_interpolate(vtheta_field,
-                                                 used_theta,used_radii,
-                                                 t1,r1)
-                    vr1   = bilinear_interpolate(vrad_field,
-                                                 used_theta,used_radii,
-                                                 t1,r1)
-
-                    #loop
-                    rs.append(r1)
-                    ts.append(t1)
-                    r0, t0  = r1, t1
-                    vr0,vt0 = vr1,vt1
-            ts = np.array(ts)
-            rs = np.array(rs)
-            ax.plot(ts+dtheta/2,rs+DR/2,c='k',alpha=0.5)
+#                     #and another
+#                     r1    = rint + step/2       * vrint
+#                     t1    = tint + step/2 /r1   * vtint
+#                     vt1   = bilinear_interpolate(vtheta_cent,
+#                                                  used_theta,Rmed,
+#                                                  t1,r1)
+#                     vr1   = bilinear_interpolate(vrad_cent,
+#                                                  used_theta,Rmed,
+#                                                  t1,r1)
+#                     #loop
+#                     rs.append(r1)
+#                     ts.append(t1)
+#                     r0, t0  = r1, t1
+#                     vr0,vt0 = vr1,vt1
+#             ts = np.array(ts)
+#             rs = np.array(rs)
+#             ax.plot(ts+dtheta/2,rs,c='k',alpha=0.5)
 
 # draw velocity field ------------------------------------------------
 if args.quiver :
