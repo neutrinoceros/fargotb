@@ -156,17 +156,24 @@ ang_width = np.pi
 
 if args.center :
     # shifting to center the planet
-    bg_field,corr           = shift(bg_field,     base_theta,theta_p)
-    vrad_field,corr         = shift(vrad_field,   base_theta,theta_p)
-    vtheta_field,corr       = shift(vtheta_field, base_theta,theta_p)
+    bg_field,     corr = shift(bg_field,     base_theta,theta_p)
+    vrad_field,   corr = shift(vrad_field,   base_theta,theta_p)
+    vtheta_field, corr = shift(vtheta_field, base_theta,theta_p)
+    vrad_cent,    corr = shift(vrad_cent,    base_theta,theta_p)
+    vtheta_cent,  corr = shift(vtheta_cent,  base_theta,theta_p)
     used_theta -= corr
 
 if args.zoom < 1000. :
     Jmin,Jmax = findRadialLimits(r_p,used_radii,args.zoom*R_H)
+    #dev note : let the field be just a 2rows and 2lines wider in most cases can be useful
     bg_field      = bg_field     [Jmin:Jmax,:]
     vrad_field    = vrad_field   [Jmin:Jmax,:]
     vtheta_field  = vtheta_field [Jmin:Jmax,:]
+    vrad_cent     = vrad_cent    [Jmin:Jmax,:]
+    vtheta_cent   = vtheta_cent  [Jmin:Jmax,:]
     used_radii    = used_radii   [Jmin:Jmax  ]
+    Rmed          = Rmed         [Jmin:Jmax  ]
+    Rinf          = Rinf         [Jmin:Jmax  ]
 
     RMIN_ = r_p - args.zoom * R_H
     RMAX_ = r_p + args.zoom * R_H
@@ -176,6 +183,8 @@ if args.zoom < 1000. :
         bg_field      = bg_field     [:,Imin:Imax]
         vrad_field    = vrad_field   [:,Imin:Imax]
         vtheta_field  = vtheta_field [:,Imin:Imax]
+        vrad_cent     = vrad_cent    [:,Imin:Imax]
+        vtheta_cent   = vtheta_cent  [:,Imin:Imax]
         used_theta    = used_theta   [Imin:Imax  ]
         ang_width = args.zoom * R_H/r_p
 else :
@@ -228,7 +237,7 @@ if args.streamlines :
     else :
         slcolor = 'w'
 
-    even_radii = np.linspace(np.min(used_radii),np.max(used_radii),2*len(used_radii))
+    even_radii = np.linspace(np.min(Rmed),np.max(Rmed),2*len(Rmed))
     even_theta = used_theta
 
     interp_vt = np.zeros((len(even_radii),len(even_theta)))
@@ -238,22 +247,26 @@ if args.streamlines :
         for j in range(1,len(even_theta)-1) :
             theta = even_theta[j]
             interp_vt[i,j] = bilinear_interpolate(vtheta_field,
-                                                  used_theta,used_radii,
+                                                  used_theta,Rmed,
                                                   theta,rad)
             interp_vr[i,j] = bilinear_interpolate(vrad_field,
-                                                  used_theta,used_radii,
+                                                  used_theta,Rmed,
                                                   theta,rad)
 
     if args.debug :
         print "in debug mode, a quiver object is plotted instead of streamlines."
         ax.quiver(even_theta+dtheta/2,
-                  even_radii+DR/2,
-                  interp_vt, interp_vr,
-                  color='r')
+                  even_radii,
+                  interp_vt, interp_vr*0.0,
+                  color='b')
+        ax.quiver(even_theta+dtheta/2,
+                  even_radii,
+                  interp_vt*0.0, interp_vr,
+                  color='g')
 
     else :
         ax.streamplot(even_theta+dtheta/2,
-                      even_radii+DR/2,
+                      even_radii,
                       interp_vt, interp_vr,
                       density=(args.sldensity,args.sldensity),
                       color=slcolor,
