@@ -12,9 +12,8 @@ def getRinf(rmin,rmax,nrad,dr,spacing) :
 def getRmed(rmin,rmax,nrad,dr,spacing) :
     "returns nr points"
     rinf = getRinf(rmin,rmax,nrad,dr,spacing)
-    L = len(rinf)
-    rmed = np.zeros(L)
-    for i in range(L) :
+    rmed = np.zeros(nrad)
+    for i in range(nrad) :
         rmed[i]  = 2.*(rinf[i+1]**3  - rinf[i]**3)
         rmed[i] /= 3.*(rinf[i+1]**2  - rinf[i]**2)
     return rmed
