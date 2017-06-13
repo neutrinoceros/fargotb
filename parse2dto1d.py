@@ -59,7 +59,7 @@ dtheta  = 2.*np.pi/NSEC
 # MAIN LOOP ***********************************************************
 
 for key in KEYS :
-    used_radii =  getrad(RMIN,RMAX,NRAD,DR,key,SPACING)
+    used_radii = getrad(RMIN,RMAX,NRAD,DR,key,SPACING)[0:NRAD]
     #either Rinf or Rmed is returned, according to $ke
     RMED = getrad(RMIN,RMAX,NRAD,DR,'d',SPACING)
     RINF = getrad(RMIN,RMAX,NRAD,DR,'vr',SPACING)

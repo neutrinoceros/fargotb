@@ -1,22 +1,22 @@
 from parsingFunctions import *
 
 def getRinf(rmin,rmax,nrad,dr,spacing) :
+    "returns nr+1 points"
     if spacing == "Logarithmic" :
-        rinf = np.array([rmin * np.exp(i * np.log(rmax/rmin)/nrad) for i in range(nrad)])
+        rinf = np.array([rmin * np.exp(i * np.log(rmax/rmin)/nrad) for i in range(nrad+1)])
     else : #default is "Arithmetic"
-        rinf = np.linspace(rmin,rmax-dr,nrad)
+        rinf = np.linspace(rmin,rmax-dr,nrad+1)
     return rinf
 
 
 def getRmed(rmin,rmax,nrad,dr,spacing) :
+    "returns nr points"
     rinf = getRinf(rmin,rmax,nrad,dr,spacing)
     L = len(rinf)
     rmed = np.zeros(L)
-    for i in range(L-1) :
+    for i in range(L) :
         rmed[i]  = 2.*(rinf[i+1]**3  - rinf[i]**3)
         rmed[i] /= 3.*(rinf[i+1]**2  - rinf[i]**2)
-    rmed[-1]  = 2.*((rinf[-1]+dr)**3 - rinf[-1]**3)
-    rmed[-1] /= 3.*((rinf[-1]+dr)**2 - rinf[-1]**2)
     return rmed
 
 

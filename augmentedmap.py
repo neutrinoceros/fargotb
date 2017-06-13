@@ -137,7 +137,7 @@ else :#blank case
 bg_field,     bgfile = get2Dfield(key_tmp,NRAD,NSEC,OUTDIR,args.NOUT)
 Rinf                 = getRinf(RMIN,RMAX,NRAD,DR,SPACING)
 Rmed                 = getRmed(RMIN,RMAX,NRAD,DR,SPACING)
-used_radii           = Rinf.copy()
+used_radii           = Rinf.copy()[0,NRAD]
 
 vrad_field,   vrfile = get2Dfield('vr',NRAD,NSEC,OUTDIR,args.NOUT)
 vtheta_field, vtfile = get2Dfield('vt',NRAD,NSEC,OUTDIR,args.NOUT)
