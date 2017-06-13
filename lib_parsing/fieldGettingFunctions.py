@@ -5,7 +5,7 @@ def getRinf(rmin,rmax,nrad,dr,spacing) :
     if spacing == "Logarithmic" :
         rinf = np.array([rmin * np.exp(i * np.log(rmax/rmin)/nrad) for i in range(nrad+1)])
     else : #default is "Arithmetic"
-        rinf = np.linspace(rmin,rmax-dr,nrad+1)
+        rinf = np.linspace(rmin,rmax,nrad+1)
     return rinf
 
 
