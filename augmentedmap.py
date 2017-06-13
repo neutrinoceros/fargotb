@@ -101,6 +101,7 @@ rotated_theta = np.linspace(-np.pi,np.pi,NSEC)
 planet_dat  = np.loadtxt(OUTDIR+"planet0.dat")
 line_number = 0
 i = 0
+line = planet_dat[0]
 while line_number < args.NOUT :
     line = planet_dat[i]
     line_number = line[0]
@@ -137,7 +138,7 @@ else :#blank case
 bg_field,     bgfile = get2Dfield(key_tmp,NRAD,NSEC,OUTDIR,args.NOUT)
 Rinf                 = getRinf(RMIN,RMAX,NRAD,DR,SPACING)
 Rmed                 = getRmed(RMIN,RMAX,NRAD,DR,SPACING)
-used_radii           = Rinf.copy()[0,NRAD]
+used_radii           = Rinf.copy()[0:NRAD]
 
 vrad_field,   vrfile = get2Dfield('vr',NRAD,NSEC,OUTDIR,args.NOUT)
 vtheta_field, vtfile = get2Dfield('vt',NRAD,NSEC,OUTDIR,args.NOUT)
