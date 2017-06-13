@@ -3,7 +3,12 @@ import numpy as np
 from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection
 import matplotlib.cm as cm
-from tqdm import *
+
+try :
+    from tqdm import *
+except ImportError :
+    def tqdm (arg) :
+        return arg
 
 def gen_patchcollection(grid_x,grid_y,data,key) :
     dimX = len(grid_x)
