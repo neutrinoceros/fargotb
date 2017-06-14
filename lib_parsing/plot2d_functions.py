@@ -69,7 +69,7 @@ def shift(field,thetas,theta_p) :
     while thetas[i_p] < theta_p :
         i_p += 1
     i_p -= 1
-    corr = 2 *((theta_p+np.pi) - thetas[i_p])
+    corr = 2 *(theta_p - thetas[i_p])
     if thetas[i_p] < 0  :
         to_transport = i_p - ns/2
         rfield1 = field[:,to_transport:i_p+1]

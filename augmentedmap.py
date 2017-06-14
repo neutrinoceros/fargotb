@@ -162,7 +162,8 @@ if args.center :
     vtheta_field, corr = shift(vtheta_field, used_theta,theta_p)
     vrad_cent,    corr = shift(vrad_cent,    used_theta,theta_p)
     vtheta_cent,  corr = shift(vtheta_cent,  used_theta,theta_p)
-    used_theta -= corr
+    print corr
+    #used_theta -= corr
 
 if args.zoom < 1000. :
     Jmin,Jmax = findRadialLimits(r_p,used_radii,args.zoom*R_H)
@@ -198,7 +199,7 @@ TMAX_ = TMIN_+2*ang_width
 # PLOTTING ************************************************************
 # background and associated colorbar ---------------------------------
 if args.bg_key in TAGS.keys() :
-    im = ax.add_collection(gen_patchcollection(used_theta+2*np.pi,#ugly patch
+    im = ax.add_collection(gen_patchcollection(used_theta,
                                                used_radii,bg_field.T,args.bg_key))
     if args.bg_key == 'l' :
         fmt = None
