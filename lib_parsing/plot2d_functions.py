@@ -66,14 +66,19 @@ def shift(field,thetas,theta_p) :
     to make the planet appear in the middle of the plot"""
     ns = len(thetas)
     i_p = 0
-    while thetas[i_p] < theta_p +np.pi :
+    while thetas[i_p] < theta_p :
         i_p += 1
-    i_p-=1
+    i_p -= 1
     corr = 2 *((theta_p+np.pi) - thetas[i_p])
-    to_transport = i_p - ns/2
-
-    rfield1 = field[:,to_transport:i_p+1]
-    rfield2 = np.concatenate((field[:,i_p+1:],field[:,:to_transport]),axis=1)
+    if thetas[i_p] < 0  :
+        to_transport = i_p - ns/2
+        rfield1 = field[:,to_transport:i_p+1]
+        rfield2 = np.concatenate((field[:,i_p+1:],field[:,:to_transport]),axis=1)
+    else :
+        to_transport = i_p
+        rfield1 = np.concatenate((field[:,to_transport:],field[:,:i_p]),axis=1)
+        rfield2 = field[:,i_p+1:to_transport]
+        
     rfield  = np.concatenate((rfield1,rfield2),axis=1)
     return rfield,corr
 

@@ -94,7 +94,7 @@ usePhysicalUnits = True #hardcoding
 DR      = (RMAX-RMIN)/NRAD
 dtheta  = 2.*np.pi/NSEC
 
-base_theta    = np.linspace(0.,2*np.pi,NSEC)
+base_theta    = np.linspace(-np.pi,np.pi,NSEC)
 rotated_theta = np.linspace(-np.pi,np.pi,NSEC)
 
 # get planetary info -------------------------------------------------
@@ -152,16 +152,16 @@ vtheta_cent, vtfile = getVThetaCent (NRAD,NSEC,RMIN,RMAX,DR,OUTDIR,args.NOUT,Rin
 if Frame.upper() == "FIXED" :
     vtheta_field -= OmegaFrame(r_p,q_p)
 
-used_theta = base_theta -np.pi
+used_theta = base_theta#alias
 ang_width = np.pi
 
 if args.center :
     # shifting to center the planet
-    bg_field,     corr = shift(bg_field,     base_theta,theta_p)
-    vrad_field,   corr = shift(vrad_field,   base_theta,theta_p)
-    vtheta_field, corr = shift(vtheta_field, base_theta,theta_p)
-    vrad_cent,    corr = shift(vrad_cent,    base_theta,theta_p)
-    vtheta_cent,  corr = shift(vtheta_cent,  base_theta,theta_p)
+    bg_field,     corr = shift(bg_field,     used_theta,theta_p)
+    vrad_field,   corr = shift(vrad_field,   used_theta,theta_p)
+    vtheta_field, corr = shift(vtheta_field, used_theta,theta_p)
+    vrad_cent,    corr = shift(vrad_cent,    used_theta,theta_p)
+    vtheta_cent,  corr = shift(vtheta_cent,  used_theta,theta_p)
     used_theta -= corr
 
 if args.zoom < 1000. :
@@ -198,7 +198,8 @@ TMAX_ = TMIN_+2*ang_width
 # PLOTTING ************************************************************
 # background and associated colorbar ---------------------------------
 if args.bg_key in TAGS.keys() :
-    im = ax.add_collection(gen_patchcollection(used_theta,used_radii,bg_field.T,args.bg_key))
+    im = ax.add_collection(gen_patchcollection(used_theta+2*np.pi,#ugly patch
+                                               used_radii,bg_field.T,args.bg_key))
     if args.bg_key == 'l' :
         fmt = None
     else :
@@ -212,7 +213,7 @@ ax.set_xlabel(r"$\theta$", size=20)
 ax.set_ylabel(r"$r$",      size=20)
 
 ax.set_ylim(RMIN_,RMAX_)
-ax.set_xlim(TMIN_,TMAX_)
+#ax.set_xlim(TMIN_,TMAX_)
 
 
 # OPTIONAL PLOTTING ***************************************************
