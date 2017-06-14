@@ -162,8 +162,7 @@ if args.center :
     vtheta_field, corr = shift(vtheta_field, used_theta,theta_p)
     vrad_cent,    corr = shift(vrad_cent,    used_theta,theta_p)
     vtheta_cent,  corr = shift(vtheta_cent,  used_theta,theta_p)
-    print corr
-    #used_theta -= corr
+    used_theta -= corr
 
 if args.zoom < 1000. :
     Jmin,Jmax = findRadialLimits(r_p,used_radii,args.zoom*R_H)
@@ -214,7 +213,7 @@ ax.set_xlabel(r"$\theta$", size=20)
 ax.set_ylabel(r"$r$",      size=20)
 
 ax.set_ylim(RMIN_,RMAX_)
-#ax.set_xlim(TMIN_,TMAX_)
+ax.set_xlim(TMIN_,TMAX_)
 
 
 # OPTIONAL PLOTTING ***************************************************

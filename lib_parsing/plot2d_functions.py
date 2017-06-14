@@ -76,8 +76,8 @@ def shift(field,thetas,theta_p) :
         rfield2 = np.concatenate((field[:,i_p+1:],field[:,:to_transport]),axis=1)
     else :
         to_transport = i_p
-        rfield1 = np.concatenate((field[:,to_transport:],field[:,:i_p]),axis=1)
-        rfield2 = field[:,i_p+1:to_transport]
+        rfield1 = np.concatenate((field[:,i_p+1:],field[:,:i_p+1]),axis=1)
+        rfield2 = field[:,i_p+1:i_p]#always empty... but this actually works
         
     rfield  = np.concatenate((rfield1,rfield2),axis=1)
     return rfield,corr
