@@ -356,7 +356,7 @@ if args.quiver :
 
 # PRINTING OUTPUT *****************************************************
 if args.output != ""  :
-    fig.savefig(args.output,dpi=args.dpi)
+    fig.savefig(args.output,dpi=args.dpi,bbox_inches="tight")
 else :
     print "This is the interactive live mode. Use -o or --output to save your picture"
     plt.ion()
