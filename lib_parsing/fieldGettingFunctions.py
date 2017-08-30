@@ -2,7 +2,7 @@ from parsingFunctions import *
 
 def getRinf(rmin,rmax,nrad,dr,spacing) :
     "returns nr+1 points"
-    if spacing == "Logarithmic" :
+    if spacing.lower() == "logarithmic" :
         rinf = np.array([rmin * np.exp(i * np.log(rmax/rmin)/nrad) for i in range(nrad+1)])
     else : #default is "Arithmetic"
         rinf = np.linspace(rmin,rmax,nrad+1)

@@ -131,8 +131,10 @@ fi
 
 # AUTO-EDITING of files mentioning their own location *****************
 
-sed -i "s?$base?$target?g" $target/jobs/*oar   >> /dev/null 2>&1
-sed -i "s?$base?$target?g" $target/in*/*par    >> /dev/null 2>&1
+sed -i "s?$base?$target?g" $target/jobs/*oar >> /dev/null 2>&1
+sed -i "s?$base?$target?g" $target/*oar      >> /dev/null 2>&1
+sed -i "s?$base?$target?g" $target/in*/*par  >> /dev/null 2>&1
+sed -i "s?$base?$target?g" $target/*par      >> /dev/null 2>&1
 
 
 # INTERACTIVE DOCUMENTATION *******************************************
