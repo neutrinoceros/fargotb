@@ -46,7 +46,8 @@ RESTART_AUTOINCLUDE=(
     --include="tqwk*.dat"
     --include="acc*.dat"
     --include="used_rad.dat"
-    --include="dims.dat"    
+    --include="dims.dat"
+    --include="disk_info.dat"
     )
 
 
@@ -140,10 +141,10 @@ sed -i "s?$base?$target?g" $target/*par      >> /dev/null 2>&1
 # INTERACTIVE DOCUMENTATION *******************************************
 
 if [[ $MVMODE != true ]] ; then
-    OLD_OARTAG=$(eval "grep --no-filename '#OAR -n' $base/jobs/*.oar | head --lines 1")
+    OLD_OARTAG=$(eval "grep --no-filename '#OAR -n' $base/*.oar | head --lines 1")
     echo 
     read -p "*) enter new OAR tag        " NEW_OARTAG
-    sed -i "s?$OLD_OARTAG?#OAR -n $NEW_OARTAG?g" $target/jobs/*oar >> /dev/null 2>&1
+    sed -i "s?$OLD_OARTAG?#OAR -n $NEW_OARTAG?g" $target/*oar >> /dev/null 2>&1
 
 
     docfile=$target/Infos.md
